@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0           http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>dev.truedoctales</groupId>
+    <artifactId>truedoctales-parent</artifactId>
+    <version>${revision}</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>truedoctales-sample-jupiter</artifactId>
+  <packaging>jar</packaging>
+
+  <name>True Doc Tales - Sample Jupiter</name>
+  <description>Sample module demonstrating JUnit Jupiter usage</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>dev.truedoctales</groupId>
+      <artifactId>truedoctales-sample-domain</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>dev.truedoctales</groupId>
+      <artifactId>truedoctales-execution</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>dev.truedoctales</groupId>
+      <artifactId>truedoctales-report-html</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>dev.truedoctales</groupId>
+      <artifactId>truedoctales-report-json</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>dev.truedoctales</groupId>
+      <artifactId>truedoctales-report-markdown</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- Ensure tests run and generate JSON output -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.2.5</version>
+        <configuration>
+          <includes>
+            <include>**/*Test.java</include>
+          </includes>
+        </configuration>
+      </plugin>
+
+      <!-- HTML Report Generation from JSON -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.1.1</version>
+        <executions>
+          <execution>
+            <id>generate-html-report</id>
+            <goals>
+              <goal>java</goal>
+            </goals>
+            <phase>verify</phase>
+            <configuration>
+              <mainClass>dev.truedoctales.report.html.HtmlReportGenerator</mainClass>
+              <arguments>
+                <argument>${project.build.directory}/book-of-truth/json</argument>
+                <argument>${project.build.directory}/book-of-truth/html</argument>
+              </arguments>
+              <classpathScope>test</classpathScope>
+            </configuration>
+          </execution>
+
+          <!-- Markdown Report Generation from JSON -->
+          <execution>
+            <id>generate-markdown-report</id>
+            <goals>
+              <goal>java</goal>
+            </goals>
+            <phase>verify</phase>
+            <configuration>
+              <mainClass>dev.truedoctales.report.markdown.MarkdownReportGenerator</mainClass>
+              <arguments>
+                <argument>${project.build.directory}/book-of-truth/json</argument>
+                <argument>${project.build.directory}/book-of-truth/markdown</argument>
+              </arguments>
+              <classpathScope>test</classpathScope>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <reporting>
+    <plugins>
+      <!-- Maven Site Plugin for general reporting -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>3.5.0</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>index</report>
+              <report>summary</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+      <!-- Surefire Report Plugin for test results -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>3.2.5</version>
+        <configuration>
+          <showSuccess>true</showSuccess>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+
+</project>
