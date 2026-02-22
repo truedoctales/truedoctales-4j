@@ -39,7 +39,7 @@ public class StoryBookExecutionMapperImpl implements Function<StoryBookModel, St
         new StoryBookExecution(
             book.path(),
             book.title(),
-            chapterExecutionMapper.apply(book.intro()),
+            Optional.ofNullable(book.prequelChapter()).map(chapterExecutionMapper).orElse(null),
             book.chapters().stream().map(chapterExecutionMapper).toList());
     LOGGER.info("Build execution model for story book: " + storyBookExecution.title());
     return storyBookExecution;
@@ -105,7 +105,6 @@ public class StoryBookExecutionMapperImpl implements Function<StoryBookModel, St
       return new StoryExecution(
           storyModel.path(),
           storyModel.title(),
-          storyModel.summary(),
           storyModel.prequels(),
           storyModel.scenes().stream().map(sceneExecutionMapper).toList());
     }
@@ -123,13 +122,7 @@ public class StoryBookExecutionMapperImpl implements Function<StoryBookModel, St
       return new SceneExecution(
           sceneModel.title(),
           sceneModel.startLineNumber(),
-          sceneModel.description(),
-          sceneModel.steps().stream()
-              .filter(step -> step instanceof StepTask)
-              .map(step -> (StepTask) step)
-              .map(stepExecutionMapper)
-              .toList(),
-          sceneModel.steps());
+          sceneModel.steps().stream().map(stepExecutionMapper).toList());
     }
   }
 

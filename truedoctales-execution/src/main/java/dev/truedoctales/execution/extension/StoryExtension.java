@@ -130,7 +130,6 @@ public class StoryExtension
         new StoryExecution(
             Paths.get("code-based", testClass.getSimpleName() + ".java"),
             storyAnnotation.name(),
-            storyAnnotation.summary(),
             List.of(), // No prequels for code-based stories
             new ArrayList<>() // Scenes will be added during test execution
             );
@@ -190,9 +189,7 @@ public class StoryExtension
         new SceneExecution(
             sceneAnnotation.title(),
             null, // Scene number will be auto-assigned
-            sceneAnnotation.description(),
-            new ArrayList<>(), // Code-based stories don't have explicit steps
-            List.of() // No original steps
+            new ArrayList<>() // Code-based stories don't have explicit steps
             );
 
     getStore(context).put(CURRENT_SCENE_NAMESPACE, sceneExecution);

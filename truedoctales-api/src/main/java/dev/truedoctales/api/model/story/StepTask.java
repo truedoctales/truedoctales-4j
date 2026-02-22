@@ -21,6 +21,10 @@ public record StepTask(
     this(lineNumber, call, List.of(), List.of());
   }
 
+  public StepTask(int lineNumber, @NonNull StepCall call, List<Map<String, String>> inputRows) {
+    this(lineNumber, call, inputRows, List.of());
+  }
+
   public StepTask {
     if (inputRows == null) {
       inputRows = List.of();

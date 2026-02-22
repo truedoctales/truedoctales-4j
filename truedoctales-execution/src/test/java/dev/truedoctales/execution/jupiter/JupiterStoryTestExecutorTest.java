@@ -33,7 +33,7 @@ class JupiterStoryTestExecutorTest {
     // Arrange
     plotRegistry.shouldThrowAssertionError = true;
     StoryBookExecution book = createTestBookExecution();
-    ChapterExecution chapter = book.intro();
+    ChapterExecution chapter = book.prequelChapter();
     StoryExecution story = chapter.stories().getFirst();
 
     // Act
@@ -66,7 +66,7 @@ class JupiterStoryTestExecutorTest {
     // Arrange
     plotRegistry.shouldThrowRuntimeException = true;
     StoryBookExecution book = createTestBookExecution();
-    ChapterExecution chapter = book.intro();
+    ChapterExecution chapter = book.prequelChapter();
     StoryExecution story = chapter.stories().getFirst();
 
     // Act
@@ -95,7 +95,7 @@ class JupiterStoryTestExecutorTest {
     plotRegistry.shouldThrowAssertionError = false;
     plotRegistry.shouldThrowRuntimeException = false;
     StoryBookExecution book = createTestBookExecution();
-    ChapterExecution chapter = book.intro();
+    ChapterExecution chapter = book.prequelChapter();
     StoryExecution story = chapter.stories().getFirst();
 
     // Act
@@ -124,9 +124,8 @@ class JupiterStoryTestExecutorTest {
     StepBinding binding = new StepBinding("TestPlot", "test binding");
     StepExecution step =
         new StepExecution(binding, new StepCall("TestPlot", "test binding"), List.of(), 0);
-    SceneExecution scene = new SceneExecution("Test Scene", 0, null, List.of(step), List.of());
-    StoryExecution story =
-        new StoryExecution(storyPath, "Test Story", null, List.of(), List.of(scene));
+    SceneExecution scene = new SceneExecution("Test Scene", 0, List.of(step));
+    StoryExecution story = new StoryExecution(storyPath, "Test Story", List.of(), List.of(scene));
     ChapterExecution intro =
         new ChapterExecution(introPath, "Intro", "Intro Summary", List.of(story));
     return new StoryBookExecution(bookPath, "Test Book", intro, List.of());

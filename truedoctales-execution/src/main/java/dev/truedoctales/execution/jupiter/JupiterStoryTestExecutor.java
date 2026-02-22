@@ -45,7 +45,7 @@ public class JupiterStoryTestExecutor implements JuniperStoryTestBuilder {
     ChapterExecution chapter = book.findChapterForStory(story).orElseThrow();
     Optional<DynamicTest> startChapter =
         Optional.of(chapter)
-            .filter(Predicate.not(c -> c.equals(book.intro())))
+            .filter(Predicate.not(c -> c.equals(book.prequelChapter())))
             .filter(c -> chapter.stories().getFirst().equals(story))
             .map(
                 c ->
@@ -59,7 +59,7 @@ public class JupiterStoryTestExecutor implements JuniperStoryTestBuilder {
 
     Optional<DynamicTest> closeChapter =
         Optional.of(chapter)
-            .filter(Predicate.not(c -> c.equals(book.intro())))
+            .filter(Predicate.not(c -> c.equals(book.prequelChapter())))
             .filter(c -> chapter.stories().getLast().equals(story))
             .map(
                 c ->

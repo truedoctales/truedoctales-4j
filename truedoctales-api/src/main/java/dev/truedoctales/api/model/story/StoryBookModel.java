@@ -34,5 +34,5 @@ import org.jspecify.annotations.Nullable;
 public record StoryBookModel(
     @NonNull Path path,
     @NonNull String title,
-    @Nullable ChapterModel prequels,
+    @Nullable ChapterModel prequelChapter,
     @NonNull List<ChapterModel> chapters) {}

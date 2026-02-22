@@ -29,19 +29,7 @@
     </dependency>
     <dependency>
       <groupId>dev.truedoctales</groupId>
-      <artifactId>truedoctales-report-html</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>dev.truedoctales</groupId>
       <artifactId>truedoctales-report-json</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>dev.truedoctales</groupId>
-      <artifactId>truedoctales-report-markdown</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
@@ -59,47 +47,6 @@
             <include>**/*Test.java</include>
           </includes>
         </configuration>
-      </plugin>
-
-      <!-- HTML Report Generation from JSON -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>3.1.1</version>
-        <executions>
-          <execution>
-            <id>generate-html-report</id>
-            <goals>
-              <goal>java</goal>
-            </goals>
-            <phase>verify</phase>
-            <configuration>
-              <mainClass>dev.truedoctales.report.html.HtmlReportGenerator</mainClass>
-              <arguments>
-                <argument>${project.build.directory}/book-of-truth/json</argument>
-                <argument>${project.build.directory}/book-of-truth/html</argument>
-              </arguments>
-              <classpathScope>test</classpathScope>
-            </configuration>
-          </execution>
-
-          <!-- Markdown Report Generation from JSON -->
-          <execution>
-            <id>generate-markdown-report</id>
-            <goals>
-              <goal>java</goal>
-            </goals>
-            <phase>verify</phase>
-            <configuration>
-              <mainClass>dev.truedoctales.report.markdown.MarkdownReportGenerator</mainClass>
-              <arguments>
-                <argument>${project.build.directory}/book-of-truth/json</argument>
-                <argument>${project.build.directory}/book-of-truth/markdown</argument>
-              </arguments>
-              <classpathScope>test</classpathScope>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 ///
 /// Contains the book path, title, intro chapter, and all story chapters ready for execution.
 public record StoryBookExecution(
-    Path path, String title, ChapterExecution intro, List<ChapterExecution> chapters) {
+    Path path, String title, ChapterExecution prequelChapter, List<ChapterExecution> chapters) {
 
   /// Loads a story by its path from the book structure.
   ///
@@ -18,8 +18,8 @@ public record StoryBookExecution(
   /// @throws IllegalArgumentException if the story is not found
   public StoryExecution loadStory(Path path) {
     Stream<ChapterExecution> allChapters = chapters.stream();
-    if (intro != null) {
-      allChapters = Stream.concat(chapters.stream(), Stream.of(intro));
+    if (prequelChapter != null) {
+      allChapters = Stream.concat(chapters.stream(), Stream.of(prequelChapter));
     }
     return allChapters
         .flatMap(chapter -> chapter.stories().stream())
@@ -35,8 +35,8 @@ public record StoryBookExecution(
   public Optional<ChapterExecution> findChapterForStory(StoryExecution story) {
     Path chapterPath = story.path().getParent();
     Stream<ChapterExecution> allChapters = chapters.stream();
-    if (intro != null) {
-      allChapters = Stream.concat(chapters.stream(), Stream.of(intro));
+    if (prequelChapter != null) {
+      allChapters = Stream.concat(chapters.stream(), Stream.of(prequelChapter));
     }
     return allChapters.filter(chapter -> chapter.path().equals(chapterPath)).findFirst();
   }

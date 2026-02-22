@@ -122,11 +122,7 @@ public class JsonStoryListener extends PersistStoryListener {
   private void writeBookMetadata(StoryBookExecutionResult bookResult) throws IOException {
     // Create a simplified book metadata object
     BookMetadata metadata =
-        new BookMetadata(
-            bookResult.book().path().toString(),
-            bookResult.book().title(),
-            bookResult.book().summary(),
-            bookResult.book().intro());
+        new BookMetadata(bookResult.book().path().toString(), bookResult.book().title());
 
     Path metadataPath = outputDirectory.resolve("book-metadata.json");
     objectMapper.writeValue(metadataPath.toFile(), metadata);
@@ -206,7 +202,7 @@ public class JsonStoryListener extends PersistStoryListener {
   }
 
   /// Simple record to hold book metadata.
-  record BookMetadata(String path, String title, String summary, Object intro) {}
+  record BookMetadata(String path, String title) {}
 
   /// Record to hold chapter metadata with book context.
   record ChapterMetadataWrapper(String bookPath, String bookTitle, ChapterModel chapter) {}
