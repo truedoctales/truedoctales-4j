@@ -2,7 +2,6 @@ package dev.truedoctales.api.model.story;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -35,14 +34,5 @@ import org.jspecify.annotations.Nullable;
 public record StoryBookModel(
     @NonNull Path path,
     @NonNull String title,
-    @Nullable String summary,
-    @Nullable ChapterModel intro,
-    @NonNull List<ChapterModel> chapters) {
-
-  /// Returns the optional intro chapter for this book.
-  ///
-  /// @return Optional containing the intro chapter, or empty if none exists
-  public Optional<ChapterModel> getIntro() {
-    return Optional.ofNullable(intro);
-  }
-}
+    @Nullable ChapterModel prequels,
+    @NonNull List<ChapterModel> chapters) {}

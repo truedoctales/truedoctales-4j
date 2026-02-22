@@ -2,7 +2,6 @@ package dev.truedoctales.api.model.story;
 
 import java.util.List;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /// Domain model representing a Scene within a story.
 ///
@@ -14,10 +13,7 @@ import org.jspecify.annotations.Nullable;
 /// markdown format that appears before the steps. Steps can be either StepTask (executable) or
 /// StepDescription (markdown documentation).
 public record SceneModel(
-    @NonNull String title,
-    @NonNull Integer startLineNumber,
-    @Nullable String description,
-    @NonNull List<Step> steps) {
+    @NonNull String title, @NonNull Integer startLineNumber, @NonNull List<StepTask> steps) {
   public SceneModel {
     if (startLineNumber < 1) {
       throw new IllegalArgumentException("Start line number must be positive");

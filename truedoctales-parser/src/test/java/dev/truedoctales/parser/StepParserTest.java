@@ -2,8 +2,6 @@ package dev.truedoctales.parser;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import dev.truedoctales.api.model.story.Step;
-import dev.truedoctales.api.model.story.StepDescription;
 import dev.truedoctales.api.model.story.StepTask;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -18,12 +16,10 @@ class StepParserTest {
     StepParser parser = new StepParser("> **User Management** Create a new user", 1);
 
     // Act
-    Step result = parser.build();
+    StepTask stepTask = parser.build();
 
     // Assert
-    assertNotNull(result);
-    assertTrue(result instanceof StepTask);
-    StepTask stepTask = (StepTask) result;
+    assertNotNull(stepTask);
     assertEquals("User Management", stepTask.call().plotName());
     assertEquals("Create a new user", stepTask.call().stepValue());
     assertEquals(1, stepTask.lineNumber());
@@ -37,11 +33,9 @@ class StepParserTest {
         new StepParser("> **Plot With Spaces** This is a step with multiple words", 5);
 
     // Act
-    Step result = parser.build();
+    StepTask stepTask = parser.build();
 
     // Assert
-    assertTrue(result instanceof StepTask);
-    StepTask stepTask = (StepTask) result;
     assertEquals("Plot With Spaces", stepTask.call().plotName());
     assertEquals("This is a step with multiple words", stepTask.call().stepValue());
     assertEquals(5, stepTask.lineNumber());
@@ -53,13 +47,11 @@ class StepParserTest {
     StepParser parser = new StepParser("> Just a story without plot name", 3);
 
     // Act
-    Step result = parser.build();
+    StepTask result = parser.build();
 
     // Assert
-    assertTrue(result instanceof StepTask);
-    StepTask stepTask = (StepTask) result;
-    assertEquals("", stepTask.call().plotName());
-    assertEquals("Just a story without plot name", stepTask.call().stepValue());
+    assertEquals("", result.call().plotName());
+    assertEquals("Just a story without plot name", ((StepTask) result).call().stepValue());
   }
 
   @Test
@@ -68,44 +60,14 @@ class StepParserTest {
     StepParser parser = new StepParser("> **Unclosed Plot Some step", 2);
 
     // Act
-    Step result = parser.build();
+    StepTask result = parser.build();
 
     // Assert
-    assertTrue(result instanceof StepTask);
-    StepTask stepTask = (StepTask) result;
-    assertEquals("", stepTask.call().plotName());
-    assertEquals("**Unclosed Plot Some step", stepTask.call().stepValue());
+    assertEquals("", result.call().plotName());
+    assertEquals("**Unclosed Plot Some step", ((StepTask) result).call().stepValue());
   }
 
   // Tests for step description parsing (markdown content between steps)
-
-  @Test
-  void parse_shouldParseStepDescription() {
-    // Arrange
-    StepParser parser = new StepParser("This is a description line", 1);
-
-    // Act
-    Step result = parser.build();
-
-    // Assert
-    assertNotNull(result);
-    assertTrue(result instanceof StepDescription);
-    StepDescription description = (StepDescription) result;
-    assertEquals("This is a description line", description.markdown());
-    assertEquals(1, description.lineNumber());
-  }
-
-  @Test
-  void parse_shouldReturnNullForEmptyDescription() {
-    // Arrange
-    StepParser parser = new StepParser("   ", 1);
-
-    // Act
-    Step result = parser.build();
-
-    // Assert
-    assertNull(result);
-  }
 
   // Tests for table parsing with step tasks
 
@@ -123,7 +85,7 @@ class StepParserTest {
         """;
 
     // Act
-    Step result = parseStepFromTextBlock(block, 1);
+    StepTask result = parseStepFromTextBlock(block, 1);
 
     // Assert
     assertTrue(result instanceof StepTask);
@@ -150,10 +112,10 @@ class StepParserTest {
         """;
 
     // Act
-    Step result = parseStepFromTextBlock(block, 1);
+    StepTask result = parseStepFromTextBlock(block, 1);
 
     // Assert
-    assertTrue(result instanceof StepTask);
+    assertInstanceOf(StepTask.class, result);
     StepTask stepTask = (StepTask) result;
     assertEquals(3, stepTask.inputRows().size());
 
@@ -179,7 +141,7 @@ class StepParserTest {
         """;
 
     // Act
-    Step result = parseStepFromTextBlock(block, 1);
+    StepTask result = parseStepFromTextBlock(block, 1);
 
     // Assert
     assertTrue(result instanceof StepTask);
@@ -217,7 +179,7 @@ class StepParserTest {
 
     // Act
     boolean continueParsing = parser.parseLine("Next step or content", 10);
-    Step result = parser.build();
+    StepTask result = parser.build();
 
     // Assert
     assertTrue(result instanceof StepTask);
@@ -228,42 +190,6 @@ class StepParserTest {
 
   // Tests for multi-line description parsing
 
-  @Test
-  void parse_shouldParseMultilineDescription() {
-    // Arrange
-    StepParser parser = new StepParser("This is the first line", 1);
-    parser.parseLine("This is the second line", 2);
-    parser.parseLine("This is the third line", 3);
-
-    // Act
-    Step result = parser.build();
-
-    // Assert
-    assertTrue(result instanceof StepDescription);
-    StepDescription description = (StepDescription) result;
-    String expected = "This is the first line\nThis is the second line\nThis is the third line";
-    assertEquals(expected, description.markdown());
-  }
-
-  @Test
-  void parse_shouldParseMarkdownWithTables() {
-    // Arrange
-    StepParser parser = new StepParser("Some markdown content", 1);
-    parser.parseLine("| col1 | col2 |", 2);
-    parser.parseLine("|------|------|", 3);
-    parser.parseLine("| val1 | val2 |", 4);
-    parser.parseLine("", 5);
-
-    // Act
-    Step result = parser.build();
-
-    // Assert
-    assertTrue(result instanceof StepDescription);
-    StepDescription description = (StepDescription) result;
-    assertTrue(description.markdown().contains("| col1 | col2 |"));
-    assertTrue(description.markdown().contains("| val1 | val2 |"));
-  }
-
   // Tests for line number handling
 
   @Test
@@ -272,42 +198,10 @@ class StepParserTest {
     StepParser parser = new StepParser("> **Plot** Step", 42);
 
     // Act
-    Step result = parser.build();
+    StepTask result = parser.build();
 
     // Assert
-    assertTrue(result instanceof StepTask);
-    StepTask stepTask = (StepTask) result;
-    assertEquals(42, stepTask.lineNumber());
-  }
-
-  @Test
-  void parse_shouldPreserveLineNumberForDescription() {
-    // Arrange
-    StepParser parser = new StepParser("Description text", 99);
-
-    // Act
-    Step result = parser.build();
-
-    // Assert
-    assertTrue(result instanceof StepDescription);
-    StepDescription description = (StepDescription) result;
-    assertEquals(99, description.lineNumber());
-  }
-
-  // Tests for edge cases
-
-  @Test
-  void parse_shouldHandleEmptyPlotName() {
-    // Arrange
-    StepParser parser = new StepParser("> **** Just the step", 1);
-
-    // Act
-    Step result = parser.build();
-
-    // Assert
-    assertTrue(result instanceof StepTask);
-    StepTask stepTask = (StepTask) result;
-    assertEquals("", stepTask.call().plotName());
+    assertEquals(42, result.lineNumber());
   }
 
   @Test
@@ -316,26 +210,10 @@ class StepParserTest {
     StepParser parser = new StepParser("> **Plot** Step with @#$%^& special chars", 1);
 
     // Act
-    Step result = parser.build();
+    StepTask result = parser.build();
 
     // Assert
-    assertTrue(result instanceof StepTask);
-    StepTask stepTask = (StepTask) result;
-    assertEquals("Step with @#$%^& special chars", stepTask.call().stepValue());
-  }
-
-  @Test
-  void parse_shouldHandleWhitespaceBeforeAndAfterContent() {
-    // Arrange
-    StepParser parser = new StepParser("   Padded description   ", 1);
-
-    // Act
-    Step result = parser.build();
-
-    // Assert
-    assertTrue(result instanceof StepDescription);
-    StepDescription description = (StepDescription) result;
-    assertEquals("Padded description", description.markdown());
+    assertEquals("Step with @#$%^& special chars", ((StepTask) result).call().stepValue());
   }
 
   @Test
@@ -347,71 +225,7 @@ class StepParserTest {
     assertFalse(parser.parseLine("Next section begins", 2));
   }
 
-  @Test
-  void parseLineShouldReturnTrueForContinuationContent() {
-    // Arrange
-    StepParser parser = new StepParser("Description line 1", 1);
-
-    // Act
-    boolean result = parser.parseLine("Description line 2", 2);
-
-    // Assert
-    assertTrue(result);
-  }
-
   // Tests for table header changes
-
-  @Test
-  void parse_shouldHandleMultipleTables() {
-    // Arrange
-    String block =
-        """
-        > **Operations** Process data
-        >
-        > | id | name |
-        > |----|----- |
-        > | 1 | Alice |
-        > | 2 | Bob |
-        >
-        > | 3 | Charlie |
-        """;
-
-    // Act
-    Step result = parseStepFromTextBlock(block, 1);
-
-    // Assert
-    assertTrue(result instanceof StepTask);
-    StepTask stepTask = (StepTask) result;
-    // Empty > lines don't end the step or reset headers, so all rows are collected
-    assertEquals(3, stepTask.inputRows().size());
-    assertEquals("Alice", stepTask.inputRows().get(0).get("name"));
-    assertEquals("Bob", stepTask.inputRows().get(1).get("name"));
-    assertEquals("Charlie", stepTask.inputRows().get(2).get("name"));
-  }
-
-  @Test
-  void parse_shouldParseTableFromTextBlock() {
-    // Arrange
-    String block =
-        """
-        > **Greeting** Greet ${name}
-        >
-        > | name |
-        > |------|
-        > | John |
-        > | Jane |
-        """;
-
-    // Act
-    Step result = parseStepFromTextBlock(block, 1);
-
-    // Assert
-    assertTrue(result instanceof StepTask);
-    StepTask stepTask = (StepTask) result;
-    assertEquals(2, stepTask.inputRows().size());
-    assertEquals("John", stepTask.inputRows().get(0).get("name"));
-    assertEquals("Jane", stepTask.inputRows().get(1).get("name"));
-  }
 
   @Test
   void parse_shouldParseMultiColumnTableFromTextBlock() {
@@ -427,7 +241,7 @@ class StepParserTest {
         """;
 
     // Act
-    Step result = parseStepFromTextBlock(block, 10);
+    StepTask result = parseStepFromTextBlock(block, 10);
 
     // Assert
     assertTrue(result instanceof StepTask);
@@ -446,7 +260,7 @@ class StepParserTest {
         """;
 
     // Act
-    Step result = parseStepFromTextBlock(block, 1);
+    StepTask result = parseStepFromTextBlock(block, 1);
 
     // Assert
     assertTrue(result instanceof StepTask);
@@ -465,7 +279,7 @@ class StepParserTest {
         """;
 
     // Act
-    Step result = parseStepFromTextBlock(block, 1);
+    StepTask result = parseStepFromTextBlock(block, 1);
 
     // Assert
     assertTrue(result instanceof StepTask);
@@ -484,7 +298,7 @@ class StepParserTest {
         """;
 
     // Act
-    Step result = parseStepFromTextBlock(block, 1);
+    StepTask result = parseStepFromTextBlock(block, 1);
 
     // Assert
     assertTrue(result instanceof StepTask);
@@ -509,7 +323,7 @@ class StepParserTest {
         """;
 
     // Act
-    Step result = parseStepFromTextBlock(block, 1);
+    StepTask result = parseStepFromTextBlock(block, 1);
 
     // Assert
     assertTrue(result instanceof StepTask);
@@ -522,7 +336,7 @@ class StepParserTest {
     assertEquals("Doe", stepTask.inputRows().get(2).get("name"));
   }
 
-  private Step parseStepFromTextBlock(String block, int startLine) {
+  private StepTask parseStepFromTextBlock(String block, int startLine) {
     String trimmed = block.strip();
     String[] lines = trimmed.split("\\R");
     StepParser parser = new StepParser(lines[0], startLine);
@@ -539,13 +353,16 @@ class StepParserTest {
     StepParser parser = new StepParser(line, 23);
 
     // Act
-    Step result = parser.build();
+    StepTask result = parser.build();
 
     // Assert
-    assertTrue(result instanceof StepTask);
-    StepTask stepTask = (StepTask) result;
-    assertEquals("Greeting", stepTask.call().plotName(), "Plot name should be extracted correctly");
     assertEquals(
-        "Say Hello", stepTask.call().stepValue(), "Step value should not contain the plot name");
+        "Greeting",
+        ((StepTask) result).call().plotName(),
+        "Plot name should be extracted correctly");
+    assertEquals(
+        "Say Hello",
+        ((StepTask) result).call().stepValue(),
+        "Step value should not contain the plot name");
   }
 }

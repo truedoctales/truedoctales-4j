@@ -11,11 +11,14 @@ import org.jspecify.annotations.NonNull;
 ///
 /// StepTasks are executable units within Scenes and correspond to @Step(Plot) or ### PlotName:
 /// StepDescription directives in markdown files.
-public record StepTask(int lineNumber, @NonNull StepCall call, List<Map<String, String>> inputRows)
-    implements Step {
+public record StepTask(
+    int lineNumber,
+    @NonNull StepCall call,
+    List<Map<String, String>> inputRows,
+    List<String> originalLines) {
 
   public StepTask(int lineNumber, @NonNull StepCall call) {
-    this(lineNumber, call, List.of());
+    this(lineNumber, call, List.of(), List.of());
   }
 
   public StepTask {

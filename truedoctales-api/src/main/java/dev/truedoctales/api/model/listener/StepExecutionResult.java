@@ -1,6 +1,5 @@
 package dev.truedoctales.api.model.listener;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import dev.truedoctales.api.model.execution.StepExecution;
 import org.jspecify.annotations.Nullable;
 
@@ -11,10 +10,10 @@ import org.jspecify.annotations.Nullable;
 /// @param errorMessage optional error message if the binding failed
 /// @param throwable optional exception if the binding encountered an error
 public record StepExecutionResult(
-    @JsonProperty("execution") StepExecution execution,
-    @JsonProperty("status") ExecutionStatus status,
-    @JsonProperty("errorMessage") @Nullable String errorMessage,
-    @JsonProperty("throwable") @Nullable Throwable throwable)
+    StepExecution execution,
+    ExecutionStatus status,
+    @Nullable String errorMessage,
+    @Nullable Throwable throwable)
     implements HasExecutionStatus {
 
   /// Creates a successful binding execution result.

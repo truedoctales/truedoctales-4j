@@ -2,7 +2,6 @@ package dev.truedoctales.parser;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import dev.truedoctales.api.model.story.StepTask;
 import dev.truedoctales.api.model.story.StoryModel;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -144,10 +143,10 @@ class MarkdownStoryParserImplTest {
 
     // Assert
     assertFalse(story.scenes().isEmpty());
-    assertFalse(story.scenes().get(0).steps().isEmpty());
-    var firstStep = story.scenes().get(0).steps().get(0);
-    assertTrue(firstStep instanceof StepTask);
-    assertEquals(2, ((StepTask) firstStep).inputRows().size());
+    assertFalse(story.scenes().getFirst().steps().isEmpty());
+    var firstStep = story.scenes().getFirst().steps().getFirst();
+    assertNotNull(firstStep);
+    assertEquals(2, firstStep.inputRows().size());
   }
 
   @Test
@@ -204,39 +203,6 @@ class MarkdownStoryParserImplTest {
   }
 
   @Test
-  void parse_shouldParseSceneDescription() throws IOException {
-    // Arrange
-    String content =
-        """
-        # Story
-
-        ## Story
-
-        ## Scene: Test Scene
-
-        This is a description of the scene.
-        It can have multiple lines.
-
-        > **TestPlot** Action
-
-        > | param |
-        > | ----- |
-        > | value |
-        """;
-    createTempFile("story.md", content);
-
-    // Act
-    StoryModel story = parser.parse(tempDir, Path.of("story.md"));
-
-    // Assert
-    assertEquals(1, story.scenes().size());
-    assertEquals("Test Scene", story.scenes().get(0).title());
-    assertNotNull(story.scenes().get(0).description());
-    assertTrue(story.scenes().get(0).description().contains("description of the scene"));
-    assertTrue(story.scenes().get(0).description().contains("multiple lines"));
-  }
-
-  @Test
   void parse_shouldHandleSceneWithoutDescription() throws IOException {
     // Arrange
     String content =
@@ -260,8 +226,7 @@ class MarkdownStoryParserImplTest {
 
     // Assert
     assertEquals(1, story.scenes().size());
-    assertEquals("Test Scene", story.scenes().get(0).title());
-    assertNull(story.scenes().get(0).description());
+    assertEquals("Test Scene", story.scenes().getFirst().title());
   }
 
   @Test
@@ -287,7 +252,7 @@ class MarkdownStoryParserImplTest {
     // Assert - should parse without throwing and include prequel
     assertNotNull(story);
     assertEquals(1, story.prequels().size());
-    assertEquals(Path.of("prequel.md"), story.prequels().get(0));
+    assertEquals(Path.of("prequel.md"), story.prequels().getFirst());
   }
 
   @Test
@@ -326,7 +291,7 @@ class MarkdownStoryParserImplTest {
 
     // Assert
     assertEquals(1, story.prequels().size());
-    assertEquals(Path.of("prequel.md"), story.prequels().get(0));
+    assertEquals(Path.of("prequel.md"), story.prequels().getFirst());
   }
 
   @Test

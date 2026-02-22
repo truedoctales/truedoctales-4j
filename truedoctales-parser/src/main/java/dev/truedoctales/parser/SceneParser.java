@@ -1,14 +1,13 @@
 package dev.truedoctales.parser;
 
 import dev.truedoctales.api.model.story.SceneModel;
-import dev.truedoctales.api.model.story.Step;
-import dev.truedoctales.api.model.story.StepDescription;
+import dev.truedoctales.api.model.story.StepTask;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * Parser for a single scene within a markdown story.
+ * Parser for a single scene within a Markdown story.
  *
  * <p>A scene:
  *
@@ -56,14 +55,12 @@ final class SceneParser {
     // Check for next scene marker
     if (trimmedLine.startsWith(SCENE_PREFIX)) {
       finishCurrentStep();
-      finishBetweenStepsDescription();
       return false; // Scene parsing complete
     }
 
     // If we encounter a new step declaration while currently parsing a step, close the current step
     if (context.currentStepParser != null && isStepDeclarationLine(trimmedLine)) {
       finishCurrentStep();
-      finishBetweenStepsDescription();
       context.transitionToStepParsing();
       context.currentStepParser = new StepParser(trimmedLine, context.lineNumber);
       return true;
@@ -83,14 +80,8 @@ final class SceneParser {
     // Check if line starts new step
     if (trimmedLine.startsWith(STEP_PREFIX)) {
       context.transitionToStepParsing();
-      finishBetweenStepsDescription();
       context.currentStepParser = new StepParser(trimmedLine, context.lineNumber);
       return true;
-    }
-
-    // Accumulate description markdown
-    if (!trimmedLine.isEmpty()) {
-      context.addDescriptionLine(line);
     }
 
     return true;
@@ -103,11 +94,8 @@ final class SceneParser {
    */
   SceneModel build() {
     finishCurrentStep();
-    finishBetweenStepsDescription();
-    context.prependSceneDescription(startLineNumber);
 
-    return new SceneModel(
-        title, startLineNumber, context.getSceneDescription(), List.copyOf(context.steps));
+    return new SceneModel(title, startLineNumber, List.copyOf(context.steps));
   }
 
   int getLineNumber() {
@@ -118,30 +106,18 @@ final class SceneParser {
 
   private void finishCurrentStep() {
     if (context.currentStepParser != null) {
-      Step step = context.currentStepParser.build();
-      if (step != null) {
-        context.steps.add(step);
-      }
+      StepTask step = context.currentStepParser.build();
+      context.steps.add(step);
       context.currentStepParser = null;
-    }
-  }
-
-  private void finishBetweenStepsDescription() {
-    String markdown = context.getAndClearIntermediateDescription();
-    if (!markdown.isEmpty()) {
-      context.steps.add(new StepDescription(markdown, context.lineNumber));
     }
   }
 
   /** Mutable parsing context holding all scene state. */
   private static final class ParseContext {
-    private final StringBuilder sceneDescription = new StringBuilder();
-    private final StringBuilder intermediateDescription = new StringBuilder();
-    private final List<Step> steps = new ArrayList<>();
+    private final List<StepTask> steps = new ArrayList<>();
 
     private int lineNumber;
     private StepParser currentStepParser;
-    private ParsingPhase phase = ParsingPhase.SCENE_DESCRIPTION;
 
     ParseContext(int startLine) {
       this.lineNumber = startLine;
@@ -151,50 +127,7 @@ final class SceneParser {
       lineNumber++;
     }
 
-    void transitionToStepParsing() {
-      phase = ParsingPhase.STEPS;
-    }
-
-    void addDescriptionLine(String line) {
-      switch (phase) {
-        case SCENE_DESCRIPTION -> {
-          if (!sceneDescription.isEmpty()) {
-            sceneDescription.append("\n");
-          }
-          sceneDescription.append(line);
-        }
-        case STEPS -> {
-          if (!intermediateDescription.isEmpty()) {
-            intermediateDescription.append("\n");
-          }
-          intermediateDescription.append(line);
-        }
-      }
-    }
-
-    String getSceneDescription() {
-      String desc = sceneDescription.toString().trim();
-      return desc.isEmpty() ? null : desc;
-    }
-
-    String getAndClearIntermediateDescription() {
-      String markdown = intermediateDescription.toString().trim();
-      intermediateDescription.setLength(0);
-      return markdown;
-    }
-
-    void prependSceneDescription(int lineNumber) {
-      String desc = sceneDescription.toString().trim();
-      if (!desc.isEmpty()) {
-        steps.addFirst(new StepDescription(desc, lineNumber));
-      }
-    }
-
-    /** Parsing phase state. */
-    private enum ParsingPhase {
-      SCENE_DESCRIPTION,
-      STEPS
-    }
+    void transitionToStepParsing() {}
   }
 
   private boolean isStepDeclarationLine(String trimmedLine) {

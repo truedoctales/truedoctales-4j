@@ -1,8 +1,6 @@
 package dev.truedoctales.parser;
 
-import dev.truedoctales.api.model.story.Step;
 import dev.truedoctales.api.model.story.StepCall;
-import dev.truedoctales.api.model.story.StepDescription;
 import dev.truedoctales.api.model.story.StepTask;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -33,11 +31,11 @@ final class StepParser {
   private static final String BLOCKQUOTE_PREFIX = ">";
 
   private final int startLineNumber;
-  private final ParserState state;
+  private final TaskState state;
 
   StepParser(String firstLine, int lineNumber) {
     this.startLineNumber = lineNumber;
-    this.state = parseInitialLine(firstLine.trim());
+    this.state = parseStepTaskFormat(firstLine.trim().substring(1).trim());
   }
 
   /**
@@ -47,12 +45,11 @@ final class StepParser {
    * @param lineNumber current line number (unused but kept for API compatibility)
    * @return `true` if line consumed, `false` if step parsing complete
    */
-  boolean parseLine(String line, @SuppressWarnings("unused") int lineNumber) {
+  boolean parseLine(String line, int lineNumber) {
     String trimmed = line.trim();
 
     return switch (state) {
       case TaskState task -> parseTaskLine(task, trimmed);
-      case DescriptionState desc -> parseDescriptionLine(desc, line);
     };
   }
 
@@ -61,25 +58,13 @@ final class StepParser {
    *
    * @return the constructed Step, or `null` if empty
    */
-  Step build() {
-    return switch (state) {
-      case TaskState task ->
-          new StepTask(
-              startLineNumber, new StepCall(task.plot, task.stepValue), List.copyOf(task.rows));
-      case DescriptionState desc -> {
-        String markdown = desc.builder.toString().trim();
-        yield markdown.isEmpty() ? null : new StepDescription(markdown, startLineNumber);
-      }
-    };
-  }
+  StepTask build() {
 
-  // ===== Private Implementation =====
-
-  private ParserState parseInitialLine(String line) {
-    if (line.startsWith(BLOCKQUOTE_PREFIX)) {
-      return parseStepTaskFormat(line.substring(1).trim());
-    }
-    return new DescriptionState(new StringBuilder(line));
+    return new StepTask(
+        startLineNumber,
+        new StepCall(state.plot, state.stepValue),
+        List.copyOf(state.rows),
+        List.of());
   }
 
   private TaskState parseStepTaskFormat(String content) {
@@ -121,18 +106,10 @@ final class StepParser {
     return true;
   }
 
-  private boolean parseDescriptionLine(DescriptionState desc, String line) {
-    if (!desc.builder.isEmpty()) {
-      desc.builder.append("\n");
-    }
-    desc.builder.append(line);
-    return true;
-  }
-
   // ===== State Classes =====
 
   /** Sealed hierarchy representing parser state. */
-  private sealed interface ParserState permits TaskState, DescriptionState {}
+  private sealed interface ParserState permits TaskState {}
 
   /** State for parsing executable step tasks with tables. */
   private static final class TaskState implements ParserState {
@@ -203,15 +180,6 @@ final class StepParser {
         row.put(headers.get(i), values.get(i));
       }
       return row;
-    }
-  }
-
-  /** State for parsing markdown descriptions. */
-  private static final class DescriptionState implements ParserState {
-    private final StringBuilder builder;
-
-    DescriptionState(StringBuilder builder) {
-      this.builder = builder;
     }
   }
 

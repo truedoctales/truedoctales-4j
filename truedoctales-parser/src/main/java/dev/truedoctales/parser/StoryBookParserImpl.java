@@ -84,8 +84,9 @@ public final class StoryBookParserImpl implements StoryBookParser {
 
     return new StoryBookModel(
         bookPath,
-        bookIntro.map(IntroMarkdownParser.IntroContent::title).orElse("Book of Stories"),
-        bookIntro.map(IntroMarkdownParser.IntroContent::summary).orElse(null),
+        bookIntro
+            .map(IntroMarkdownParser.IntroContent::summary)
+            .orElse(bookPath.getFileName().toString()),
         prequelChapter.orElse(null),
         chapters);
   }
