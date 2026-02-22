@@ -381,7 +381,6 @@ public class StoryExtension
         new ChapterModel(
             Paths.get("code-based", sanitizeFilename(storyAnnotation.chapter())),
             storyAnnotation.chapter(),
-            loadChapterSummary(storyAnnotation.chapter()), // Try to load summary from markdown
             List.of() // No stories in chapter model (this is for context only)
             );
 

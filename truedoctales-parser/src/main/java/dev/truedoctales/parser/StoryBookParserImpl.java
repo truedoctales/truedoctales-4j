@@ -85,7 +85,7 @@ public final class StoryBookParserImpl implements StoryBookParser {
     return new StoryBookModel(
         bookPath,
         bookIntro
-            .map(IntroMarkdownParser.IntroContent::summary)
+            .map(IntroMarkdownParser.IntroContent::title)
             .orElse(bookPath.getFileName().toString()),
         prequelChapter.orElse(null),
         chapters);
@@ -150,7 +150,6 @@ public final class StoryBookParserImpl implements StoryBookParser {
     return new ChapterModel(
         relativePath.getFileName(),
         chapterIntro.map(IntroMarkdownParser.IntroContent::title).orElse(chapterName),
-        chapterIntro.map(IntroMarkdownParser.IntroContent::summary).orElse(null),
         stories);
   }
 

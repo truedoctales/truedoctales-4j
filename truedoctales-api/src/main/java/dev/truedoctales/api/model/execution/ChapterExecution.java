@@ -8,4 +8,4 @@ import org.jspecify.annotations.Nullable;
 ///
 /// Includes optional intro content (title and summary) parsed from chapter intro.md files.
 public record ChapterExecution(
-    Path path, String title, @Nullable String summary, List<StoryExecution> stories) {}
+    Path path, String title, List<StoryExecution> stories) {}

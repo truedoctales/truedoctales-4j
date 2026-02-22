@@ -24,8 +24,8 @@ class StoryBookParserImplTest {
   void storyBookModel_shouldCreateWithValidData() {
     // Arrange
     List<ChapterModel> chapters =
-        List.of(new ChapterModel(Path.of("test/path"), "Test Chapter", null, List.of()));
-    ChapterModel intro = new ChapterModel(Path.of("intro/path"), "Intro", null, List.of());
+        List.of(new ChapterModel(Path.of("test/path"), "Test Chapter",  List.of()));
+    ChapterModel intro = new ChapterModel(Path.of("intro/path"), "Intro",  List.of());
 
     // Act
     StoryBookModel book = new StoryBookModel(Path.of("test-book"), "Test Book", null, chapters);

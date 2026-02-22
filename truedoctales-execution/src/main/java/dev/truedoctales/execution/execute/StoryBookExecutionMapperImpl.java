@@ -88,7 +88,6 @@ public class StoryBookExecutionMapperImpl implements Function<StoryBookModel, St
       return new ChapterExecution(
           chapterModel.path(),
           chapterModel.title(),
-          chapterModel.summary(),
           chapterModel.stories().stream().map(storyExecutionMapper).toList());
     }
   }

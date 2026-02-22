@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 /// Parser for intro.md files that extracts title and summary.
 ///
@@ -33,40 +34,15 @@ public class IntroMarkdownParser {
       return null;
     }
 
-    List<String> lines = Files.readAllLines(introFilePath);
-    if (lines.isEmpty()) {
-      return null;
-    }
+    Optional<String> title = Files.lines(introFilePath)
+            .filter(l -> l.startsWith("# "))
+            .map(l -> l.substring(2).trim())
+            .findFirst();
 
-    String title = null;
-    StringBuilder summary = new StringBuilder();
-    boolean foundTitle = false;
 
-    for (String line : lines) {
-      String trimmedLine = line.trim();
-
-      // Extract title from the first H1 heading
-      if (trimmedLine.startsWith("# ") && title == null) {
-        title = trimmedLine.substring(2).trim();
-        foundTitle = true;
-        continue;
-      }
-
-      // Collect all remaining lines as markdown summary (after title is found)
-      if (foundTitle) {
-        if (!summary.isEmpty()) {
-          summary.append("\n");
-        }
-        summary.append(line); // Keep original line with indentation for markdown formatting
-      }
-    }
-
-    // Trim leading/trailing whitespace from summary but preserve internal formatting
-    String summaryText = summary.toString().trim();
-
-    return new IntroContent(title, summaryText.isEmpty() ? null : summaryText);
+    return new IntroContent(title.orElse(null));
   }
 
   /// Record containing the parsed intro content.
-  public record IntroContent(String title, String summary) {}
+  public record IntroContent(String title) {}
 }

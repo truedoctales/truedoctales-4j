@@ -18,5 +18,4 @@ import org.jspecify.annotations.Nullable;
 public record ChapterModel(
     @NonNull Path path,
     @NonNull String title,
-    @Nullable String summary,
     @NonNull List<StoryModel> stories) {}
