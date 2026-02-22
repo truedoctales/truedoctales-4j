@@ -53,8 +53,7 @@ public class JupiterStoryTestExecutor implements JuniperStoryTestBuilder {
                         "start Chapter: " + chapter.title(),
                         () -> {
                           executionListener.startChapter(
-                              new ChapterModel(
-                                  chapter.path(), chapter.title(), List.of()));
+                              new ChapterModel(chapter.path(), chapter.title(), List.of()));
                         }));
 
     Optional<DynamicTest> closeChapter =
@@ -67,10 +66,7 @@ public class JupiterStoryTestExecutor implements JuniperStoryTestBuilder {
                         "End Chapter: " + chapter.title(),
                         () ->
                             executionListener.endChapter(
-                                new ChapterModel(
-                                    chapter.path(),
-                                    chapter.title(),
-                                    List.of()))));
+                                new ChapterModel(chapter.path(), chapter.title(), List.of()))));
 
     List<DynamicNode> nodes = new ArrayList<>();
     startChapter.ifPresent(nodes::add);

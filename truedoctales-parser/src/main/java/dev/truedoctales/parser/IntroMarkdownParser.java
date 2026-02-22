@@ -3,7 +3,6 @@ package dev.truedoctales.parser;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
 
 /// Parser for intro.md files that extracts title and summary.
@@ -34,11 +33,11 @@ public class IntroMarkdownParser {
       return null;
     }
 
-    Optional<String> title = Files.lines(introFilePath)
+    Optional<String> title =
+        Files.lines(introFilePath)
             .filter(l -> l.startsWith("# "))
             .map(l -> l.substring(2).trim())
             .findFirst();
-
 
     return new IntroContent(title.orElse(null));
   }

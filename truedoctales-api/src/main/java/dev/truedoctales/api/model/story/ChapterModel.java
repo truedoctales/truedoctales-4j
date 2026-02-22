@@ -3,7 +3,6 @@ package dev.truedoctales.api.model.story;
 import java.nio.file.Path;
 import java.util.List;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /// Domain model representing a Chapter - a logical grouping of related Stories.
 ///
@@ -16,6 +15,4 @@ import org.jspecify.annotations.Nullable;
 /// A Chapter contains StoryModels representing individual story files within the chapter
 /// directory.
 public record ChapterModel(
-    @NonNull Path path,
-    @NonNull String title,
-    @NonNull List<StoryModel> stories) {}
+    @NonNull Path path, @NonNull String title, @NonNull List<StoryModel> stories) {}

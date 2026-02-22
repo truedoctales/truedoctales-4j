@@ -7,7 +7,6 @@ import dev.truedoctales.api.execute.PersistStoryListener;
 import dev.truedoctales.api.model.listener.ChapterExecutionResult;
 import dev.truedoctales.api.model.listener.StoryBookExecutionResult;
 import dev.truedoctales.api.model.listener.StoryExecutionResult;
-import dev.truedoctales.api.model.story.ChapterModel;
 import dev.truedoctales.api.model.story.StoryBookModel;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -90,33 +89,28 @@ public class JsonStoryListener extends PersistStoryListener {
 
       // Write book metadata (includes intro and structure)
       writeBookMetadata(bookResult);
-
-      // Write chapter metadata for ALL chapters from the book model (including empty ones)
-      int chapterCount = 0;
-      if (bookModel != null) {
-        for (ChapterModel chapter : bookModel.chapters()) {
-          writeChapterMetadataFromModel(bookResult, chapter);
-          chapterCount++;
-        }
-      }
-
-      // Write each story as a separate JSON file
-      int storyCount = 0;
-      for (ChapterExecutionResult chapterResult : bookResult.chapterResults()) {
-        for (StoryExecutionResult storyResult : chapterResult.storyResults()) {
-          writeStoryJson(bookResult, chapterResult, storyResult);
-          storyCount++;
-        }
-      }
-
-      System.out.println(
-          "Chapter metadata JSON written: " + chapterCount + " chapters to " + outputDirectory);
-      System.out.println(
-          "Story execution JSON written: " + storyCount + " stories to " + outputDirectory);
+      bookResult
+          .chapterResults()
+          .forEach(
+              chapterModel -> {
+                try {
+                  writeChapter(chapterModel);
+                } catch (IOException e) {
+                  throw new RuntimeException(e);
+                }
+              });
     } catch (IOException e) {
       System.err.println("Failed to write JSON output: " + e.getMessage());
       e.printStackTrace();
     }
+  }
+
+  private void writeChapter(ChapterExecutionResult chapterModel) throws IOException {
+    Path chapterDir =  Files.createDirectories(outputDirectory.resolve(chapterModel.chapter().path()));
+    writeChapterMetadata(chapterDir, chapterModel);
+      for (StoryExecutionResult storyResult : chapterModel.storyResults()) {
+          writeStoryJson(storyResult);
+      }
   }
 
   private void writeBookMetadata(StoryBookExecutionResult bookResult) throws IOException {
@@ -124,68 +118,42 @@ public class JsonStoryListener extends PersistStoryListener {
     BookMetadata metadata =
         new BookMetadata(bookResult.book().path().toString(), bookResult.book().title());
 
-    Path metadataPath = outputDirectory.resolve("book-metadata.json");
+    Path metadataPath = outputDirectory.resolve("meta.json");
     objectMapper.writeValue(metadataPath.toFile(), metadata);
     System.out.println("Book metadata written to: " + metadataPath);
   }
 
-  private void writeChapterMetadata(
-      StoryBookExecutionResult bookResult, ChapterExecutionResult chapterResult)
+  private void writeChapterMetadata(Path outputChapterDir, ChapterExecutionResult chapterResult)
       throws IOException {
     // Create filename from chapter name
-    String chapterName = sanitizeFilename(chapterResult.chapter().title());
-    String filename = "chapter--" + chapterName + ".json";
+    String filename = "meta.json";
 
-    Path chapterPath = outputDirectory.resolve(filename);
+    Path chapterMeta = outputChapterDir.resolve(filename);
 
-    // Create a chapter metadata wrapper
-    ChapterMetadataWrapper wrapper =
-        new ChapterMetadataWrapper(
-            bookResult.book().path().toString(),
-            bookResult.book().title(),
-            chapterResult.chapter());
-
-    objectMapper.writeValue(chapterPath.toFile(), wrapper);
-  }
-
-  private void writeChapterMetadataFromModel(
-      StoryBookExecutionResult bookResult, ChapterModel chapter) throws IOException {
-    // Create filename from chapter name
-    String chapterName = sanitizeFilename(chapter.title());
-    String filename = "chapter--" + chapterName + ".json";
-
-    Path chapterPath = outputDirectory.resolve(filename);
-
-    // Create a chapter metadata wrapper
-    ChapterMetadataWrapper wrapper =
-        new ChapterMetadataWrapper(
-            bookResult.book().path().toString(), bookResult.book().title(), chapter);
-
-    objectMapper.writeValue(chapterPath.toFile(), wrapper);
+    objectMapper.writeValue(
+        chapterMeta.toFile(),
+        new ChapterMeta(
+            chapterResult.chapter().title(),
+            chapterResult.chapter().path().toString()));
   }
 
   private void writeStoryJson(
-      StoryBookExecutionResult bookResult,
-      ChapterExecutionResult chapterResult,
       StoryExecutionResult storyResult)
       throws IOException {
 
-    // Create filename from chapter and story names
-    String chapterName = sanitizeFilename(chapterResult.chapter().title());
-    String storyName = sanitizeFilename(storyResult.execution().title());
-    String filename = chapterName + "--" + storyName + ".json";
 
-    Path storyPath = outputDirectory.resolve(filename);
+    Path storyPath = outputDirectory.resolve(storyResult.execution().path());
+//    change from markdown to json
+    Path storyMetaJson = storyPath.getParent().resolve(storyPath.getFileName().toString().replaceAll("\\.md$", ".json"));
 
     // Create a story execution wrapper that includes context
-    StoryExecutionWrapper wrapper =
-        new StoryExecutionWrapper(
-            bookResult.book().path().toString(),
-            bookResult.book().title(),
-            chapterResult.chapter(),
+    StoryMeta wrapper =
+        new StoryMeta(
+            storyResult.execution().path().toString(),
+            storyResult.execution().title(),
             storyResult);
 
-    objectMapper.writeValue(storyPath.toFile(), wrapper);
+    objectMapper.writeValue(storyMetaJson.toFile(), wrapper);
   }
 
   private String sanitizeFilename(String name) {
@@ -204,10 +172,8 @@ public class JsonStoryListener extends PersistStoryListener {
   /// Simple record to hold book metadata.
   record BookMetadata(String path, String title) {}
 
-  /// Record to hold chapter metadata with book context.
-  record ChapterMetadataWrapper(String bookPath, String bookTitle, ChapterModel chapter) {}
+  record ChapterMeta(String path, String title) {}
 
   /// Wrapper class to include book and chapter context with story execution.
-  record StoryExecutionWrapper(
-      String bookPath, String bookTitle, ChapterModel chapter, StoryExecutionResult storyResult) {}
+  record StoryMeta(String path, String title, StoryExecutionResult storyResult) {}
 }
