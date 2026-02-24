@@ -24,6 +24,7 @@
     <module>truedoctales-parser</module>
     <module>truedoctales-execution</module>
     <module>truedoctales-report-json</module>
+    <module>truedoctales-report-markdown</module>
     <module>truedoctales-sample-domain</module>
     <module>truedoctales-sample-jupiter</module>
   </modules>
