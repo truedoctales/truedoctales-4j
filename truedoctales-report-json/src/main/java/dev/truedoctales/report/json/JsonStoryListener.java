@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Logger;
 
 /// Story execution listener that persists execution results as JSON.
 ///
@@ -19,15 +20,16 @@ import java.nio.file.Paths;
 /// This allows for distributed test execution and easier merging of results.
 public class JsonStoryListener extends PersistStoryListener {
 
+  private static final Logger logger = Logger.getLogger(JsonStoryListener.class.getName());
+
   private final Path outputDirectory;
   private final ObjectMapper objectMapper;
-  private StoryBookModel bookModel; // Store book model for chapter metadata generation
 
   /// Creates a new JSON story listener with default output directory.
   ///
   /// Output will be written to target/book-of-truth/json/
   public JsonStoryListener() {
-    this(Paths.get("target/book-of-truth/json"));
+    this(Paths.get("target/book-of-truth/.execution"));
   }
 
   /// Creates a new JSON story listener with specified output directory.
@@ -63,14 +65,14 @@ public class JsonStoryListener extends PersistStoryListener {
   @Override
   public void startBook(StoryBookModel storyBookModel) {
     super.startBook(storyBookModel);
-    this.bookModel = storyBookModel; // Store for later use
-    System.out.println("JsonStoryListener: startBook called for " + storyBookModel.title());
+    // Store book model for chapter metadata generation
+    logger.info("JsonStoryListener: startBook called for " + storyBookModel.title());
   }
 
   @Override
   public void closeBook() {
     super.closeBook();
-    System.out.println("JsonStoryListener: closeBook called");
+    logger.info("JsonStoryListener: closeBook called");
     writeJsonOutputs();
   }
 
@@ -78,11 +80,11 @@ public class JsonStoryListener extends PersistStoryListener {
     try {
       StoryBookExecutionResult bookResult = getBookResult();
       if (bookResult == null) {
-        System.err.println("No book result to write to JSON");
+        logger.warning("No book result to write to JSON");
         return;
       }
 
-      System.out.println("Writing book with " + bookResult.getChapters().size() + " chapters");
+      logger.info("Writing book with " + bookResult.getChapters().size() + " chapters");
 
       // Ensure output directory exists
       Files.createDirectories(outputDirectory);
@@ -100,8 +102,8 @@ public class JsonStoryListener extends PersistStoryListener {
                 }
               });
     } catch (IOException e) {
-      System.err.println("Failed to write JSON output: " + e.getMessage());
-      e.printStackTrace();
+      logger.severe("Failed to write JSON output: " + e.getMessage());
+      logger.throwing(JsonStoryListener.class.getName(), "writeJsonOutputs", e);
     }
   }
 
