@@ -26,7 +26,8 @@ public class PersistStoryListener extends LoggingStoryExecutionListener
 
   @Override
   public void startBook(StoryBookModel storyBookModel) {
-    book = new StoryBookExecutionResult(storyBookModel);
+    book = new StoryBookExecutionResult();
+    book.setTitle(storyBookModel.title());
   }
 
   /// Returns the complete book execution result.
@@ -38,15 +39,20 @@ public class PersistStoryListener extends LoggingStoryExecutionListener
 
   @Override
   public void startChapter(ChapterModel execution) {
-    book.addChapterResult(new ChapterExecutionResult(execution));
+    ChapterExecutionResult chapterResult = new ChapterExecutionResult();
+    chapterResult.setPath(execution.path().toString());
+    chapterResult.setTitle(execution.title());
+    book.addChapterResult(chapterResult);
   }
 
   @Override
   public void startStory(StoryExecution execution) {
 
-    var currentStory = new StoryExecutionResult(execution);
+    var currentStory = new StoryExecutionResult();
+    currentStory.setPath(execution.path().toString());
+    currentStory.setTitle(execution.title());
     if (stories.isEmpty()) {
-      book.chapterResults().getLast().addStoryResult(currentStory);
+      book.getChapters().getLast().addStoryResult(currentStory);
     } else {
       stories.getLast().addPrequelResult(currentStory);
     }

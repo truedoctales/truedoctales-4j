@@ -82,7 +82,7 @@ public class JsonStoryListener extends PersistStoryListener {
         return;
       }
 
-      System.out.println("Writing book with " + bookResult.chapterResults().size() + " chapters");
+      System.out.println("Writing book with " + bookResult.getChapters().size() + " chapters");
 
       // Ensure output directory exists
       Files.createDirectories(outputDirectory);
@@ -90,7 +90,7 @@ public class JsonStoryListener extends PersistStoryListener {
       // Write book metadata (includes intro and structure)
       writeBookMetadata(bookResult);
       bookResult
-          .chapterResults()
+          .getChapters()
           .forEach(
               chapterModel -> {
                 try {
@@ -106,74 +106,41 @@ public class JsonStoryListener extends PersistStoryListener {
   }
 
   private void writeChapter(ChapterExecutionResult chapterModel) throws IOException {
-    Path chapterDir =  Files.createDirectories(outputDirectory.resolve(chapterModel.chapter().path()));
+    Path chapterDir = Files.createDirectories(outputDirectory.resolve(chapterModel.getPath()));
     writeChapterMetadata(chapterDir, chapterModel);
-      for (StoryExecutionResult storyResult : chapterModel.storyResults()) {
-          writeStoryJson(storyResult);
-      }
+    for (StoryExecutionResult storyResult : chapterModel.getStories()) {
+      writeStoryJson(storyResult);
+    }
   }
 
   private void writeBookMetadata(StoryBookExecutionResult bookResult) throws IOException {
-    // Create a simplified book metadata object
-    BookMetadata metadata =
-        new BookMetadata(bookResult.book().path().toString(), bookResult.book().title());
-
     Path metadataPath = outputDirectory.resolve("meta.json");
-    objectMapper.writeValue(metadataPath.toFile(), metadata);
-    System.out.println("Book metadata written to: " + metadataPath);
+    objectMapper.writeValue(metadataPath.toFile(), new BookMetadata(bookResult.getTitle()));
   }
 
   private void writeChapterMetadata(Path outputChapterDir, ChapterExecutionResult chapterResult)
       throws IOException {
     // Create filename from chapter name
     String filename = "meta.json";
-
     Path chapterMeta = outputChapterDir.resolve(filename);
-
     objectMapper.writeValue(
-        chapterMeta.toFile(),
-        new ChapterMeta(
-            chapterResult.chapter().title(),
-            chapterResult.chapter().path().toString()));
+        chapterMeta.toFile(), new ChapterMeta(chapterResult.getPath(), chapterResult.getTitle()));
   }
 
-  private void writeStoryJson(
-      StoryExecutionResult storyResult)
-      throws IOException {
+  private void writeStoryJson(StoryExecutionResult storyResult) throws IOException {
 
+    Path storyPath = outputDirectory.resolve(storyResult.getPath());
+    //    change from markdown to json
+    Path storyMetaJson =
+        storyPath
+            .getParent()
+            .resolve(storyPath.getFileName().toString().replaceAll("\\.md$", ".json"));
 
-    Path storyPath = outputDirectory.resolve(storyResult.execution().path());
-//    change from markdown to json
-    Path storyMetaJson = storyPath.getParent().resolve(storyPath.getFileName().toString().replaceAll("\\.md$", ".json"));
-
-    // Create a story execution wrapper that includes context
-    StoryMeta wrapper =
-        new StoryMeta(
-            storyResult.execution().path().toString(),
-            storyResult.execution().title(),
-            storyResult);
-
-    objectMapper.writeValue(storyMetaJson.toFile(), wrapper);
-  }
-
-  private String sanitizeFilename(String name) {
-    // Remove invalid filename characters and limit length
-    String sanitized = name.replaceAll("[^a-zA-Z0-9-_\\s]", "").replaceAll("\\s+", "-");
-    return sanitized.substring(0, Math.min(sanitized.length(), 100));
-  }
-
-  /// Returns the output directory for JSON files.
-  ///
-  /// @return the output directory
-  public Path getOutputDirectory() {
-    return outputDirectory;
+    objectMapper.writeValue(storyMetaJson.toFile(), storyResult);
   }
 
   /// Simple record to hold book metadata.
-  record BookMetadata(String path, String title) {}
+  record BookMetadata(String title) {}
 
   record ChapterMeta(String path, String title) {}
-
-  /// Wrapper class to include book and chapter context with story execution.
-  record StoryMeta(String path, String title, StoryExecutionResult storyResult) {}
 }

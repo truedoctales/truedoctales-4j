@@ -6,12 +6,12 @@ import java.util.List;
 
 /// Represents the result of executing a scene (a group of steps).
 ///
-/// @param scene the scene execution detales
 /// @param stepResults the results of all steps within this scene
 /// @param status the overall execution status of the scene
 public record SceneExecutionResult(
-    @JsonProperty("scene") SceneExecution scene,
-    @JsonProperty("stepResults") List<StepExecutionResult> stepResults,
+    String title,
+    Integer lineNumber,
+    List<StepExecutionResult> stepResults,
     @JsonProperty("status") ExecutionStatus status)
     implements HasExecutionStatus {
 
@@ -20,6 +20,10 @@ public record SceneExecutionResult(
   /// @param scene the scene execution detales
   /// @param stepResults the results of all steps within this scene
   public SceneExecutionResult(SceneExecution scene, List<StepExecutionResult> stepResults) {
-    this(scene, stepResults, ExecutionStatusCalculator.computeStatus(stepResults));
+    this(
+        scene.title(),
+        scene.lineNumber(),
+        stepResults,
+        ExecutionStatusCalculator.computeStatus(stepResults));
   }
 }

@@ -9,10 +9,7 @@ import java.util.stream.Stream;
 ///
 /// Contains the book path, title, intro chapter, and all story chapters ready for execution.
 public record StoryBookExecution(
-    Path path, String title,
-    ChapterExecution prequelChapter,
-    List<ChapterExecution> chapters) {
-
+    Path path, String title, ChapterExecution prequelChapter, List<ChapterExecution> chapters) {
 
   /// Loads a story by its path from the book structure.
   ///

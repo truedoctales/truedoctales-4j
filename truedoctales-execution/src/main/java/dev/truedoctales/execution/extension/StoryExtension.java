@@ -134,7 +134,9 @@ public class StoryExtension
             new ArrayList<>() // Scenes will be added during test execution
             );
 
-    StoryExecutionResult executionResult = new StoryExecutionResult(storyExecution);
+    StoryExecutionResult executionResult = new StoryExecutionResult();
+    executionResult.setPath(storyExecution.path().toString());
+    executionResult.setTitle(storyExecution.title());
 
     // Store in context
     getStore(context).put(EXECUTION_NAMESPACE, executionResult);
@@ -266,11 +268,11 @@ public class StoryExtension
       Integer sceneIndex = templateStore.get(sceneIndexKey, Integer.class);
       if (sceneIndex != null) {
         // Replace existing scene with updated parameter table
-        storyResult.sceneResults().set(sceneIndex, sceneResult);
+        storyResult.getSceneResults().set(sceneIndex, sceneResult);
       } else {
         // First invocation - add the scene and remember its index
         storyResult.addSceneResult(sceneResult);
-        templateStore.put(sceneIndexKey, storyResult.sceneResults().size() - 1);
+        templateStore.put(sceneIndexKey, storyResult.getSceneResults().size() - 1);
       }
     }
   }

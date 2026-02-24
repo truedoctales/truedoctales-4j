@@ -1,8 +1,5 @@
 package dev.truedoctales.api.model.listener;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import dev.truedoctales.api.model.execution.StoryExecution;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,73 +8,59 @@ import java.util.List;
 /// Contains the story execution, prequel results, and scene results. The status is computed
 /// based on the scene results.
 public class StoryExecutionResult implements HasExecutionStatus {
-  private final StoryExecution execution;
-  private final List<StoryExecutionResult> prequelResults = new ArrayList<>();
-  private final List<SceneExecutionResult> sceneResults = new ArrayList<>();
+  private String path;
+  private String title;
+  private List<StoryExecutionResult> prequelResults;
+  private List<SceneExecutionResult> sceneResults;
 
-  /// Creates a story execution result.
-  ///
-  /// @param execution the story execution detales
-  public StoryExecutionResult(StoryExecution execution) {
-    this.execution = execution;
+  public String getPath() {
+    return path;
   }
 
-  /// Creates a story execution result with prequels and scenes (for Jackson deserialization).
-  ///
-  /// @param execution the story execution detales
-  /// @param prequelResults the prequel results
-  /// @param sceneResults the scene results
-  @JsonCreator
-  public StoryExecutionResult(
-      @JsonProperty("execution") StoryExecution execution,
-      @JsonProperty("prequelResults") List<StoryExecutionResult> prequelResults,
-      @JsonProperty("sceneResults") List<SceneExecutionResult> sceneResults) {
-    this.execution = execution;
-    if (prequelResults != null) {
-      this.prequelResults.addAll(prequelResults);
-    }
-    if (sceneResults != null) {
-      this.sceneResults.addAll(sceneResults);
-    }
+  public void setPath(String path) {
+    this.path = path;
   }
 
-  /// Returns the story execution detales.
-  ///
-  /// @return the story execution
-  public StoryExecution execution() {
-    return execution;
+  public String getTitle() {
+    return title;
   }
 
-  /// Returns the results of prequel stories.
-  ///
-  /// @return list of prequel execution results
-  public List<StoryExecutionResult> prequelResults() {
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  public List<StoryExecutionResult> getPrequelResults() {
     return prequelResults;
   }
 
-  /// Returns the results of all scenes in this story.
-  ///
-  /// @return list of scene execution results
-  public List<SceneExecutionResult> sceneResults() {
+  public void setPrequelResults(List<StoryExecutionResult> prequelResults) {
+    this.prequelResults = prequelResults;
+  }
+
+  public List<SceneExecutionResult> getSceneResults() {
     return sceneResults;
   }
 
-  /// Adds a prequel execution result.
-  ///
-  /// @param prequelResult the prequel result to add
-  public void addPrequelResult(StoryExecutionResult prequelResult) {
-    prequelResults.add(prequelResult);
-  }
-
-  /// Adds a scene execution result.
-  ///
-  /// @param sceneResult the scene result to add
-  public void addSceneResult(SceneExecutionResult sceneResult) {
-    sceneResults.add(sceneResult);
+  public void setSceneResults(List<SceneExecutionResult> sceneResults) {
+    this.sceneResults = sceneResults;
   }
 
   @Override
   public ExecutionStatus status() {
     return ExecutionStatusCalculator.computeStatus(sceneResults);
+  }
+
+  public void addPrequelResult(StoryExecutionResult currentStory) {
+    if (prequelResults == null) {
+      prequelResults = new ArrayList<>();
+    }
+    prequelResults.add(currentStory);
+  }
+
+  public void addSceneResult(SceneExecutionResult result) {
+    if (sceneResults == null) {
+      sceneResults = new ArrayList<>();
+    }
+    sceneResults.add(result);
   }
 }
