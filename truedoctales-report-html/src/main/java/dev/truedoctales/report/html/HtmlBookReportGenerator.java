@@ -1,4 +1,4 @@
-package dev.truedoctales.report.markdown;
+package dev.truedoctales.report.html;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;

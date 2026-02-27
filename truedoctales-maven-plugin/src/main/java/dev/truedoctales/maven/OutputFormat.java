@@ -1,4 +1,4 @@
-package dev.truedoctales.report.markdown;
+package dev.truedoctales.maven;
 
 /// Supported report output formats.
 ///

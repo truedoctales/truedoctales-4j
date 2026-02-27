@@ -1,7 +1,7 @@
 package dev.truedoctales.maven;
 
+import dev.truedoctales.report.html.HtmlBookReportGenerator;
 import dev.truedoctales.report.markdown.BookReportGenerator;
-import dev.truedoctales.report.markdown.OutputFormat;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,13 +15,13 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 /// Maven goal that generates an enriched book report from True Doc Tales execution results.
 ///
-/// Delegates to {@link BookReportGenerator} from the {@code truedoctales-report-markdown} module.
-/// The generator copies the original book directory and enriches story markdown files with
-/// per-step pass/fail status badges produced by test execution.
+/// Delegates to {@link BookReportGenerator} from the {@code truedoctales-report-markdown} module
+/// and to {@link HtmlBookReportGenerator} from the {@code truedoctales-report-html} module.
 ///
 /// <p>Intended usage: bind this goal to the {@code verify} phase so that {@code mvn clean verify}
-/// both runs the tests and generates the enriched markdown report.  Output is written to
-/// {@code ${project.build.directory}/truedoctales-markdown}.
+/// both runs the tests and generates the enriched reports. Markdown output is written to
+/// {@code ${project.build.directory}/truedoctales-markdown} and HTML output to
+/// {@code ${project.build.directory}/truedoctales-html}.
 ///
 /// <p>Use the {@code reportFormats} parameter to control which output formats are generated
 /// (MARKDOWN, HTML, or both).
@@ -73,12 +73,30 @@ public class ReportMojo extends AbstractMojo {
     }
 
     try {
-      new BookReportGenerator(bookDirectory, executionDirectory, outputDirectory, reportFormats)
-          .generate();
+      if (reportFormats.contains(OutputFormat.MARKDOWN)) {
+        new BookReportGenerator(bookDirectory, executionDirectory, outputDirectory).generate();
+      }
+      if (reportFormats.contains(OutputFormat.HTML)) {
+        generateHtmlReport();
+      }
       logGeneratedFiles();
     } catch (IOException e) {
       throw new MojoExecutionException("Failed to generate Truedoctales report", e);
     }
+  }
+
+  private void generateHtmlReport() throws IOException {
+    // HTML is generated from enriched markdown. If markdown was already produced,
+    // use that; otherwise generate enriched markdown in a temporary location first.
+    Path markdownSource;
+    if (reportFormats.contains(OutputFormat.MARKDOWN)) {
+      markdownSource = outputDirectory;
+    } else {
+      markdownSource = outputDirectory.resolveSibling("truedoctales-markdown-tmp");
+      new BookReportGenerator(bookDirectory, executionDirectory, markdownSource).generate();
+    }
+    Path htmlOutput = outputDirectory.resolveSibling("truedoctales-html");
+    new HtmlBookReportGenerator(markdownSource, htmlOutput).generate();
   }
 
   private void logGeneratedFiles() throws IOException {
