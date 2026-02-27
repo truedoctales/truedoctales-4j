@@ -61,6 +61,15 @@
             <include>**/*Test.java</include>
           </includes>
         </configuration>
+        <executions>
+          <execution>
+            <id>run-tests-before-site</id>
+            <goals>
+              <goal>test</goal>
+            </goals>
+            <phase>pre-site</phase>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
