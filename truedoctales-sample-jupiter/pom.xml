@@ -37,6 +37,20 @@
 
   <build>
     <plugins>
+      <!-- Generate Markdown report from test execution results -->
+      <plugin>
+        <groupId>dev.truedoctales</groupId>
+        <artifactId>truedoctales-maven-plugin</artifactId>
+        <version>${project.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>report</goal>
+            </goals>
+            <phase>verify</phase>
+          </execution>
+        </executions>
+      </plugin>
       <!-- Ensure tests run and generate JSON output -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
