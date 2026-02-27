@@ -37,7 +37,7 @@
 
   <build>
     <plugins>
-      <!-- Generate Markdown report from test execution results -->
+      <!-- Generate enriched Markdown report during mvn site -->
       <plugin>
         <groupId>dev.truedoctales</groupId>
         <artifactId>truedoctales-maven-plugin</artifactId>
@@ -47,7 +47,7 @@
             <goals>
               <goal>report</goal>
             </goals>
-            <phase>verify</phase>
+            <phase>pre-site</phase>
           </execution>
         </executions>
       </plugin>
