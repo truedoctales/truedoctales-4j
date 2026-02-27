@@ -241,7 +241,7 @@ public class HtmlBookReportGenerator {
   private String buildNavigationHtml(List<NavEntry> navigation, NavEntry current) {
     StringBuilder sb = new StringBuilder();
     String currentGroup = null;
-    boolean currentGroupHasActive = false;
+    String activeGroup = getGroupLabel(current.relativePath());
 
     for (NavEntry entry : navigation) {
       String group = getGroupLabel(entry.relativePath());
@@ -252,14 +252,13 @@ public class HtmlBookReportGenerator {
             sb.append("      </details>\n");
           }
         }
-        currentGroupHasActive = hasActiveEntry(navigation, current, group);
         if ("Book".equals(group)) {
           sb.append("      <div class=\"nav-group-label\">")
               .append(escapeHtml(group))
               .append("</div>\n");
           sb.append("        <ul>\n");
         } else {
-          String openAttr = currentGroupHasActive ? " open" : "";
+          String openAttr = group.equals(activeGroup) ? " open" : "";
           sb.append("      <details class=\"nav-tree\"").append(openAttr).append(">\n");
           sb.append("        <summary>").append(escapeHtml(group)).append("</summary>\n");
           sb.append("        <ul>\n");
@@ -282,15 +281,6 @@ public class HtmlBookReportGenerator {
       }
     }
     return sb.toString();
-  }
-
-  private boolean hasActiveEntry(List<NavEntry> navigation, NavEntry current, String group) {
-    for (NavEntry entry : navigation) {
-      if (entry.equals(current) && group.equals(getGroupLabel(entry.relativePath()))) {
-        return true;
-      }
-    }
-    return false;
   }
 
   private String getGroupLabel(String relativePath) {
@@ -411,7 +401,7 @@ public class HtmlBookReportGenerator {
           transform: rotate(90deg);
         }
         .sidebar-content .nav-tree summary:hover {
-          background: #e2e8f0;
+          background: var(--border);
         }
         .sidebar-content .nav-tree ul {
           padding-left: 0.5rem;
