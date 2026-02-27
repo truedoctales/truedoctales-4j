@@ -241,19 +241,33 @@ public class HtmlBookReportGenerator {
   private String buildNavigationHtml(List<NavEntry> navigation, NavEntry current) {
     StringBuilder sb = new StringBuilder();
     String currentGroup = null;
+    boolean currentGroupHasActive = false;
 
     for (NavEntry entry : navigation) {
       String group = getGroupLabel(entry.relativePath());
       if (!group.equals(currentGroup)) {
         if (currentGroup != null) {
-          sb.append("      </ul>\n");
+          sb.append("        </ul>\n");
+          if (!"Book".equals(currentGroup)) {
+            sb.append("      </details>\n");
+          }
         }
-        sb.append("      <h3>").append(escapeHtml(group)).append("</h3>\n");
-        sb.append("      <ul>\n");
+        currentGroupHasActive = hasActiveEntry(navigation, current, group);
+        if ("Book".equals(group)) {
+          sb.append("      <div class=\"nav-group-label\">")
+              .append(escapeHtml(group))
+              .append("</div>\n");
+          sb.append("        <ul>\n");
+        } else {
+          String openAttr = currentGroupHasActive ? " open" : "";
+          sb.append("      <details class=\"nav-tree\"").append(openAttr).append(">\n");
+          sb.append("        <summary>").append(escapeHtml(group)).append("</summary>\n");
+          sb.append("        <ul>\n");
+        }
         currentGroup = group;
       }
       String activeClass = entry.equals(current) ? " class=\"active\"" : "";
-      sb.append("        <li><a href=\"DEPTH_PREFIX/")
+      sb.append("          <li><a href=\"DEPTH_PREFIX/")
           .append(entry.htmlRelativePath())
           .append("\"")
           .append(activeClass)
@@ -262,9 +276,21 @@ public class HtmlBookReportGenerator {
           .append("</a></li>\n");
     }
     if (currentGroup != null) {
-      sb.append("      </ul>\n");
+      sb.append("        </ul>\n");
+      if (!"Book".equals(currentGroup)) {
+        sb.append("      </details>\n");
+      }
     }
     return sb.toString();
+  }
+
+  private boolean hasActiveEntry(List<NavEntry> navigation, NavEntry current, String group) {
+    for (NavEntry entry : navigation) {
+      if (entry.equals(current) && group.equals(getGroupLabel(entry.relativePath()))) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private String getGroupLabel(String relativePath) {
@@ -349,6 +375,46 @@ public class HtmlBookReportGenerator {
           letter-spacing: 0.05em;
           color: var(--text-muted);
           padding: 0.75rem 1.5rem 0.25rem;
+        }
+        .sidebar-content .nav-group-label {
+          font-size: 0.75rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          color: var(--text-muted);
+          padding: 0.75rem 1.5rem 0.25rem;
+        }
+        .sidebar-content .nav-tree {
+          border-bottom: 1px solid var(--border);
+        }
+        .sidebar-content .nav-tree summary {
+          display: block;
+          padding: 0.5rem 1.5rem;
+          font-size: 0.8rem;
+          font-weight: 600;
+          color: var(--text);
+          cursor: pointer;
+          list-style: none;
+          user-select: none;
+          transition: background 0.15s;
+        }
+        .sidebar-content .nav-tree summary::-webkit-details-marker { display: none; }
+        .sidebar-content .nav-tree summary::before {
+          content: '▶';
+          display: inline-block;
+          margin-right: 0.5rem;
+          font-size: 0.6rem;
+          transition: transform 0.2s;
+          vertical-align: middle;
+        }
+        .sidebar-content .nav-tree[open] > summary::before {
+          transform: rotate(90deg);
+        }
+        .sidebar-content .nav-tree summary:hover {
+          background: #e2e8f0;
+        }
+        .sidebar-content .nav-tree ul {
+          padding-left: 0.5rem;
         }
         .sidebar-content ul { list-style: none; }
         .sidebar-content li a {

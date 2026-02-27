@@ -210,4 +210,58 @@ class HtmlBookReportGeneratorTest {
     assertTrue(html.contains("viewport"), "Should include viewport meta tag");
     assertTrue(html.contains("@media"), "Should include responsive CSS media queries");
   }
+
+  @Test
+  void generate_shouldUseCollapsibleTreeForChapterGroups() throws IOException {
+    Files.writeString(markdownDir.resolve("00_intro.md"), "# Book Intro\n");
+    Path ch = Files.createDirectories(markdownDir.resolve("01_chapter-basics"));
+    Files.writeString(ch.resolve("00_intro.md"), "# Chapter 1\n");
+    Files.writeString(ch.resolve("01_story.md"), "# Story\n");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String introHtml = Files.readString(htmlOutputDir.resolve("00_intro.html"));
+    assertTrue(
+        introHtml.contains("<details class=\"nav-tree\""),
+        "Chapter groups should use <details> for collapsible tree");
+    assertTrue(
+        introHtml.contains("<summary>"), "Chapter groups should have a <summary> toggle label");
+  }
+
+  @Test
+  void generate_shouldCollapseChapterGroupsByDefault() throws IOException {
+    Files.writeString(markdownDir.resolve("00_intro.md"), "# Book Intro\n");
+    Path ch1 = Files.createDirectories(markdownDir.resolve("01_chapter"));
+    Files.writeString(ch1.resolve("01_story.md"), "# Story 1\n");
+    Path ch2 = Files.createDirectories(markdownDir.resolve("02_chapter"));
+    Files.writeString(ch2.resolve("01_story.md"), "# Story 2\n");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    // When viewing the intro (root), no chapter groups should be open
+    String introHtml = Files.readString(htmlOutputDir.resolve("00_intro.html"));
+    assertFalse(
+        introHtml.contains("<details class=\"nav-tree\" open"),
+        "Chapter groups should be collapsed by default when not active");
+  }
+
+  @Test
+  void generate_shouldExpandChapterGroupContainingActivePage() throws IOException {
+    Files.writeString(markdownDir.resolve("00_intro.md"), "# Book Intro\n");
+    Path ch1 = Files.createDirectories(markdownDir.resolve("01_chapter"));
+    Files.writeString(ch1.resolve("01_story.md"), "# Story 1\n");
+    Path ch2 = Files.createDirectories(markdownDir.resolve("02_chapter"));
+    Files.writeString(ch2.resolve("01_story.md"), "# Story 2\n");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    // When viewing a story in chapter 1, that chapter group should be expanded
+    String storyHtml = Files.readString(htmlOutputDir.resolve("01_chapter/01_story.html"));
+    assertTrue(
+        storyHtml.contains("<details class=\"nav-tree\" open"),
+        "Chapter group containing active page should be expanded");
+  }
 }
