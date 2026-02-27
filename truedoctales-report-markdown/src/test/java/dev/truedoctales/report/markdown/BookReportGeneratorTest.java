@@ -180,6 +180,72 @@ class BookReportGeneratorTest {
     assertTrue(enrichedContent.contains("| alpha | 1     |"));
   }
 
+  @Test
+  void generate_shouldIncludeCodeBasedStoryAlongsideBookIntro() throws IOException {
+    // Reproduces the real-world scenario:
+    // - Book has 03_chapter/00_intro.md but NOT 01_devil.md (code-based)
+    // - Execution dir has 03_chapter/01_devil.json + 03_chapter/01_devil.md (from StoryExtension)
+    // Expected: output contains BOTH 00_intro.md AND enriched 01_devil.md
+    Path bookChapter = Files.createDirectories(bookDir.resolve("03_chapter"));
+    Files.writeString(bookChapter.resolve("00_intro.md"), "# Chapter Intro\n");
+
+    String codeStoryMd =
+        """
+        # The Devil with the Three Golden Hairs (Code)
+
+        ## Scene: The quest begins
+
+        > **Code** The quest begins
+        """;
+
+    // JSON written by StoryExtension uses field-only visibility ObjectMapper.
+    // Use the real JSON shape to catch any deserialization mismatch.
+    String codeStoryJson =
+        """
+        {
+          "path" : "03_chapter/01_devil.md",
+          "title" : "The Devil (Code)",
+          "prequelResults" : null,
+          "sceneResults" : [ {
+            "title" : "The quest begins",
+            "lineNumber" : null,
+            "stepResults" : [ {
+              "lineNumber" : 0,
+              "plot" : "Code",
+              "pattern" : "questBegins",
+              "inputType" : "SEQUENCE",
+              "variables" : { },
+              "stepData" : [ ],
+              "status" : "SUCCESS",
+              "errorMessage" : null,
+              "throwable" : null
+            } ],
+            "status" : "SUCCESS"
+          } ]
+        }
+        """;
+
+    Path execChapter = Files.createDirectories(executionDir.resolve("03_chapter"));
+    Files.writeString(execChapter.resolve("01_devil.md"), codeStoryMd);
+    Files.writeString(execChapter.resolve("01_devil.json"), codeStoryJson);
+
+    BookReportGenerator generator = new BookReportGenerator(bookDir, executionDir, outputDir);
+    generator.generate();
+
+    // Book intro must be copied
+    Path introPath = outputDir.resolve("03_chapter").resolve("00_intro.md");
+    assertTrue(Files.exists(introPath), "00_intro.md should be copied from book directory");
+
+    // Code-based story must appear via execution-directory fallback
+    Path devilPath = outputDir.resolve("03_chapter").resolve("01_devil.md");
+    assertTrue(Files.exists(devilPath), "01_devil.md should be created from execution directory");
+
+    String enriched = Files.readString(devilPath);
+    assertTrue(
+        enriched.contains("> **Code** The quest begins ✅"),
+        "Code-based story should be enriched with ✅ badge");
+  }
+
   // Helper methods
 
   private StoryExecutionResult buildStoryResult(String path, ExecutionStatus status) {
