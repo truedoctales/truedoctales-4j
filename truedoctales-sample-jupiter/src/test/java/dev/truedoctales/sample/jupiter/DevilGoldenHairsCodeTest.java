@@ -28,7 +28,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 /// during test execution, making this story appear in the Book of Truth documentation.
 @Story(
     book = "Book of Stories",
-    storyPath = "03_devils-chapter/01_devil-three-golden-hairs.md",
+    storyPath = "03_chapter-devil-three-golden-hairs/01_devil-three-golden-hairs.md",
     title = "The Devil with the Three Golden Hairs (Code)",
     markdown =
         """

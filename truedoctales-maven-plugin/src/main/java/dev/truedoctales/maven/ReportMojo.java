@@ -17,11 +17,10 @@ import org.apache.maven.plugins.annotations.Parameter;
 /// The generator copies the original book directory and enriches story markdown files with
 /// per-step pass/fail status badges produced by test execution.
 ///
-/// <p>Intended usage: run {@code mvn test} (or {@code mvn verify}) first so that
-/// {@code JsonStoryListener} writes execution JSON, then run {@code mvn site} which triggers
-/// this goal in the {@code pre-site} phase. Output is written to
+/// <p>Intended usage: bind this goal to the {@code verify} phase so that {@code mvn clean verify}
+/// both runs the tests and generates the enriched markdown report.  Output is written to
 /// {@code ${project.build.directory}/truedoctales-markdown}.
-@Mojo(name = "report", defaultPhase = LifecyclePhase.PRE_SITE)
+@Mojo(name = "report", defaultPhase = LifecyclePhase.VERIFY)
 public class ReportMojo extends AbstractMojo {
 
   /// Path to the original book directory containing the markdown stories.
