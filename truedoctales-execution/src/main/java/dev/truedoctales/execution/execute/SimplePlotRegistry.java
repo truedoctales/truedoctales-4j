@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /// Registry that manages plot instances and their binding methods.
 ///
@@ -38,10 +39,23 @@ public class SimplePlotRegistry implements PlotRegistry {
             entry ->
                 new PlotBinding(
                     entry.getKey(),
-                    entry.getValue().keySet().stream()
-                        .map(s -> new StepBinding(entry.getKey(), s, InputType.SEQUENCE))
+                    entry.getValue().entrySet().stream()
+                        .map(
+                            e ->
+                                new StepBinding(
+                                    entry.getKey(),
+                                    e.getKey(),
+                                    getInputType(e.getValue().method())))
                         .toList()))
         .collect(Collectors.toSet());
+  }
+
+  public InputType getInputType(Method method) {
+    return Stream.of(method.getParameterTypes())
+        .filter(Map.class::isAssignableFrom)
+        .findFirst()
+        .map(x -> InputType.BATCH)
+        .orElse(InputType.SEQUENCE);
   }
 
   @Override
