@@ -43,6 +43,9 @@ public class ReportMojo extends AbstractMojo {
 
   @Override
   public void execute() throws MojoExecutionException {
+    getLog()
+        .error(
+            "HEEY! This plugin is deprecated and will be removed in a future release. Please use the standalone report generator instead:");
     if (!Files.isDirectory(bookDirectory)) {
       getLog().warn("Book directory does not exist: " + bookDirectory);
       return;
