@@ -119,7 +119,7 @@ public class StoryExtension
 
     // Store in context
     getStore(context).put(EXECUTION_NAMESPACE, executionResult);
-    getStore(context).put(SCENE_DESCRIPTIONS_NAMESPACE, new LinkedHashMap<String, String>());
+    getStore(context).put(SCENE_DESCRIPTIONS_NAMESPACE, new LinkedHashMap<>());
 
     System.out.println("StoryExtension: Initialized for story: " + storyAnnotation.storyPath());
   }
