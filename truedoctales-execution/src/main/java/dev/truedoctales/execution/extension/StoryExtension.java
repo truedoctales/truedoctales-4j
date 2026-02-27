@@ -451,12 +451,68 @@ public class StoryExtension
                 .append("** ")
                 .append(scene.title())
                 .append("\n");
+
+            // Render parameter table if step has data rows
+            if (step.stepData() != null && !step.stepData().isEmpty()) {
+              appendParameterTable(md, step.stepData());
+            }
           }
         }
       }
     }
 
     return md.toString();
+  }
+
+  /// Appends a markdown table (in blockquote format) for parameterized test data.
+  private void appendParameterTable(StringBuilder md, List<Map<String, String>> stepData) {
+    // Get column headers from the first row
+    List<String> headers = new ArrayList<>(stepData.getFirst().keySet());
+
+    // Calculate column widths
+    int[] widths = new int[headers.size()];
+    for (int i = 0; i < headers.size(); i++) {
+      widths[i] = headers.get(i).length();
+    }
+    for (Map<String, String> row : stepData) {
+      int col = 0;
+      for (String header : headers) {
+        String value = row.getOrDefault(header, "");
+        widths[col] = Math.max(widths[col], value.length());
+        col++;
+      }
+    }
+
+    // Header row
+    md.append(">\n> |");
+    for (int i = 0; i < headers.size(); i++) {
+      md.append(" ").append(pad(headers.get(i), widths[i])).append(" |");
+    }
+    md.append("\n");
+
+    // Separator row
+    md.append("> |");
+    for (int i = 0; i < headers.size(); i++) {
+      md.append("-").append("-".repeat(widths[i])).append("-|");
+    }
+    md.append("\n");
+
+    // Data rows
+    for (Map<String, String> row : stepData) {
+      md.append("> |");
+      for (int i = 0; i < headers.size(); i++) {
+        String value = row.getOrDefault(headers.get(i), "");
+        md.append(" ").append(pad(value, widths[i])).append(" |");
+      }
+      md.append("\n");
+    }
+  }
+
+  private static String pad(String value, int width) {
+    if (value.length() >= width) {
+      return value;
+    }
+    return value + " ".repeat(width - value.length());
   }
 
   private ExtensionContext.Store getStore(ExtensionContext context) {
