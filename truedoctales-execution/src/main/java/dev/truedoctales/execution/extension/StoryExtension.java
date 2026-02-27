@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import dev.truedoctales.api.annotations.Scene;
 import dev.truedoctales.api.annotations.Story;
-import dev.truedoctales.api.model.execution.SceneExecution;
-import dev.truedoctales.api.model.execution.StepBinding;
-import dev.truedoctales.api.model.execution.StepExecution;
-import dev.truedoctales.api.model.execution.StoryExecution;
+import dev.truedoctales.api.model.execution.*;
 import dev.truedoctales.api.model.listener.SceneExecutionResult;
 import dev.truedoctales.api.model.listener.StepExecutionResult;
 import dev.truedoctales.api.model.listener.StoryExecutionResult;
@@ -242,7 +239,7 @@ public class StoryExtension
 
     // For code-based stories, create a single "implicit" step representing the entire test method
     String methodName = context.getRequiredTestMethod().getName();
-    StepBinding binding = new StepBinding(CODE_STEP_TYPE, methodName);
+    StepBinding binding = new StepBinding(CODE_STEP_TYPE, methodName, InputType.SEQUENCE);
     StepCall call = new StepCall(CODE_STEP_TYPE, sceneAnnotation.title());
 
     // Use the accumulated parameter table as step data (will grow with each invocation)
@@ -330,7 +327,7 @@ public class StoryExtension
 
     // Create failed step
     String methodName = context.getRequiredTestMethod().getName();
-    StepBinding binding = new StepBinding(CODE_STEP_TYPE, methodName);
+    StepBinding binding = new StepBinding(CODE_STEP_TYPE, methodName, InputType.SEQUENCE);
     StepCall call = new StepCall(CODE_STEP_TYPE, sceneAnnotation.title());
     StepExecution implicitStep = new StepExecution(binding, call, List.of(), 0);
 

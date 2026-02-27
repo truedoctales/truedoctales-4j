@@ -1,5 +1,6 @@
 package dev.truedoctales.api.model.listener;
 
+import dev.truedoctales.api.model.execution.InputType;
 import dev.truedoctales.api.model.execution.StepExecution;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ public record StepExecutionResult(
     int lineNumber,
     String plot,
     String pattern,
+    InputType inputType,
     Map<String, String> variables,
     List<Map<String, String>> stepData,
     ExecutionStatus status,
@@ -30,6 +32,7 @@ public record StepExecutionResult(
         step.lineNumber(),
         step.binding().plot(),
         step.binding().pattern(),
+        step.binding().inputType(),
         step.variables(),
         step.stepData(),
         ExecutionStatus.SUCCESS,
@@ -43,6 +46,7 @@ public record StepExecutionResult(
         step.lineNumber(),
         step.binding().plot(),
         step.binding().pattern(),
+        step.binding().inputType(),
         step.variables(),
         step.stepData(),
         ExecutionStatus.ERROR,

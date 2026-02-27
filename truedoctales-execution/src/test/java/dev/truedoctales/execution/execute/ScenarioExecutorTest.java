@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import dev.truedoctales.api.execute.PlotRegistry;
 import dev.truedoctales.api.execute.StoryExecutionListener;
+import dev.truedoctales.api.model.execution.InputType;
 import dev.truedoctales.api.model.execution.PlotBinding;
 import dev.truedoctales.api.model.execution.StepBinding;
 import dev.truedoctales.api.model.execution.StepExecution;
@@ -30,7 +31,7 @@ class ScenarioExecutorTest {
   @Test
   void execute_shouldCallListenerAndRegistry() {
     // Arrange
-    StepBinding binding = new StepBinding("plot", "binding");
+    StepBinding binding = new StepBinding("plot", "binding", InputType.SEQUENCE);
     StepExecution execution =
         new StepExecution(binding, new StepCall("plot", "binding"), java.util.List.of(), 0);
 
@@ -47,7 +48,7 @@ class ScenarioExecutorTest {
   void execute_shouldHandleExceptionAndNotifyListener() {
     // Arrange
 
-    StepBinding binding = new StepBinding("plot", "binding");
+    StepBinding binding = new StepBinding("plot", "binding", InputType.SEQUENCE);
     var stepCall = new StepCall("plot", "binding");
     StepExecution execution = new StepExecution(binding, stepCall, java.util.List.of(), 10);
     plotRegistry.shouldThrow = true;
@@ -67,7 +68,7 @@ class ScenarioExecutorTest {
   @Test
   void execute_shouldIncludeLineNumberInErrorMessage() {
     // Arrange
-    StepBinding binding = new StepBinding("plot", "binding");
+    StepBinding binding = new StepBinding("plot", "binding", InputType.SEQUENCE);
     var stepCall = new StepCall("plot", "binding");
     StepExecution execution = new StepExecution(binding, stepCall, java.util.List.of(), 42);
     plotRegistry.shouldThrow = true;
@@ -83,7 +84,7 @@ class ScenarioExecutorTest {
   @Test
   void execute_shouldNotIncludeLineNumberWhenZero() {
     // Arrange
-    StepBinding binding = new StepBinding("plot", "binding");
+    StepBinding binding = new StepBinding("plot", "binding", InputType.SEQUENCE);
     var stepCall = new StepCall("plot", "binding");
     StepExecution execution = new StepExecution(binding, stepCall, java.util.List.of(), 0);
     plotRegistry.shouldThrow = true;

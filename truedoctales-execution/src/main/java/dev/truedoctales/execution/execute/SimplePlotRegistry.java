@@ -3,6 +3,7 @@ package dev.truedoctales.execution.execute;
 import dev.truedoctales.api.annotations.Plot;
 import dev.truedoctales.api.annotations.Step;
 import dev.truedoctales.api.execute.PlotRegistry;
+import dev.truedoctales.api.model.execution.InputType;
 import dev.truedoctales.api.model.execution.PlotBinding;
 import dev.truedoctales.api.model.execution.StepBinding;
 import dev.truedoctales.api.model.execution.StepExecution;
@@ -38,7 +39,7 @@ public class SimplePlotRegistry implements PlotRegistry {
                 new PlotBinding(
                     entry.getKey(),
                     entry.getValue().keySet().stream()
-                        .map(s -> new StepBinding(entry.getKey(), s))
+                        .map(s -> new StepBinding(entry.getKey(), s, InputType.SEQUENCE))
                         .toList()))
         .collect(Collectors.toSet());
   }

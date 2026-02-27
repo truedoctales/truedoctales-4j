@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import dev.truedoctales.api.annotations.Plot;
 import dev.truedoctales.api.annotations.Step;
+import dev.truedoctales.api.model.execution.InputType;
 import dev.truedoctales.api.model.execution.PlotBinding;
 import dev.truedoctales.api.model.execution.StepBinding;
 import dev.truedoctales.api.model.execution.StepExecution;
@@ -62,7 +63,7 @@ class SimplePlotRegistryTest {
     TestPlot plot = new TestPlot();
     registry.register(plot);
 
-    StepBinding step = new StepBinding("TestPlot", "Simple binding");
+    StepBinding step = new StepBinding("TestPlot", "Simple binding", InputType.SEQUENCE);
     var call = new StepCall("TestPlot", "Simple binding");
     StepExecution execution = new StepExecution(step, call, List.of(), 0);
 
@@ -79,7 +80,7 @@ class SimplePlotRegistryTest {
     TestPlot plot = new TestPlot();
     registry.register(plot);
 
-    StepBinding binding = new StepBinding("TestPlot", "Step with ${param}");
+    StepBinding binding = new StepBinding("TestPlot", "Step with ${param}", InputType.SEQUENCE);
     var call = new StepCall("TestPlot", "Step with test-value");
     List<Map<String, String>> data = List.of(Map.of("param", "test-value"));
     StepExecution execution = new StepExecution(binding, call, data, 0);
@@ -94,7 +95,7 @@ class SimplePlotRegistryTest {
   @Test
   void invoke_shouldThrowWhenPlotNotFound() {
     // Arrange
-    StepBinding step = new StepBinding("NonExistentPlot", "Some binding");
+    StepBinding step = new StepBinding("NonExistentPlot", "Some binding", InputType.SEQUENCE);
     var call = new StepCall("NonExistentPlot", "Some binding");
     StepExecution execution = new StepExecution(step, call, List.of(), 0);
 
@@ -108,7 +109,7 @@ class SimplePlotRegistryTest {
   void invoke_shouldThrowWhenStepNotFound() {
     // Arrange
     registry.register(new TestPlot());
-    StepBinding step = new StepBinding("TestPlot", "Non-existent binding");
+    StepBinding step = new StepBinding("TestPlot", "Non-existent binding", InputType.SEQUENCE);
     var call = new StepCall("TestPlot", "Non-existent binding");
     StepExecution execution = new StepExecution(step, call, List.of(), 0);
 
@@ -126,11 +127,11 @@ class SimplePlotRegistryTest {
     registry.register(plot1).register(plot2);
 
     // Act
-    StepBinding step1 = new StepBinding("TestPlot", "Simple binding");
+    StepBinding step1 = new StepBinding("TestPlot", "Simple binding", InputType.SEQUENCE);
     var call1 = new StepCall("TestPlot", "Simple binding");
     registry.invoke(new StepExecution(step1, call1, List.of(), 0));
 
-    StepBinding step2 = new StepBinding("AnotherPlot", "Another binding");
+    StepBinding step2 = new StepBinding("AnotherPlot", "Another binding", InputType.SEQUENCE);
     var call2 = new StepCall("AnotherPlot", "Another binding");
     registry.invoke(new StepExecution(step2, call2, List.of(), 0));
 

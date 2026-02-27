@@ -1,6 +1,7 @@
 package dev.truedoctales.execution.mapping;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static dev.truedoctales.api.model.execution.InputType.SEQUENCE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import dev.truedoctales.api.model.execution.PlotBinding;
 import dev.truedoctales.api.model.execution.StepBinding;
@@ -25,8 +26,8 @@ class StoryBookExecutionMapperImplTest {
             new PlotBinding(
                 "plot1",
                 List.of(
-                    new StepBinding("plot1", "Without variable"),
-                    new StepBinding("plot1", "With ${variable}"))));
+                    new StepBinding("plot1", "Without variable", SEQUENCE),
+                    new StepBinding("plot1", "With ${variable}", SEQUENCE))));
     mapper = new StoryBookExecutionMapperImpl(bindings);
   }
 
@@ -36,7 +37,7 @@ class StoryBookExecutionMapperImplTest {
     StepTask stepModel = new StepTask(10, new StepCall("plot1", "Without variable"), List.of());
     StepExecution expected =
         new StepExecution(
-            new StepBinding("plot1", "Without variable"),
+            new StepBinding("plot1", "Without variable", SEQUENCE),
             new StepCall("plot1", "Without variable"),
             List.of(),
             10);
@@ -55,7 +56,7 @@ class StoryBookExecutionMapperImplTest {
     StepTask stepModel = new StepTask(10, call);
     StepExecution expected =
         new StepExecution(
-            new StepBinding("plot1", "With ${variable}"),
+            new StepBinding("plot1", "With ${variable}", SEQUENCE),
             call,
             List.of(),
             10,
