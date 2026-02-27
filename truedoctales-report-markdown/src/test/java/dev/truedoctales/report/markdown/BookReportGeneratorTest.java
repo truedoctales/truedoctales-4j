@@ -146,6 +146,40 @@ class BookReportGeneratorTest {
     assertTrue(enrichedContent.contains("> **Code** Test scene ✅"));
   }
 
+  @Test
+  void generate_shouldEnrichCodeBasedStoryWithTable() throws IOException {
+    // Simulates a code-based story with a parameterized test table
+    String storyContent =
+        """
+        # Code Story
+
+        ## Scene: Parameterized scene
+
+        > **Code** Parameterized scene
+        >
+        > | name  | value |
+        > |-------|-------|
+        > | alpha | 1     |
+        > | beta  | 2     |
+        """;
+    Path storyJsonDir = Files.createDirectories(executionDir.resolve("03_chapter"));
+    Files.writeString(storyJsonDir.resolve("01_param-story.md"), storyContent);
+
+    StoryExecutionResult result =
+        buildStoryResult("03_chapter/01_param-story.md", ExecutionStatus.SUCCESS);
+    objectMapper.writeValue(storyJsonDir.resolve("01_param-story.json").toFile(), result);
+
+    BookReportGenerator generator = new BookReportGenerator(bookDir, executionDir, outputDir);
+    generator.generate();
+
+    Path enrichedPath = outputDir.resolve("03_chapter").resolve("01_param-story.md");
+    assertTrue(Files.exists(enrichedPath));
+    String enrichedContent = Files.readString(enrichedPath);
+    assertTrue(enrichedContent.contains("> **Code** Parameterized scene ✅"));
+    assertTrue(enrichedContent.contains("| name  | value |"));
+    assertTrue(enrichedContent.contains("| alpha | 1     |"));
+  }
+
   // Helper methods
 
   private StoryExecutionResult buildStoryResult(String path, ExecutionStatus status) {

@@ -466,6 +466,9 @@ public class StoryExtension
 
   /// Appends a markdown table (in blockquote format) for parameterized test data.
   private void appendParameterTable(StringBuilder md, List<Map<String, String>> stepData) {
+    if (stepData.isEmpty()) {
+      return;
+    }
     // Get column headers from the first row
     List<String> headers = new ArrayList<>(stepData.getFirst().keySet());
 
