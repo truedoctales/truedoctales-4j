@@ -1,5 +1,6 @@
 package dev.truedoctales.execution.execute;
 
+import dev.truedoctales.api.model.execution.InputType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -24,54 +25,39 @@ public class MethodInvoker {
 
   private static final Logger LOGGER = Logger.getLogger(MethodInvoker.class.getName());
 
-  /// Invokes a method with data from table rows.
-  ///
-  /// @param instance the object instance
-  /// @param method the method to invoke
-  /// @param maps the table data rows
-  /// @return the method result
-  /// @throws Exception if invocation fails
-  public Object invoke(Object instance, Method method, List<Map<String, String>> maps)
-      throws Exception {
-    return invoke(instance, method, maps, Map.of());
-  }
-
   /// Invokes a method with data from table rows and extracted variables.
   ///
-  /// @param instance the object instance
-  /// @param method the method to invoke
-  /// @param maps the table data rows
+  /// @param instance  the object instance
+  /// @param method    the method to invoke
+  /// @param inputType
+  /// @param maps      the table data rows
   /// @param variables extracted variables from pattern matching
   /// @return the method result
   /// @throws Exception if invocation fails
   public Object invoke(
-      Object instance, Method method, List<Map<String, String>> maps, Map<String, String> variables)
+      Object instance,
+      Method method,
+      InputType inputType,
+      List<Map<String, String>> maps,
+      Map<String, String> variables)
       throws Exception {
-    if (hasNoParametersAndNoData(method, maps, variables)) {
-      return invokeWithoutParameters(instance, method);
-    }
-    if (hasParametersButNotCollection(method)) {
-      return invokeWithEachDataRow(instance, method, maps, variables);
-    }
-    if (expectsCollectionParameter(method)) {
-      return invokeWithDataCollection(instance, method, maps, variables);
-    }
-    throw new IllegalArgumentException("Unable to invoke method: " + method.getName());
-  }
-
-  private boolean hasNoParametersAndNoData(
-      Method method, List<Map<String, String>> maps, Map<String, String> variables) {
-    return method.getParameterCount() == 0 && maps.isEmpty() && variables.isEmpty();
-  }
-
-  private boolean hasParametersButNotCollection(Method method) {
-    return method.getParameterCount() > 0 && !expectsCollectionParameter(method);
+    return switch (inputType) {
+      case NONE -> invokeWithoutParameters(instance, method);
+      case SEQUENCE -> {
+        if (maps.isEmpty()) {
+          yield invokeWithVariables(instance, method, variables);
+        } else {
+          yield invokeWithEachDataRow(instance, method, maps, variables);
+        }
+      }
+      case BATCH -> invokeWithDataCollection(instance, method, maps, variables);
+    };
   }
 
   private Object invokeWithEachDataRow(
       Object instance, Method method, List<Map<String, String>> maps, Map<String, String> variables)
       throws Exception {
-    var results = new ArrayList<Object>();
+    var results = new ArrayList<>();
     for (Map<String, String> map : maps) {
       // Merge variables with each row
       Map<String, String> mergedData = new HashMap<>(variables);
@@ -113,38 +99,6 @@ public class MethodInvoker {
     method.setAccessible(true);
     Object[] args = prepareArgumentsFromDataCollection(method, methodCalls, variables);
     return method.invoke(instance, args);
-  }
-
-  /// Checks if a method expects a collection parameter for data rows.
-  ///
-  /// Returns true if the method has at least one parameter that is a List or Collection.
-  ///
-  /// The collection parameter can be of type:
-  /// - `List<Map<String, String>>` - Raw maps (no automatic type conversion)
-  /// - `List<RecordType>` - Typed objects (automatic conversion from maps to records/POJOs)
-  ///
-  /// When using typed collections (e.g., `List<Person>`), the framework automatically
-  /// converts each row from the data table to an instance of the specified type using its
-  /// constructor. All type conversions (String to Long, LocalDate, etc.) are handled automatically.
-  ///
-  /// **Note:** A method should have at most one collection parameter. If multiple
-  /// collection parameters are present, only the first one will receive the data and others will
-  /// receive null.
-  ///
-  /// @param method the method to check
-  /// @return true if the method has a List or Collection parameter
-  boolean expectsCollectionParameter(Method method) {
-    Parameter[] parameters = method.getParameters();
-
-    // Check if any parameter is a List or Collection
-    for (Parameter param : parameters) {
-      Class<?> paramType = param.getType();
-      if (List.class.isAssignableFrom(paramType) || Collection.class.isAssignableFrom(paramType)) {
-        return true;
-      }
-    }
-
-    return false;
   }
 
   private Object[] prepareArgumentsFromVariables(Method method, Map<String, String> variables) {

@@ -121,7 +121,7 @@ class JupiterStoryTestExecutorTest {
     Path bookPath = Path.of("book");
     Path introPath = Path.of("intro");
     Path storyPath = introPath.resolve("test.md");
-    StepBinding binding = new StepBinding("TestPlot", "test binding");
+    StepBinding binding = new StepBinding("TestPlot", "test binding", InputType.SEQUENCE);
     StepExecution step =
         new StepExecution(binding, new StepCall("TestPlot", "test binding"), List.of(), 0);
     SceneExecution scene = new SceneExecution("Test Scene", 0, List.of(step));

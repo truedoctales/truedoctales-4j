@@ -27,9 +27,9 @@ public class JsonStoryListener extends PersistStoryListener {
 
   /// Creates a new JSON story listener with default output directory.
   ///
-  /// Output will be written to target/book-of-truth/json/
+  /// Output will be written to target/truedoctales/json/
   public JsonStoryListener() {
-    this(Paths.get("target/book-of-truth/.execution"));
+    this(Paths.get("target/truedoctales-report/"));
   }
 
   /// Creates a new JSON story listener with specified output directory.

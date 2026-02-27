@@ -2,6 +2,7 @@ package dev.truedoctales.execution.execute;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import dev.truedoctales.api.model.execution.InputType;
 import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.util.*;
@@ -200,7 +201,7 @@ class MethodInvokerTest {
     List<Map<String, String>> emptyData = List.of();
 
     // Act
-    invoker.invoke(target, method, emptyData);
+    invoker.invoke(target, method, InputType.SEQUENCE, emptyData, Map.of());
 
     // Assert
     assertTrue(target.noParamsCalled);
@@ -213,7 +214,7 @@ class MethodInvokerTest {
     List<Map<String, String>> data = List.of(Map.of("name", "Test"));
 
     // Act
-    invoker.invoke(target, method, data);
+    invoker.invoke(target, method, InputType.SEQUENCE, data, Map.of());
 
     // Assert
     assertEquals("Test", target.lastStringValue);
@@ -226,7 +227,7 @@ class MethodInvokerTest {
     List<Map<String, String>> data = List.of(Map.of("name", "Test"));
 
     // Act
-    invoker.invoke(target, method, data);
+    invoker.invoke(target, method, InputType.BATCH, data, Map.of());
 
     // Assert
     assertNotNull(target.lastListValue);
@@ -254,7 +255,7 @@ class MethodInvokerTest {
     Map<String, String> variables = Map.of("skill", "Math");
 
     // Act
-    invoker.invoke(target, method, tableData, variables);
+    invoker.invoke(target, method, InputType.SEQUENCE, tableData, variables);
 
     // Assert
     assertEquals("Alice", target.lastStringValue);
@@ -269,7 +270,7 @@ class MethodInvokerTest {
     Map<String, String> variables = Map.of("name", "Bob");
 
     // Act
-    invoker.invoke(target, method, tableData, variables);
+    invoker.invoke(target, method, InputType.SEQUENCE, tableData, variables);
 
     // Assert
     assertEquals("Bob", target.lastStringValue);
@@ -283,7 +284,7 @@ class MethodInvokerTest {
     Map<String, String> variables = Map.of("skill", "Programming");
 
     // Act
-    invoker.invoke(target, method, tableData, variables);
+    invoker.invoke(target, method, InputType.BATCH, tableData, variables);
 
     // Assert
     assertEquals("Programming", target.lastStringValue);

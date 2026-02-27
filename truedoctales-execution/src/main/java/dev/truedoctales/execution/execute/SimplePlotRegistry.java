@@ -3,6 +3,7 @@ package dev.truedoctales.execution.execute;
 import dev.truedoctales.api.annotations.Plot;
 import dev.truedoctales.api.annotations.Step;
 import dev.truedoctales.api.execute.PlotRegistry;
+import dev.truedoctales.api.model.execution.InputType;
 import dev.truedoctales.api.model.execution.PlotBinding;
 import dev.truedoctales.api.model.execution.StepBinding;
 import dev.truedoctales.api.model.execution.StepExecution;
@@ -11,6 +12,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /// Registry that manages plot instances and their binding methods.
 ///
@@ -37,10 +39,23 @@ public class SimplePlotRegistry implements PlotRegistry {
             entry ->
                 new PlotBinding(
                     entry.getKey(),
-                    entry.getValue().keySet().stream()
-                        .map(s -> new StepBinding(entry.getKey(), s))
+                    entry.getValue().entrySet().stream()
+                        .map(
+                            e ->
+                                new StepBinding(
+                                    entry.getKey(),
+                                    e.getKey(),
+                                    getInputType(e.getValue().method())))
                         .toList()))
         .collect(Collectors.toSet());
+  }
+
+  public InputType getInputType(Method method) {
+    return Stream.of(method.getParameterTypes())
+        .filter(Collection.class::isAssignableFrom)
+        .findFirst()
+        .map(x -> InputType.BATCH)
+        .orElse(InputType.SEQUENCE);
   }
 
   @Override
@@ -60,7 +75,11 @@ public class SimplePlotRegistry implements PlotRegistry {
     }
     try {
       return methodInvoker.invoke(
-          call.instance(), call.method(), stepExecution.stepData(), stepExecution.variables());
+          call.instance(),
+          call.method(),
+          getInputType(call.method()),
+          stepExecution.stepData(),
+          stepExecution.variables());
     } catch (InvocationTargetException e) {
       Throwable cause = e.getTargetException();
       // Always throw as RuntimeException to ensure it can be caught and wrapped properly

@@ -5,16 +5,11 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import dev.truedoctales.api.annotations.Scene;
 import dev.truedoctales.api.annotations.Story;
-import dev.truedoctales.api.model.execution.SceneExecution;
-import dev.truedoctales.api.model.execution.StepBinding;
-import dev.truedoctales.api.model.execution.StepExecution;
-import dev.truedoctales.api.model.execution.StoryExecution;
+import dev.truedoctales.api.model.execution.*;
 import dev.truedoctales.api.model.listener.SceneExecutionResult;
 import dev.truedoctales.api.model.listener.StepExecutionResult;
 import dev.truedoctales.api.model.listener.StoryExecutionResult;
-import dev.truedoctales.api.model.story.ChapterModel;
 import dev.truedoctales.api.model.story.StepCall;
-import dev.truedoctales.report.json.JsonStoryReader;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -25,14 +20,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.extension.AfterAllCallback;
-import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
-import org.junit.jupiter.api.extension.BeforeAllCallback;
-import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.InvocationInterceptor;
-import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
-import org.junit.jupiter.api.extension.TestWatcher;
+import org.jspecify.annotations.NonNull;
+import org.junit.jupiter.api.extension.*;
 
 /// JUnit 5 extension that captures test execution for @Story annotated test classes.
 ///
@@ -64,7 +53,6 @@ import org.junit.jupiter.api.extension.TestWatcher;
 ///   <li>Detect classes annotated with @Story
 ///   <li>Capture test methods annotated with @Scene
 ///   <li>Build a StoryExecutionResult during test execution
-///   <li>Write JSON to target/book-of-truth/json/{Chapter}--{Story}.json
 /// </ul>
 public class StoryExtension
     implements BeforeAllCallback,
@@ -80,7 +68,7 @@ public class StoryExtension
   private static final String CURRENT_PARAMETERS_NAMESPACE = "currentParameters";
   private static final String SCENE_ADDED_NAMESPACE = "sceneAdded";
   private static final String CODE_STEP_TYPE = "Code";
-  private static final int MAX_FILENAME_LENGTH = 100; // Limit to avoid filesystem issues
+  // Limit to avoid filesystem issues
 
   private final ObjectMapper objectMapper;
   private final Path outputDirectory;
@@ -88,7 +76,7 @@ public class StoryExtension
   /// Creates a new StoryExtension with default configuration.
   public StoryExtension() {
     this.objectMapper = createObjectMapper();
-    this.outputDirectory = Paths.get("target/book-of-truth/json");
+    this.outputDirectory = Paths.get("target/truedoctales-report");
   }
 
   /// Creates a new StoryExtension with custom output directory.
@@ -116,7 +104,7 @@ public class StoryExtension
   }
 
   @Override
-  public void beforeAll(ExtensionContext context) throws Exception {
+  public void beforeAll(ExtensionContext context) {
     Class<?> testClass = context.getRequiredTestClass();
     Story storyAnnotation = testClass.getAnnotation(Story.class);
 
@@ -129,7 +117,7 @@ public class StoryExtension
     StoryExecution storyExecution =
         new StoryExecution(
             Paths.get("code-based", testClass.getSimpleName() + ".java"),
-            storyAnnotation.name(),
+            storyAnnotation.title(),
             List.of(), // No prequels for code-based stories
             new ArrayList<>() // Scenes will be added during test execution
             );
@@ -141,18 +129,14 @@ public class StoryExtension
     // Store in context
     getStore(context).put(EXECUTION_NAMESPACE, executionResult);
 
-    System.out.println(
-        "StoryExtension: Initialized for story: "
-            + storyAnnotation.name()
-            + " in chapter: "
-            + storyAnnotation.chapter());
+    System.out.println("StoryExtension: Initialized for story: " + storyAnnotation.storyPath());
   }
 
   @Override
   public void interceptTestMethod(
-      InvocationInterceptor.Invocation<Void> invocation,
+      InvocationInterceptor.@NonNull Invocation<Void> invocation,
       ReflectiveInvocationContext<Method> invocationContext,
-      ExtensionContext extensionContext)
+      @NonNull ExtensionContext extensionContext)
       throws Throwable {
     // Capture method parameters before test execution
     List<Object> arguments = invocationContext.getArguments();
@@ -175,7 +159,7 @@ public class StoryExtension
   }
 
   @Override
-  public void beforeTestExecution(ExtensionContext context) throws Exception {
+  public void beforeTestExecution(ExtensionContext context) {
     Story storyAnnotation = context.getRequiredTestClass().getAnnotation(Story.class);
     if (storyAnnotation == null) {
       return;
@@ -198,7 +182,7 @@ public class StoryExtension
   }
 
   @Override
-  public void afterTestExecution(ExtensionContext context) throws Exception {
+  public void afterTestExecution(ExtensionContext context) {
     Story storyAnnotation = context.getRequiredTestClass().getAnnotation(Story.class);
     if (storyAnnotation == null) {
       return;
@@ -247,7 +231,7 @@ public class StoryExtension
 
     // For code-based stories, create a single "implicit" step representing the entire test method
     String methodName = context.getRequiredTestMethod().getName();
-    StepBinding binding = new StepBinding(CODE_STEP_TYPE, methodName);
+    StepBinding binding = new StepBinding(CODE_STEP_TYPE, methodName, InputType.SEQUENCE);
     StepCall call = new StepCall(CODE_STEP_TYPE, sceneAnnotation.title());
 
     // Use the accumulated parameter table as step data (will grow with each invocation)
@@ -335,7 +319,7 @@ public class StoryExtension
 
     // Create failed step
     String methodName = context.getRequiredTestMethod().getName();
-    StepBinding binding = new StepBinding(CODE_STEP_TYPE, methodName);
+    StepBinding binding = new StepBinding(CODE_STEP_TYPE, methodName, InputType.SEQUENCE);
     StepCall call = new StepCall(CODE_STEP_TYPE, sceneAnnotation.title());
     StepExecution implicitStep = new StepExecution(binding, call, List.of(), 0);
 
@@ -365,7 +349,7 @@ public class StoryExtension
 
     if (executionResult == null) {
       System.err.println(
-          "StoryExtension: No execution result found for: " + storyAnnotation.name());
+          "StoryExtension: No execution result found for: " + storyAnnotation.title());
       return;
     }
 
@@ -378,30 +362,18 @@ public class StoryExtension
     // Ensure output directory exists
     Files.createDirectories(outputDirectory);
 
-    // Create chapter model
-    ChapterModel chapterModel =
-        new ChapterModel(
-            Paths.get("code-based", sanitizeFilename(storyAnnotation.chapter())),
-            storyAnnotation.chapter(),
-            List.of() // No stories in chapter model (this is for context only)
-            );
-
-    // Write chapter metadata if not already written
-    writeChapterMetadata(storyAnnotation.book(), chapterModel);
-
-    // Create wrapper with chapter context
-    JsonStoryReader.StoryExecutionWrapper wrapper =
-        new JsonStoryReader.StoryExecutionWrapper(
-            storyAnnotation.book(), storyAnnotation.book(), chapterModel, executionResult);
-
     // Create filename
-    String chapterName = sanitizeFilename(storyAnnotation.chapter());
-    String storyName = sanitizeFilename(storyAnnotation.name());
-    String filename = chapterName + "--" + storyName + ".json";
-    Path outputPath = outputDirectory.resolve(filename);
+    Path storyPath = Path.of(storyAnnotation.storyPath());
+    Path storyFile =
+        storyPath.getParent().resolve(storyPath.getFileName().toString().replace(".md", ".json"));
+    outputDirectory
+        .resolve(storyPath.getParent())
+        .toFile()
+        .mkdirs(); // Ensure parent directories exist
+    Path outputPath = outputDirectory.resolve(storyFile);
 
     // Write JSON
-    objectMapper.writeValue(outputPath.toFile(), wrapper);
+    objectMapper.writeValue(outputPath.toFile(), executionResult);
 
     System.out.println(
         "StoryExtension: JSON written to: "
@@ -411,48 +383,8 @@ public class StoryExtension
             + " bytes)");
   }
 
-  private String loadChapterSummary(String chapterTitle) {
-    // Try to find and read the chapter intro from markdown
-    // This looks for patterns like: 03_chapter-devil-three-golden-hairs/00_intro.md
-    // For now, return null - chapter summary will come from markdown if it exists
-    // This prevents coupling between code tests and markdown structure
-    return null;
-  }
-
-  private void writeChapterMetadata(String bookTitle, ChapterModel chapterModel)
-      throws IOException {
-    // Create filename from chapter name
-    String chapterName = sanitizeFilename(chapterModel.title());
-    String filename = "chapter--" + chapterName + ".json";
-    Path chapterPath = outputDirectory.resolve(filename);
-
-    // Only write if file doesn't already exist (don't overwrite markdown-generated metadata)
-    if (Files.exists(chapterPath)) {
-      return;
-    }
-
-    // Create a chapter metadata wrapper (matching JsonStoryListener format)
-    ChapterMetadataWrapper wrapper =
-        new ChapterMetadataWrapper(
-            "code-based", // bookPath for code-based chapters
-            bookTitle,
-            chapterModel);
-
-    objectMapper.writeValue(chapterPath.toFile(), wrapper);
-    System.out.println("StoryExtension: Chapter metadata written to: " + chapterPath);
-  }
-
-  private String sanitizeFilename(String name) {
-    // Remove invalid filename characters and limit length
-    String sanitized = name.replaceAll("[^a-zA-Z0-9-_\\s]", "").replaceAll("\\s+", "-");
-    return sanitized.substring(0, Math.min(sanitized.length(), MAX_FILENAME_LENGTH));
-  }
-
   private ExtensionContext.Store getStore(ExtensionContext context) {
     return context.getStore(
         ExtensionContext.Namespace.create(getClass(), context.getRequiredTestClass()));
   }
-
-  /// Record to hold chapter metadata with book context (matches JsonStoryListener format).
-  record ChapterMetadataWrapper(String bookPath, String bookTitle, ChapterModel chapter) {}
 }
