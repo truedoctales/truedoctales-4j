@@ -157,6 +157,7 @@ public class BookReportGenerator {
     mapper.registerModule(new JavaTimeModule());
     mapper.registerModule(new Jdk8Module());
     mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
     mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     mapper.setVisibility(
         mapper

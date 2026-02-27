@@ -25,6 +25,7 @@
     <module>truedoctales-execution</module>
     <module>truedoctales-report-json</module>
     <module>truedoctales-report-markdown</module>
+    <module>truedoctales-maven-plugin</module>
     <module>truedoctales-sample-domain</module>
     <module>truedoctales-sample-jupiter</module>
   </modules>
@@ -267,6 +268,8 @@
                     <exclude>*.report.json</exclude>
                     <exclude>*.report.html</exclude>
                     <exclude>*.report.markdown</exclude>
+                    <!-- Exclude Maven plugin mojo - tested via integration -->
+                    <exclude>*.maven</exclude>
                   </excludes>
                 </rule>
               </rules>
