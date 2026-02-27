@@ -5,6 +5,7 @@ import dev.truedoctales.report.markdown.BookReportGenerator;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 import org.apache.maven.plugin.AbstractMojo;
@@ -89,14 +90,23 @@ public class ReportMojo extends AbstractMojo {
     // HTML is generated from enriched markdown. If markdown was already produced,
     // use that; otherwise generate enriched markdown in a temporary location first.
     Path markdownSource;
+    Path tempMarkdownDir = null;
     if (reportFormats.contains(OutputFormat.MARKDOWN)) {
       markdownSource = outputDirectory;
     } else {
-      markdownSource = outputDirectory.resolveSibling("truedoctales-markdown-tmp");
-      new BookReportGenerator(bookDirectory, executionDirectory, markdownSource).generate();
+      tempMarkdownDir = outputDirectory.resolveSibling("truedoctales-markdown-tmp");
+      new BookReportGenerator(bookDirectory, executionDirectory, tempMarkdownDir).generate();
+      markdownSource = tempMarkdownDir;
     }
     Path htmlOutput = outputDirectory.resolveSibling("truedoctales-html");
     new HtmlBookReportGenerator(markdownSource, htmlOutput).generate();
+
+    // Clean up temporary markdown if it was created
+    if (tempMarkdownDir != null && Files.isDirectory(tempMarkdownDir)) {
+      try (Stream<Path> walk = Files.walk(tempMarkdownDir)) {
+        walk.sorted(Comparator.reverseOrder()).forEach(p -> p.toFile().delete());
+      }
+    }
   }
 
   private void logGeneratedFiles() throws IOException {
