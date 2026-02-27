@@ -137,7 +137,14 @@ public class HtmlBookReportGenerator {
     String preprocessed = preprocessMermaid(markdown);
     Node document = markdownParser.parse(preprocessed);
     String html = htmlRenderer.render(document);
+    html = rewriteMarkdownLinks(html);
     return postprocessMermaid(html);
+  }
+
+  /// Rewrites {@code .md} links in the rendered HTML to point to the corresponding {@code .html}
+  /// files so that prequel and cross-story links work correctly in the HTML report.
+  private String rewriteMarkdownLinks(String html) {
+    return html.replaceAll("(<a\\s[^>]*href=\"[^\"]*?)\\.md(\")", "$1.html$2");
   }
 
   /// Converts mermaid fenced code blocks to HTML div blocks before commonmark parsing.

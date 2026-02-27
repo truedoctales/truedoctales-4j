@@ -248,6 +248,49 @@ class HtmlBookReportGeneratorTest {
   }
 
   @Test
+  void convertMarkdownToHtml_shouldRewriteMdLinksToHtml() {
+    String markdown = "See [Setup](setup.md) and [Data](../shared/data.md) for details.";
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    String html = generator.convertMarkdownToHtml(markdown);
+
+    assertTrue(html.contains("href=\"setup.html\""), "Should rewrite .md link to .html");
+    assertTrue(
+        html.contains("href=\"../shared/data.html\""),
+        "Should rewrite .md link with path to .html");
+    assertFalse(html.contains(".md\""), "Should not contain any .md link references");
+  }
+
+  @Test
+  void convertMarkdownToHtml_shouldRewritePrequelBlockLinks() {
+    String markdown =
+        """
+        > Prequels
+        > - [Setup Users](setup-users.md)
+        > - [Setup Data](setup-data.md)
+        """;
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    String html = generator.convertMarkdownToHtml(markdown);
+
+    assertTrue(
+        html.contains("href=\"setup-users.html\""), "Should rewrite prequel .md link to .html");
+    assertTrue(
+        html.contains("href=\"setup-data.html\""), "Should rewrite prequel .md link to .html");
+  }
+
+  @Test
+  void convertMarkdownToHtml_shouldNotRewriteNonMdLinks() {
+    String markdown = "Visit [Google](https://google.com) or see [Image](photo.png).";
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    String html = generator.convertMarkdownToHtml(markdown);
+
+    assertTrue(html.contains("href=\"https://google.com\""), "Should preserve external links");
+    assertTrue(html.contains("href=\"photo.png\""), "Should preserve non-md links");
+  }
+
+  @Test
   void generate_shouldExpandChapterGroupContainingActivePage() throws IOException {
     Files.writeString(markdownDir.resolve("00_intro.md"), "# Book Intro\n");
     Path ch1 = Files.createDirectories(markdownDir.resolve("01_chapter"));
