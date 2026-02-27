@@ -125,6 +125,27 @@ class BookReportGeneratorTest {
     assertDoesNotThrow(generator::generate);
   }
 
+  @Test
+  void generate_shouldFallBackToExecutionDirectoryForMarkdown() throws IOException {
+    // Code-based stories have no markdown in the book directory.
+    // The markdown is generated alongside the JSON in the execution directory.
+    String storyContent = "# Code Story\n\n## Scene: Test\n\n> **Code** Test scene\n";
+    Path storyJsonDir = Files.createDirectories(executionDir.resolve("03_chapter"));
+    Files.writeString(storyJsonDir.resolve("01_code-story.md"), storyContent);
+
+    StoryExecutionResult result =
+        buildStoryResult("03_chapter/01_code-story.md", ExecutionStatus.SUCCESS);
+    objectMapper.writeValue(storyJsonDir.resolve("01_code-story.json").toFile(), result);
+
+    BookReportGenerator generator = new BookReportGenerator(bookDir, executionDir, outputDir);
+    generator.generate();
+
+    Path enrichedPath = outputDir.resolve("03_chapter").resolve("01_code-story.md");
+    assertTrue(Files.exists(enrichedPath));
+    String enrichedContent = Files.readString(enrichedPath);
+    assertTrue(enrichedContent.contains("> **Code** Test scene ✅"));
+  }
+
   // Helper methods
 
   private StoryExecutionResult buildStoryResult(String path, ExecutionStatus status) {

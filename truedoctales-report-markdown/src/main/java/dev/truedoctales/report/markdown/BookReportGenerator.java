@@ -133,9 +133,10 @@ public class BookReportGenerator {
         return;
       }
 
-      Path markdownPath = bookDirectory.resolve(result.getPath());
-      if (!Files.exists(markdownPath)) {
-        logger.warning("Original markdown not found: " + markdownPath);
+      Path markdownPath = resolveMarkdownPath(result.getPath());
+      if (markdownPath == null) {
+        logger.warning(
+            "Original markdown not found in book or execution directory: " + result.getPath());
         return;
       }
 
@@ -150,6 +151,20 @@ public class BookReportGenerator {
     } catch (IOException e) {
       logger.warning("Failed to enrich story: " + jsonFile + " - " + e.getMessage());
     }
+  }
+
+  /// Resolves the markdown source file, checking the book directory first,
+  /// then falling back to the execution directory (for code-based stories).
+  private Path resolveMarkdownPath(String relativePath) {
+    Path bookPath = bookDirectory.resolve(relativePath);
+    if (Files.exists(bookPath)) {
+      return bookPath;
+    }
+    Path executionPath = executionDirectory.resolve(relativePath);
+    if (Files.exists(executionPath)) {
+      return executionPath;
+    }
+    return null;
   }
 
   private ObjectMapper createObjectMapper() {

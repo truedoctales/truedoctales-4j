@@ -67,8 +67,8 @@ public class StoryExtension
   private static final String PARAMETER_TABLE_NAMESPACE = "parameterTable";
   private static final String CURRENT_PARAMETERS_NAMESPACE = "currentParameters";
   private static final String SCENE_ADDED_NAMESPACE = "sceneAdded";
+  private static final String SCENE_DESCRIPTIONS_NAMESPACE = "sceneDescriptions";
   private static final String CODE_STEP_TYPE = "Code";
-  // Limit to avoid filesystem issues
 
   private final ObjectMapper objectMapper;
   private final Path outputDirectory;
@@ -113,21 +113,13 @@ public class StoryExtension
       return;
     }
 
-    // Create story execution model
-    StoryExecution storyExecution =
-        new StoryExecution(
-            Paths.get("code-based", testClass.getSimpleName() + ".java"),
-            storyAnnotation.title(),
-            List.of(), // No prequels for code-based stories
-            new ArrayList<>() // Scenes will be added during test execution
-            );
-
     StoryExecutionResult executionResult = new StoryExecutionResult();
-    executionResult.setPath(storyExecution.path().toString());
-    executionResult.setTitle(storyExecution.title());
+    executionResult.setPath(storyAnnotation.storyPath());
+    executionResult.setTitle(storyAnnotation.title());
 
     // Store in context
     getStore(context).put(EXECUTION_NAMESPACE, executionResult);
+    getStore(context).put(SCENE_DESCRIPTIONS_NAMESPACE, new LinkedHashMap<String, String>());
 
     System.out.println("StoryExtension: Initialized for story: " + storyAnnotation.storyPath());
   }
@@ -168,6 +160,17 @@ public class StoryExtension
     Scene sceneAnnotation = context.getRequiredTestMethod().getAnnotation(Scene.class);
     if (sceneAnnotation == null) {
       return;
+    }
+
+    // Store scene description for markdown generation
+    ExtensionContext classContext = context.getParent().orElse(context);
+    @SuppressWarnings("unchecked")
+    Map<String, String> descriptions =
+        getStore(classContext).get(SCENE_DESCRIPTIONS_NAMESPACE, Map.class);
+    if (descriptions != null
+        && !sceneAnnotation.description().isBlank()
+        && !descriptions.containsKey(sceneAnnotation.title())) {
+      descriptions.put(sceneAnnotation.title(), sceneAnnotation.description());
     }
 
     // Create scene execution (will be reused for all parameter invocations)
@@ -353,8 +356,13 @@ public class StoryExtension
       return;
     }
 
-    // Write JSON file
+    @SuppressWarnings("unchecked")
+    Map<String, String> sceneDescriptions =
+        getStore(context).get(SCENE_DESCRIPTIONS_NAMESPACE, Map.class);
+
+    // Write JSON file and markdown file
     writeJsonFile(storyAnnotation, executionResult);
+    writeMarkdownFile(storyAnnotation, executionResult, sceneDescriptions);
   }
 
   private void writeJsonFile(Story storyAnnotation, StoryExecutionResult executionResult)
@@ -381,6 +389,74 @@ public class StoryExtension
             + " ("
             + Files.size(outputPath)
             + " bytes)");
+  }
+
+  private void writeMarkdownFile(
+      Story storyAnnotation,
+      StoryExecutionResult executionResult,
+      Map<String, String> sceneDescriptions)
+      throws IOException {
+    Path storyPath = Path.of(storyAnnotation.storyPath());
+    Path markdownPath = outputDirectory.resolve(storyPath);
+    Files.createDirectories(markdownPath.getParent());
+
+    String markdown = generateMarkdown(storyAnnotation, executionResult, sceneDescriptions);
+    Files.writeString(markdownPath, markdown);
+
+    System.out.println(
+        "StoryExtension: Markdown written to: "
+            + markdownPath.toAbsolutePath()
+            + " ("
+            + Files.size(markdownPath)
+            + " bytes)");
+  }
+
+  /// Generates markdown content from the story annotation and execution results.
+  ///
+  /// The generated markdown follows the same format as hand-written markdown stories,
+  /// so the markdown-report module can process both identically.
+  private String generateMarkdown(
+      Story storyAnnotation,
+      StoryExecutionResult executionResult,
+      Map<String, String> sceneDescriptions) {
+    StringBuilder md = new StringBuilder();
+
+    // Story header from @Story.markdown
+    String storyMarkdown = storyAnnotation.markdown().stripIndent().strip();
+    if (!storyMarkdown.isEmpty()) {
+      md.append(storyMarkdown);
+    } else {
+      md.append("# ").append(storyAnnotation.title());
+    }
+    md.append("\n");
+
+    // Generate scene sections
+    if (executionResult.getSceneResults() != null) {
+      for (SceneExecutionResult scene : executionResult.getSceneResults()) {
+        md.append("\n## Scene: ").append(scene.title()).append("\n");
+
+        // Add scene description if available
+        if (sceneDescriptions != null && sceneDescriptions.containsKey(scene.title())) {
+          String description = sceneDescriptions.get(scene.title()).stripIndent().strip();
+          if (!description.isEmpty()) {
+            md.append("\n").append(description).append("\n");
+          }
+        }
+
+        // Add step declaration line for each step in the scene
+        if (scene.stepResults() != null) {
+          for (StepExecutionResult step : scene.stepResults()) {
+            md.append("\n> **")
+                .append(step.plot())
+                .append("** ")
+                .append(scene.title())
+                .append("\n");
+          }
+        }
+      }
+    }
+
+    return md.toString();
   }
 
   private ExtensionContext.Store getStore(ExtensionContext context) {
