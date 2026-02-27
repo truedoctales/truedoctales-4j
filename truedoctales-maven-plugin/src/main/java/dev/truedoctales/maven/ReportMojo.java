@@ -4,6 +4,7 @@ import dev.truedoctales.report.markdown.BookReportGenerator;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Stream;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -43,20 +44,40 @@ public class ReportMojo extends AbstractMojo {
 
   @Override
   public void execute() throws MojoExecutionException {
+    getLog().info("Book directory: " + bookDirectory);
+    getLog().info("Execution directory: " + executionDirectory);
+    getLog().info("Output directory: " + outputDirectory);
+
     if (!Files.isDirectory(bookDirectory)) {
       getLog().warn("Book directory does not exist: " + bookDirectory);
       return;
     }
     if (!Files.isDirectory(executionDirectory)) {
       getLog().warn("Execution directory does not exist: " + executionDirectory);
+      getLog().warn("Run 'mvn verify' first to generate execution JSON.");
       return;
     }
 
     try {
       new BookReportGenerator(bookDirectory, executionDirectory, outputDirectory).generate();
-      getLog().info("Truedoctales enriched report written to " + outputDirectory);
+      logGeneratedFiles();
     } catch (IOException e) {
       throw new MojoExecutionException("Failed to generate Truedoctales report", e);
+    }
+  }
+
+  private void logGeneratedFiles() throws IOException {
+    if (!Files.isDirectory(outputDirectory)) {
+      getLog().warn("Output directory was not created: " + outputDirectory);
+      return;
+    }
+    try (Stream<Path> files = Files.walk(outputDirectory)) {
+      long count =
+          files
+              .filter(Files::isRegularFile)
+              .peek(f -> getLog().info("  Generated: " + outputDirectory.relativize(f)))
+              .count();
+      getLog().info("Truedoctales report: " + count + " file(s) written to " + outputDirectory);
     }
   }
 }
