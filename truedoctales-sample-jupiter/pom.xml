@@ -37,7 +37,10 @@
 
   <build>
     <plugins>
-      <!-- Generate enriched Markdown report during mvn site -->
+      <!-- Generate enriched Markdown report during mvn site.
+           Requires 'mvn verify' to have run first so that JSON + Markdown
+           execution results exist in target/truedoctales-report/.
+           Usage: mvn clean verify && mvn site -->
       <plugin>
         <groupId>dev.truedoctales</groupId>
         <artifactId>truedoctales-maven-plugin</artifactId>
@@ -46,26 +49,6 @@
           <execution>
             <goals>
               <goal>report</goal>
-            </goals>
-            <phase>pre-site</phase>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- Ensure tests run and generate JSON output -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.2.5</version>
-        <configuration>
-          <includes>
-            <include>**/*Test.java</include>
-          </includes>
-        </configuration>
-        <executions>
-          <execution>
-            <id>run-tests-before-site</id>
-            <goals>
-              <goal>test</goal>
             </goals>
             <phase>pre-site</phase>
           </execution>
