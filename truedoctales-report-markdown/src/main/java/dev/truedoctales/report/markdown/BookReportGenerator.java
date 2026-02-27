@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.List;
 import java.util.logging.Logger;
 
 /// Generates an enriched markdown report by merging the original book with execution results.
@@ -46,33 +47,68 @@ public class BookReportGenerator {
   private final Path outputDirectory;
   private final ObjectMapper objectMapper;
   private final StoryReportMerger merger;
+  private final List<OutputFormat> outputFormats;
 
-  /// Creates a new book report generator.
+  /// Creates a new book report generator that produces markdown output only.
   ///
   /// @param bookDirectory the root directory of the original book (markdown files)
   /// @param executionDirectory the directory containing JSON execution results
   /// @param outputDirectory the directory where the enriched report will be written
   public BookReportGenerator(Path bookDirectory, Path executionDirectory, Path outputDirectory) {
+    this(bookDirectory, executionDirectory, outputDirectory, List.of(OutputFormat.MARKDOWN));
+  }
+
+  /// Creates a new book report generator with configurable output formats.
+  ///
+  /// @param bookDirectory the root directory of the original book (markdown files)
+  /// @param executionDirectory the directory containing JSON execution results
+  /// @param outputDirectory the directory where the enriched report will be written
+  /// @param outputFormats the list of report formats to generate
+  public BookReportGenerator(
+      Path bookDirectory,
+      Path executionDirectory,
+      Path outputDirectory,
+      List<OutputFormat> outputFormats) {
     this.bookDirectory = bookDirectory;
     this.executionDirectory = executionDirectory;
     this.outputDirectory = outputDirectory;
     this.objectMapper = createObjectMapper();
     this.merger = new StoryReportMerger();
+    this.outputFormats = outputFormats;
   }
 
-  /// Generates the enriched markdown report.
+  /// Generates the report in the configured output formats.
   ///
   /// @throws IOException if reading or writing files fails
   public void generate() throws IOException {
     logger.info(
         "Generating report from book: " + bookDirectory + " with execution: " + executionDirectory);
 
-    Files.createDirectories(outputDirectory);
+    if (outputFormats.contains(OutputFormat.MARKDOWN)) {
+      Files.createDirectories(outputDirectory);
+      copyBookFiles();
+      enrichWithExecutionResults();
+      logger.info("Markdown report generated in: " + outputDirectory);
+    }
 
-    copyBookFiles();
-    enrichWithExecutionResults();
-
-    logger.info("Report generated in: " + outputDirectory);
+    if (outputFormats.contains(OutputFormat.HTML)) {
+      // Generate HTML from enriched markdown if markdown was produced,
+      // otherwise generate a temporary enriched markdown first.
+      Path markdownSource;
+      if (outputFormats.contains(OutputFormat.MARKDOWN)) {
+        markdownSource = outputDirectory;
+      } else {
+        // Produce enriched markdown in a temporary location for HTML conversion.
+        markdownSource = outputDirectory.resolveSibling("truedoctales-markdown-tmp");
+        Files.createDirectories(markdownSource);
+        BookReportGenerator mdGen =
+            new BookReportGenerator(
+                bookDirectory, executionDirectory, markdownSource, List.of(OutputFormat.MARKDOWN));
+        mdGen.generate();
+      }
+      Path htmlOutput = outputDirectory.resolveSibling("truedoctales-html");
+      new HtmlBookReportGenerator(markdownSource, htmlOutput).generate();
+    }
   }
 
   private void copyBookFiles() throws IOException {
