@@ -2,6 +2,7 @@ package dev.truedoctales.report.markdown;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import dev.truedoctales.api.model.execution.InputType;
 import dev.truedoctales.api.model.listener.ExecutionStatus;
 import dev.truedoctales.api.model.listener.SceneExecutionResult;
 import dev.truedoctales.api.model.listener.StepExecutionResult;
@@ -222,11 +223,12 @@ class StoryReportMergerTest {
   }
 
   private StepExecutionResult buildStep(ExecutionStatus status) {
-    return new StepExecutionResult(1, "Plot", "pattern", Map.of(), List.of(), status, null, null);
+    return new StepExecutionResult(
+        1, "Plot", "pattern", InputType.SEQUENCE, Map.of(), List.of(), status, null, null);
   }
 
   private StepExecutionResult buildStepWithError(ExecutionStatus status, String errorMessage) {
     return new StepExecutionResult(
-        1, "Plot", "pattern", Map.of(), List.of(), status, errorMessage, null);
+        1, "Plot", "pattern", InputType.SEQUENCE, Map.of(), List.of(), status, errorMessage, null);
   }
 }

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import dev.truedoctales.api.model.execution.InputType;
 import dev.truedoctales.api.model.listener.ExecutionStatus;
 import dev.truedoctales.api.model.listener.SceneExecutionResult;
 import dev.truedoctales.api.model.listener.StepExecutionResult;
@@ -131,7 +132,8 @@ class BookReportGeneratorTest {
     result.setPath(path);
     result.setTitle("Test Story");
     StepExecutionResult step =
-        new StepExecutionResult(1, "Plot", "pattern", Map.of(), List.of(), status, null, null);
+        new StepExecutionResult(
+            1, "Plot", "pattern", InputType.SEQUENCE, Map.of(), List.of(), status, null, null);
     SceneExecutionResult scene = new SceneExecutionResult("Scene Title", 1, List.of(step), status);
     result.addSceneResult(scene);
     return result;
@@ -144,7 +146,15 @@ class BookReportGeneratorTest {
     result.setTitle("Test Story");
     StepExecutionResult step =
         new StepExecutionResult(
-            1, "Plot", "pattern", Map.of(), List.of(), status, errorMessage, null);
+            1,
+            "Plot",
+            "pattern",
+            InputType.SEQUENCE,
+            Map.of(),
+            List.of(),
+            status,
+            errorMessage,
+            null);
     SceneExecutionResult scene = new SceneExecutionResult("Scene Title", 1, List.of(step), status);
     result.addSceneResult(scene);
     return result;
