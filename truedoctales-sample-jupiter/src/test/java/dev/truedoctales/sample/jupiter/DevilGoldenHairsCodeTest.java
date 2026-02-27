@@ -20,7 +20,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 /// Code-based version of "The Devil with the Three Golden Hairs" story.
 ///
-/// This story mirrors the markdown version but is written entirely in Java code.
+/// This story mirrors the Markdown version but is written entirely in Java code.
 /// It demonstrates that code-based and markdown-based stories can coexist and
 /// produce the same documentation output.
 ///
@@ -28,10 +28,15 @@ import org.junit.jupiter.params.provider.CsvSource;
 /// during test execution, making this story appear in the Book of Truth documentation.
 @Story(
     book = "Book of Stories",
-    chapter = "Chapter 3: The Devil with the Three Golden Hairs",
-    name = "The Devil with the Three Golden Hairs (Code)",
-    summary =
-        "A boy was born with a caul, marking him as lucky. The king sends him on a deadly quest to bring three golden hairs from the Devil's head.")
+    storyPath = "03_devils-chapter/01_devil-three-golden-hairs.md",
+    title = "The Devil with the Three Golden Hairs (Code)",
+    markdown =
+        """
+            # The Devil with the Three Golden Hairs (Code)
+
+            A boy was born with a caul, marking him as lucky.
+            The king sends him on a deadly quest to bring three golden hairs from the Devil's head.
+            """)
 @ExtendWith(StoryExtension.class)
 public class DevilGoldenHairsCodeTest {
 

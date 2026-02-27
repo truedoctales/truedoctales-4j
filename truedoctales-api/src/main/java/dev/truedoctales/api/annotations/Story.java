@@ -44,17 +44,17 @@ public @interface Story {
   /// Stories with the same book and chapter will be grouped together.
   ///
   /// @return the chapter name
-  String chapter();
+  String storyPath();
 
   /// The name of this story.
   ///
   /// This will be the title of the story in the generated documentation.
   ///
   /// @return the story name
-  String name();
+  String title();
 
   /// Optional summary or description of the story.
   ///
   /// @return the story summary, defaults to empty string
-  String summary() default "";
+  String markdown() default "";
 }
