@@ -220,7 +220,7 @@ public class HtmlBookReportGenerator {
           <script>
             mermaid.initialize({ startOnLoad: true, theme: 'default' });
             document.getElementById('sidebar-toggle').addEventListener('click', function() {
-              document.getElementById('sidebar').classList.toggle('collapsed');
+              document.getElementById('sidebar').classList.toggle('open');
             });
           </script>
         </body>
@@ -334,7 +334,6 @@ public class HtmlBookReportGenerator {
           transition: transform 0.3s ease;
           z-index: 100;
         }
-        .sidebar.collapsed { transform: translateX(-100%); }
         .sidebar-header {
           padding: 1.5rem;
           border-bottom: 1px solid var(--border);
@@ -455,7 +454,7 @@ public class HtmlBookReportGenerator {
         }
         @media (max-width: 768px) {
           .sidebar { transform: translateX(-100%); }
-          .sidebar.collapsed { transform: translateX(0); }
+          .sidebar.open { transform: translateX(0); }
           .sidebar-toggle { display: block; }
           .content { margin-left: 0; }
           article { padding: 1.5rem 1rem; }

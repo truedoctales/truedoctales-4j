@@ -196,7 +196,7 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     String html = generator.convertMarkdownToHtml(markdown);
 
-    assertTrue(html.contains("<table>") || html.contains("<table"), "Should render table");
+    assertTrue(html.contains("<table>"), "Should render table");
   }
 
   @Test
