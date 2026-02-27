@@ -9,9 +9,7 @@ import dev.truedoctales.api.model.execution.*;
 import dev.truedoctales.api.model.listener.SceneExecutionResult;
 import dev.truedoctales.api.model.listener.StepExecutionResult;
 import dev.truedoctales.api.model.listener.StoryExecutionResult;
-import dev.truedoctales.api.model.story.ChapterModel;
 import dev.truedoctales.api.model.story.StepCall;
-import dev.truedoctales.report.json.JsonStoryReader;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -22,14 +20,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.extension.AfterAllCallback;
-import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
-import org.junit.jupiter.api.extension.BeforeAllCallback;
-import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.InvocationInterceptor;
-import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
-import org.junit.jupiter.api.extension.TestWatcher;
+import org.jspecify.annotations.NonNull;
+import org.junit.jupiter.api.extension.*;
 
 /// JUnit 5 extension that captures test execution for @Story annotated test classes.
 ///
@@ -142,9 +134,9 @@ public class StoryExtension
 
   @Override
   public void interceptTestMethod(
-      InvocationInterceptor.Invocation<Void> invocation,
+      InvocationInterceptor.@NonNull Invocation<Void> invocation,
       ReflectiveInvocationContext<Method> invocationContext,
-      ExtensionContext extensionContext)
+      @NonNull ExtensionContext extensionContext)
       throws Throwable {
     // Capture method parameters before test execution
     List<Object> arguments = invocationContext.getArguments();
@@ -167,7 +159,7 @@ public class StoryExtension
   }
 
   @Override
-  public void beforeTestExecution(ExtensionContext context) throws Exception {
+  public void beforeTestExecution(ExtensionContext context) {
     Story storyAnnotation = context.getRequiredTestClass().getAnnotation(Story.class);
     if (storyAnnotation == null) {
       return;
@@ -190,7 +182,7 @@ public class StoryExtension
   }
 
   @Override
-  public void afterTestExecution(ExtensionContext context) throws Exception {
+  public void afterTestExecution(ExtensionContext context) {
     Story storyAnnotation = context.getRequiredTestClass().getAnnotation(Story.class);
     if (storyAnnotation == null) {
       return;
@@ -369,19 +361,6 @@ public class StoryExtension
       throws IOException {
     // Ensure output directory exists
     Files.createDirectories(outputDirectory);
-
-    // Create chapter model
-    ChapterModel chapterModel =
-        new ChapterModel(
-            Paths.get(storyAnnotation.storyPath()).getParent(),
-            storyAnnotation.title(),
-            List.of() // No stories in chapter model (this is for context only)
-            );
-
-    // Create wrapper with chapter context
-    JsonStoryReader.StoryExecutionWrapper wrapper =
-        new JsonStoryReader.StoryExecutionWrapper(
-            storyAnnotation.book(), storyAnnotation.book(), chapterModel, executionResult);
 
     // Create filename
     Path storyPath = Path.of(storyAnnotation.storyPath());

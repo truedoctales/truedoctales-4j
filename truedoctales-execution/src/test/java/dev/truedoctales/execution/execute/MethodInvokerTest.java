@@ -255,7 +255,7 @@ class MethodInvokerTest {
     Map<String, String> variables = Map.of("skill", "Math");
 
     // Act
-    invoker.invoke(target, method, InputType.BATCH, tableData, variables);
+    invoker.invoke(target, method, InputType.SEQUENCE, tableData, variables);
 
     // Assert
     assertEquals("Alice", target.lastStringValue);
@@ -284,7 +284,7 @@ class MethodInvokerTest {
     Map<String, String> variables = Map.of("skill", "Programming");
 
     // Act
-    invoker.invoke(target, method, InputType.SEQUENCE, tableData, variables);
+    invoker.invoke(target, method, InputType.BATCH, tableData, variables);
 
     // Assert
     assertEquals("Programming", target.lastStringValue);

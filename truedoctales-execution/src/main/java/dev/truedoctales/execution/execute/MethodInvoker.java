@@ -43,8 +43,14 @@ public class MethodInvoker {
       throws Exception {
     return switch (inputType) {
       case NONE -> invokeWithoutParameters(instance, method);
-      case SEQUENCE -> invokeWithVariables(instance, method, variables);
-      case BATCH -> invokeWithEachDataRow(instance, method, maps, variables);
+      case SEQUENCE -> {
+        if (maps.isEmpty()) {
+          yield invokeWithVariables(instance, method, variables);
+        } else {
+          yield invokeWithEachDataRow(instance, method, maps, variables);
+        }
+      }
+      case BATCH -> invokeWithDataCollection(instance, method, maps, variables);
     };
   }
 

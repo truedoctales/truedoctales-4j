@@ -52,7 +52,7 @@ public class SimplePlotRegistry implements PlotRegistry {
 
   public InputType getInputType(Method method) {
     return Stream.of(method.getParameterTypes())
-        .filter(Map.class::isAssignableFrom)
+        .filter(Collection.class::isAssignableFrom)
         .findFirst()
         .map(x -> InputType.BATCH)
         .orElse(InputType.SEQUENCE);
