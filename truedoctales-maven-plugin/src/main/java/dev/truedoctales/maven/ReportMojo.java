@@ -19,7 +19,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 /// <p>Intended usage: run {@code mvn test} (or {@code mvn verify}) first so that
 /// {@code JsonStoryListener} writes execution JSON, then run {@code mvn site} which triggers
 /// this goal in the {@code pre-site} phase. Output is written to
-/// {@code ${project.build.directory}/site/truedoctales} following Maven site conventions.
+/// {@code ${project.build.directory}/truedoctales-markdown}.
 @Mojo(name = "report", defaultPhase = LifecyclePhase.PRE_SITE)
 public class ReportMojo extends AbstractMojo {
 
@@ -31,21 +31,18 @@ public class ReportMojo extends AbstractMojo {
 
   /// Directory that contains the JSON execution results produced by {@code JsonStoryListener}.
   @Parameter(
-      defaultValue = "${project.build.directory}/book-of-truth/.execution",
+      defaultValue = "${project.build.directory}/truedoctales-report",
       property = "truedoctales.executionDirectory")
   private Path executionDirectory;
 
   /// Directory where the enriched book copy will be written.
   @Parameter(
-      defaultValue = "${project.build.directory}/site/truedoctales",
+      defaultValue = "${project.build.directory}/truedoctales-markdown",
       property = "truedoctales.outputDirectory")
   private Path outputDirectory;
 
   @Override
   public void execute() throws MojoExecutionException {
-    getLog()
-        .error(
-            "HEEY! This plugin is deprecated and will be removed in a future release. Please use the standalone report generator instead:");
     if (!Files.isDirectory(bookDirectory)) {
       getLog().warn("Book directory does not exist: " + bookDirectory);
       return;
