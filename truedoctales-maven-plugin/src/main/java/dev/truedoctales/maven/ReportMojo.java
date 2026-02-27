@@ -71,13 +71,13 @@ public class ReportMojo extends AbstractMojo {
       getLog().warn("Output directory was not created: " + outputDirectory);
       return;
     }
+    long count = 0;
     try (Stream<Path> files = Files.walk(outputDirectory)) {
-      long count =
-          files
-              .filter(Files::isRegularFile)
-              .peek(f -> getLog().info("  Generated: " + outputDirectory.relativize(f)))
-              .count();
-      getLog().info("Truedoctales report: " + count + " file(s) written to " + outputDirectory);
+      for (Path file : (Iterable<Path>) files.filter(Files::isRegularFile)::iterator) {
+        getLog().info("  Generated: " + outputDirectory.relativize(file));
+        count++;
+      }
     }
+    getLog().info("Truedoctales report: " + count + " file(s) written to " + outputDirectory);
   }
 }
