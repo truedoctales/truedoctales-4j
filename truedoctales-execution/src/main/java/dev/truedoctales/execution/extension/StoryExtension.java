@@ -130,12 +130,26 @@ public class StoryExtension
       ReflectiveInvocationContext<Method> invocationContext,
       @NonNull ExtensionContext extensionContext)
       throws Throwable {
-    // Capture method parameters before test execution
+    captureParameters(invocationContext, extensionContext);
+    invocation.proceed();
+  }
+
+  @Override
+  public void interceptTestTemplateMethod(
+      InvocationInterceptor.@NonNull Invocation<Void> invocation,
+      ReflectiveInvocationContext<Method> invocationContext,
+      @NonNull ExtensionContext extensionContext)
+      throws Throwable {
+    captureParameters(invocationContext, extensionContext);
+    invocation.proceed();
+  }
+
+  private void captureParameters(
+      ReflectiveInvocationContext<Method> invocationContext, ExtensionContext extensionContext) {
     List<Object> arguments = invocationContext.getArguments();
     Method method = invocationContext.getExecutable();
     Parameter[] parameters = method.getParameters();
 
-    // Build parameter map
     Map<String, String> paramMap = new LinkedHashMap<>();
     for (int i = 0; i < parameters.length && i < arguments.size(); i++) {
       String paramName = parameters[i].getName();
@@ -143,11 +157,7 @@ public class StoryExtension
       paramMap.put(paramName, paramValue != null ? paramValue.toString() : "null");
     }
 
-    // Store in context for use in afterTestExecution
     getStore(extensionContext).put(CURRENT_PARAMETERS_NAMESPACE, paramMap);
-
-    // Proceed with test execution
-    invocation.proceed();
   }
 
   @Override
