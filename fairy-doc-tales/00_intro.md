@@ -1,4 +1,7 @@
-# True Doc Tales - Living Documentation Through Fairy Tales
+# True Doc Tales
+
+*Fairy tales become reality*
+
 
 ![True Doc Tales](assets/big_icon_full.png)
 
