@@ -146,6 +146,10 @@ body {
   list-style: none;
   user-select: none;
   transition: background 0.15s, color 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
 }
 .sidebar-content .nav-tree summary::-webkit-details-marker { display: none; }
 
@@ -174,8 +178,9 @@ body {
   color: var(--pico-secondary-color, #475569);
   text-decoration: none;
   font-size: 0.84rem;
+  font-weight: 600;
   border-left: 3px solid transparent;
-  transition: all 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   line-height: 1.5;
 }
 .sidebar-content li a:hover {
@@ -186,14 +191,13 @@ body {
 .sidebar-content li a.active {
   background: var(--primary-bg);
   border-left-color: var(--primary);
-  font-weight: 600;
   color: var(--primary);
 }
 
 .sidebar-toggle {
   display: none;
   position: fixed;
-  top: calc(var(--header-height) + 0.75rem);
+  top: 5px;
   left: 1rem;
   z-index: 200;
   background: var(--primary);
