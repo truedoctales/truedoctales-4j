@@ -46,7 +46,6 @@ graph LR
     L --> M[Free All Nightingales]
     M --> N[Fairy Defeated]
     N --> O[Happy Ending]
-    
     style C fill:#f66
     style D fill:#f66
     style G fill:#6f6
