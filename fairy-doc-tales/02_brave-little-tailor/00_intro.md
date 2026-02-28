@@ -1,4 +1,4 @@
-# Chapter 2: The Brave Little Tailor - Seven at One Blow!
+# The Brave Little Tailor - Seven at One Blow!
 
 ![The Brave Little Tailor](https://picsum.photos/600/400?random=3)
 

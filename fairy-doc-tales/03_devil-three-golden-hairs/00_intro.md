@@ -1,4 +1,4 @@
-# Chapter 3: The Devil with the Three Golden Hairs
+# The Devil with the Three Golden Hairs
 
 ![The Devil with Three Golden Hairs](https://picsum.photos/500/400?random=7)
 

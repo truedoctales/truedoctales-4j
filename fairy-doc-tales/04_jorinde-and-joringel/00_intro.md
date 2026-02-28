@@ -1,4 +1,4 @@
-# Chapter 4: Jorinde and Joringel - Love Conquers Magic
+# Jorinde and Joringel - Love Conquers Magic
 
 ![Jorinde and Joringel](https://picsum.photos/500/400?random=12)
 
