@@ -303,7 +303,10 @@ public class HtmlBookReportGenerator {
           </script>
           <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
           <script>
-            if (typeof mermaid !== 'undefined') { mermaid.initialize({ startOnLoad: true, theme: 'default' }); }
+            if (typeof mermaid !== 'undefined') {
+              var mermaidTheme = (document.documentElement.getAttribute('data-theme') === 'dark') ? 'dark' : 'default';
+              mermaid.initialize({ startOnLoad: true, theme: mermaidTheme });
+            }
           </script>
         </body>
         </html>
