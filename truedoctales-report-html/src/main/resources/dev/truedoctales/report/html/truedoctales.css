@@ -80,6 +80,12 @@ body {
   background: rgba(255,255,255,0.25);
 }
 
+/* Dark-mode header — use a subdued slate instead of the light-mode blue */
+[data-theme="dark"] .top-header {
+  background: linear-gradient(135deg, #1e293b, #334155);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
 /* --- Sidebar -------------------------------------------------------- */
 
 .sidebar {
@@ -119,28 +125,13 @@ body {
   border-bottom: 1px solid var(--border-light);
 }
 .sidebar-content .nav-tree summary {
-  display: block;
   padding: 0.625rem 1.5rem;
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--pico-color, #1e293b);
   cursor: pointer;
-  list-style: none;
   user-select: none;
   transition: background 0.15s, color 0.15s;
-}
-.sidebar-content .nav-tree summary::-webkit-details-marker { display: none; }
-.sidebar-content .nav-tree summary::before {
-  content: '\25b6';
-  display: inline-block;
-  margin-right: 0.5rem;
-  font-size: 0.55rem;
-  transition: transform 0.2s cubic-bezier(0.4,0,0.2,1);
-  vertical-align: middle;
-  color: var(--pico-muted-color, #64748b);
-}
-.sidebar-content .nav-tree[open] > summary::before {
-  transform: rotate(90deg);
 }
 .sidebar-content .nav-tree summary:hover {
   background: var(--border-light);
