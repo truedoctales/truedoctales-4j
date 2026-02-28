@@ -301,7 +301,10 @@ public class HtmlBookReportGenerator {
                 mermaid.initialize({ startOnLoad: false, theme: mermaidTheme() });
                 document.querySelectorAll('.mermaid').forEach(function(el) {
                   var source = el.getAttribute('data-mermaid-source');
-                  if (!source) { source = el.textContent; el.setAttribute('data-mermaid-source', source); }
+                  if (!source) {
+                    source = el.textContent;
+                    el.setAttribute('data-mermaid-source', source);
+                  }
                   el.removeAttribute('data-processed');
                   el.innerHTML = source;
                 });
