@@ -104,39 +104,111 @@ body {
   box-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 
-/* Fairy-tale theme — whimsical storybook aesthetic */
+/* Fairy-tale theme — old storybook / parchment aesthetic */
 [data-theme="fairytale"] {
-  --primary: #7c3aed;
-  --primary-dark: #6d28d9;
-  --primary-light: #a78bfa;
-  --primary-bg: #f5f3ff;
-  --border-light: #ede9fe;
+  --primary: #8b5e3c;
+  --primary-dark: #6b3a1f;
+  --primary-light: #b5835a;
+  --primary-bg: #faf3e8;
+  --border-light: #e8d5b8;
   color-scheme: light;
 }
+[data-theme="fairytale"] body {
+  font-family: "Palatino Linotype", "Book Antiqua", Palatino, Georgia, "Times New Roman", serif;
+  background: #f5ebe0;
+}
 [data-theme="fairytale"] .top-header {
-  background: linear-gradient(135deg, #6d28d9, #a78bfa, #f472b6);
-  box-shadow: 0 2px 8px rgba(109,40,217,0.25);
+  background: linear-gradient(135deg, #5c3317, #8b5e3c, #6b3a1f);
+  box-shadow: 0 2px 8px rgba(92,51,23,0.35);
+  border-bottom: 2px solid #3e1f0d;
 }
 [data-theme="fairytale"] .sidebar {
-  background: #faf5ff;
-  border-right-color: #ede9fe;
+  background: #faf3e8;
+  border-right: 2px solid #d4b896;
+}
+[data-theme="fairytale"] .sidebar-content .nav-group-label {
+  color: #8b5e3c;
+  font-family: "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+}
+[data-theme="fairytale"] .sidebar-content .nav-tree summary {
+  color: #5c3317;
+  font-family: "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
 }
 [data-theme="fairytale"] .sidebar-content .nav-tree summary:hover {
-  background: #ede9fe;
-  color: #7c3aed;
+  background: #f0e0c8;
+  color: #6b3a1f;
+}
+[data-theme="fairytale"] .sidebar-content li a {
+  font-family: "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
 }
 [data-theme="fairytale"] .sidebar-content li a:hover {
-  background: #ede9fe;
-  border-left-color: #a78bfa;
-  color: #7c3aed;
+  background: #f0e0c8;
+  border-left-color: #b5835a;
+  color: #6b3a1f;
 }
 [data-theme="fairytale"] .sidebar-content li a.active {
-  background: #f5f3ff;
-  border-left-color: #7c3aed;
-  color: #7c3aed;
+  background: #faf3e8;
+  border-left-color: #8b5e3c;
+  color: #6b3a1f;
+}
+[data-theme="fairytale"] .content {
+  background: #fdf8f0;
+  position: relative;
+}
+[data-theme="fairytale"] article {
+  color: #3e2a1a;
+  position: relative;
+}
+[data-theme="fairytale"] article h1,
+[data-theme="fairytale"] article h2,
+[data-theme="fairytale"] article h3 {
+  font-family: "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+  color: #5c3317;
+}
+[data-theme="fairytale"] article h1:first-child {
+  text-align: center;
+  border-bottom: 2px solid #d4b896;
+  padding-bottom: 0.75rem;
+}
+/* Decorative fairy-tale background icons using CSS pseudo-elements */
+[data-theme="fairytale"] .content::before {
+  content: "🦄";
+  position: fixed;
+  bottom: 6rem;
+  right: 2rem;
+  font-size: 3rem;
+  opacity: 0.10;
+  pointer-events: none;
+  z-index: 0;
+}
+[data-theme="fairytale"] .content::after {
+  content: "🐺";
+  position: fixed;
+  bottom: 2rem;
+  right: 6rem;
+  font-size: 2.5rem;
+  opacity: 0.10;
+  pointer-events: none;
+  z-index: 0;
+}
+[data-theme="fairytale"] .sidebar::after {
+  content: "🦇";
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2rem;
+  opacity: 0.12;
+  pointer-events: none;
 }
 [data-theme="fairytale"] .report-footer {
-  background: #faf5ff;
+  background: #f5ebe0;
+  border-top-color: #d4b896;
+  color: #8b5e3c;
+  font-family: "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+}
+[data-theme="fairytale"] .report-footer .footer-brand {
+  color: #5c3317;
 }
 
 /* --- Sidebar -------------------------------------------------------- */

@@ -493,6 +493,26 @@ class HtmlBookReportGeneratorTest {
     assertTrue(
         css.contains("[data-theme=\"fairytale\"] .top-header"),
         "CSS should include fairy-tale header styling");
+    assertTrue(
+        css.contains("Palatino"), "Fairy-tale theme should use serif font for old-book aesthetic");
+  }
+
+  @Test
+  void generate_cssShouldIncludeFairyTaleBackgroundIcons() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String css = Files.readString(htmlOutputDir.resolve("truedoctales.css"));
+    assertTrue(
+        css.contains("\"\uD83E\uDD84\""),
+        "Fairy-tale theme should include unicorn icon as background");
+    assertTrue(
+        css.contains("\"\uD83E\uDD87\""), "Fairy-tale theme should include bat icon as background");
+    assertTrue(
+        css.contains("\"\uD83D\uDC3A\""),
+        "Fairy-tale theme should include wolf icon as background");
   }
 
   @Test
