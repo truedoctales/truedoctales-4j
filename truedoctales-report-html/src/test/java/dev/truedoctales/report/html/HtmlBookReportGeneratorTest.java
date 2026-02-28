@@ -470,6 +470,32 @@ class HtmlBookReportGeneratorTest {
   }
 
   @Test
+  void generate_shouldIncludeFairyTaleThemeInToggle() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String html = Files.readString(htmlOutputDir.resolve("intro.html"));
+    assertTrue(html.contains("fairytale"), "Should include fairytale theme in toggle script");
+  }
+
+  @Test
+  void generate_cssShouldIncludeFairyTaleTheme() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String css = Files.readString(htmlOutputDir.resolve("truedoctales.css"));
+    assertTrue(
+        css.contains("[data-theme=\"fairytale\"]"), "CSS should include fairy-tale theme styles");
+    assertTrue(
+        css.contains("[data-theme=\"fairytale\"] .top-header"),
+        "CSS should include fairy-tale header styling");
+  }
+
+  @Test
   void generate_shouldUseTitleFromMetaJsonWhenPresent() throws IOException {
     Files.writeString(markdownDir.resolve("00_intro.md"), "# Markdown Title\n");
     Path ch = Files.createDirectories(markdownDir.resolve("01_chapter"));

@@ -42,6 +42,7 @@ body {
   z-index: 150;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12);
   flex-shrink: 0;
+  box-sizing: border-box;
 }
 .top-header-brand {
   display: flex;
@@ -49,14 +50,18 @@ body {
   gap: 0.75rem;
   text-decoration: none;
   color: white;
+  max-height: 100%;
 }
 .top-header-brand:hover { color: white; text-decoration: none; }
 .top-header-brand img {
-  width: 48px;
-  height: 48px;
+  width: auto;
+  height: calc(var(--header-height) - 0.75rem);
+  max-height: 48px;
+  aspect-ratio: 1;
   border-radius: 6px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.2);
   margin: 0;
+  flex-shrink: 0;
 }
 .top-header-brand-text {
   display: flex;
@@ -97,6 +102,41 @@ body {
 [data-theme="dark"] .top-header {
   background: linear-gradient(135deg, #1e293b, #334155);
   box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* Fairy-tale theme — whimsical storybook aesthetic */
+[data-theme="fairytale"] {
+  --primary: #7c3aed;
+  --primary-dark: #6d28d9;
+  --primary-light: #a78bfa;
+  --primary-bg: #f5f3ff;
+  --border-light: #ede9fe;
+  color-scheme: light;
+}
+[data-theme="fairytale"] .top-header {
+  background: linear-gradient(135deg, #6d28d9, #a78bfa, #f472b6);
+  box-shadow: 0 2px 8px rgba(109,40,217,0.25);
+}
+[data-theme="fairytale"] .sidebar {
+  background: #faf5ff;
+  border-right-color: #ede9fe;
+}
+[data-theme="fairytale"] .sidebar-content .nav-tree summary:hover {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+[data-theme="fairytale"] .sidebar-content li a:hover {
+  background: #ede9fe;
+  border-left-color: #a78bfa;
+  color: #7c3aed;
+}
+[data-theme="fairytale"] .sidebar-content li a.active {
+  background: #f5f3ff;
+  border-left-color: #7c3aed;
+  color: #7c3aed;
+}
+[data-theme="fairytale"] .report-footer {
+  background: #faf5ff;
 }
 
 /* --- Sidebar -------------------------------------------------------- */

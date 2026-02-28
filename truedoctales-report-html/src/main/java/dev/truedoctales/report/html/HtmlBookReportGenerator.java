@@ -289,17 +289,19 @@ public class HtmlBookReportGenerator {
               document.getElementById('sidebar').classList.toggle('open');
             });
             (function() {
-              var toggle = document.getElementById
-              ('theme-toggle');
+              var toggle = document.getElementById('theme-toggle');
               var html = document.documentElement;
+              var themes = ['light', 'dark', 'fairytale'];
+              var icons = { light: '🌙', dark: '🏰', fairytale: '☀️' };
               var stored = localStorage.getItem('truedoctales-theme');
-              if (stored) {
+              if (stored && themes.indexOf(stored) !== -1) {
                 html.setAttribute('data-theme', stored);
-                toggle.textContent = stored === 'dark' ? '☀️' : '🌙';
+                toggle.textContent = icons[stored] || '🌙';
               }
               toggle.addEventListener('click', function() {
                 var current = html.getAttribute('data-theme') || 'light';
-                var next = current === 'dark' ? 'light' : 'dark';
+                var idx = themes.indexOf(current);
+                var next = themes[(idx + 1) %% themes.length];
                 localStorage.setItem('truedoctales-theme', next);
                 location.reload();
               });
