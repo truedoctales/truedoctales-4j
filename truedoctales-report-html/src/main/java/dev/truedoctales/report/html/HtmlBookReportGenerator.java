@@ -293,33 +293,15 @@ public class HtmlBookReportGenerator {
                 html.setAttribute('data-theme', stored);
                 toggle.textContent = stored === 'dark' ? '☀️' : '🌙';
               }
-              function mermaidTheme() {
-                return (html.getAttribute('data-theme') === 'dark') ? 'dark' : 'default';
-              }
-              function rerenderMermaid() {
-                if (typeof mermaid === 'undefined') return;
-                mermaid.initialize({ startOnLoad: false, theme: mermaidTheme() });
-                document.querySelectorAll('.mermaid').forEach(function(el) {
-                  var source = el.getAttribute('data-mermaid-source');
-                  if (!source) {
-                    source = el.textContent;
-                    el.setAttribute('data-mermaid-source', source);
-                  }
-                  el.removeAttribute('data-processed');
-                  el.innerHTML = source;
-                });
-                mermaid.run();
-              }
               toggle.addEventListener('click', function() {
                 var current = html.getAttribute('data-theme') || 'light';
                 var next = current === 'dark' ? 'light' : 'dark';
-                html.setAttribute('data-theme', next);
                 localStorage.setItem('truedoctales-theme', next);
-                toggle.textContent = next === 'dark' ? '☀️' : '🌙';
-                rerenderMermaid();
+                location.reload();
               });
               if (typeof mermaid !== 'undefined') {
-                mermaid.initialize({ startOnLoad: true, theme: mermaidTheme() });
+                var theme = (html.getAttribute('data-theme') === 'dark') ? 'dark' : 'default';
+                mermaid.initialize({ startOnLoad: true, theme: theme });
               }
             })();
           </script>
