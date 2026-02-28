@@ -6,7 +6,7 @@
 
 :root {
   --sidebar-width: 290px;
-  --header-height: 3rem;
+  --header-height: 3.75rem;
   --primary: #2563eb;
   --primary-dark: #1d4ed8;
   --primary-light: #3b82f6;
@@ -37,7 +37,7 @@ body {
   color: white;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: 0 1.25rem;
   z-index: 150;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12);
@@ -46,24 +46,37 @@ body {
 .top-header-brand {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.75rem;
   text-decoration: none;
   color: white;
 }
 .top-header-brand:hover { color: white; text-decoration: none; }
 .top-header-brand img {
-  width: 26px;
-  height: 26px;
-  border-radius: 5px;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.2);
   margin: 0;
 }
-.top-header-brand span {
-  font-size: 0.95rem;
+.top-header-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.top-header-brand-text .brand-title {
+  font-size: 1.1rem;
   font-weight: 700;
   letter-spacing: 0.01em;
 }
+.top-header-brand-text .brand-subtitle {
+  font-size: 0.65rem;
+  font-weight: 400;
+  opacity: 0.85;
+  letter-spacing: 0.02em;
+}
 .theme-toggle {
+  position: absolute;
+  right: 1.25rem;
   background: rgba(255,255,255,0.15);
   border: 1px solid rgba(255,255,255,0.25);
   color: white;

@@ -261,7 +261,10 @@ public class HtmlBookReportGenerator {
           <header class="top-header">
             <a class="top-header-brand" href="%sindex.html">
               <img src="%ssmall_icon_full.png" alt="True Doc Tales">
-              <span>True Doc Tales</span>
+              <span class="top-header-brand-text">
+                <span class="brand-title">True Doc Tales</span>
+                <span class="brand-subtitle">Fairy tales become reality</span>
+              </span>
            </a>
             <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">🌙</button>
           </header>
