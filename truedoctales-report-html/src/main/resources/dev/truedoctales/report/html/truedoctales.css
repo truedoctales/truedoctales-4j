@@ -130,8 +130,18 @@ body {
   font-weight: 600;
   color: var(--pico-color, #1e293b);
   cursor: pointer;
+  list-style: none;
   user-select: none;
   transition: background 0.15s, color 0.15s;
+}
+.sidebar-content .nav-tree summary::-webkit-details-marker { display: none; }
+.sidebar-content .nav-tree summary::before {
+  content: '🐸';
+  margin-right: 0.45rem;
+  font-size: 0.85rem;
+}
+.sidebar-content .nav-tree[open] > summary::before {
+  content: '👑';
 }
 .sidebar-content .nav-tree summary:hover {
   background: var(--border-light);
