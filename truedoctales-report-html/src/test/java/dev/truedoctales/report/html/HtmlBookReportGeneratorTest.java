@@ -423,17 +423,14 @@ class HtmlBookReportGeneratorTest {
   }
 
   @Test
-  void generate_shouldIncludeGoogleFonts() throws IOException {
+  void generate_shouldIncludePicoCssFramework() throws IOException {
     Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
 
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
     String html = Files.readString(htmlOutputDir.resolve("intro.html"));
-    assertTrue(
-        html.contains("fonts.googleapis.com"),
-        "Should include Google Fonts for premium typography");
-    assertTrue(html.contains("family=Inter"), "Should load Inter font family");
+    assertTrue(html.contains("picocss/pico"), "Should include Pico CSS framework from CDN");
   }
 
   @Test
