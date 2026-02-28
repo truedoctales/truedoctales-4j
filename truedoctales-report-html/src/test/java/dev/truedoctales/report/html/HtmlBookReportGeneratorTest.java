@@ -516,6 +516,28 @@ class HtmlBookReportGeneratorTest {
   }
 
   @Test
+  void generate_cssShouldIncludeFairyTaleHeaderPattern() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String css = Files.readString(htmlOutputDir.resolve("truedoctales.css"));
+    assertTrue(
+        css.contains("[data-theme=\"fairytale\"] .top-header::before"),
+        "Fairy-tale header should have ornamental before pseudo-element");
+    assertTrue(
+        css.contains("[data-theme=\"fairytale\"] .top-header::after"),
+        "Fairy-tale header should have ornamental after pseudo-element");
+    assertTrue(css.contains("\u2767"), "Fairy-tale header pattern should include fleuron ornament");
+    assertTrue(css.contains("\uD83D\uDC51"), "Fairy-tale header pattern should include crown icon");
+    assertTrue(
+        css.contains("\u269C"), "Fairy-tale header pattern should include fleur-de-lis icon");
+    assertTrue(
+        css.contains("\uD83D\uDC09"), "Fairy-tale header pattern should include dragon icon");
+  }
+
+  @Test
   void generate_shouldUseTitleFromMetaJsonWhenPresent() throws IOException {
     Files.writeString(markdownDir.resolve("00_intro.md"), "# Markdown Title\n");
     Path ch = Files.createDirectories(markdownDir.resolve("01_chapter"));
