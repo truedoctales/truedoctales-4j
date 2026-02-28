@@ -6,6 +6,7 @@
 
 :root {
   --sidebar-width: 290px;
+  --header-height: 3rem;
   --primary: #2563eb;
   --primary-dark: #1d4ed8;
   --primary-light: #3b82f6;
@@ -14,13 +15,69 @@
 }
 
 /* --- Layout override — Pico defaults to centered container;
-       we need a sidebar + content flex layout instead. -------------- */
+       we need a header + sidebar + content layout instead. ---------- */
 
 body {
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
   margin: 0;
   padding: 0;
+}
+
+/* --- Top Header Bar ------------------------------------------------- */
+
+.top-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--header-height);
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.25rem;
+  z-index: 150;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+  flex-shrink: 0;
+}
+.top-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: white;
+}
+.top-header-brand:hover { color: white; text-decoration: none; }
+.top-header-brand img {
+  width: 26px;
+  height: 26px;
+  border-radius: 5px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  margin: 0;
+}
+.top-header-brand span {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.theme-toggle {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: white;
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+.theme-toggle:hover {
+  background: rgba(255,255,255,0.25);
 }
 
 /* --- Sidebar -------------------------------------------------------- */
@@ -30,9 +87,9 @@ body {
   background: var(--pico-card-background-color, #f8fafc);
   border-right: 1px solid var(--pico-muted-border-color, #e2e8f0);
   position: fixed;
-  top: 0;
+  top: var(--header-height);
   left: 0;
-  height: 100vh;
+  height: calc(100vh - var(--header-height));
   overflow-y: auto;
   transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
   z-index: 100;
@@ -44,31 +101,6 @@ body {
 .sidebar::-webkit-scrollbar-track { background: transparent; }
 .sidebar::-webkit-scrollbar-thumb { background: var(--pico-muted-border-color, #e2e8f0); border-radius: 3px; }
 .sidebar::-webkit-scrollbar-thumb:hover { background: var(--pico-muted-color, #64748b); }
-
-.sidebar-header {
-  padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid rgba(255,255,255,0.15);
-  background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
-  color: white;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-shrink: 0;
-}
-.sidebar-header img {
-  width: 36px;
-  height: 36px;
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  margin: 0;
-}
-.sidebar-header h2 {
-  font-size: 1.05rem;
-  font-weight: 700;
-  margin: 0;
-  color: white;
-  --pico-color: white;
-}
 
 .sidebar-content {
   padding: 0.75rem 0;
@@ -118,7 +150,17 @@ body {
   padding-left: 0.5rem;
   padding-bottom: 0.375rem;
 }
-.sidebar-content ul { list-style: none; margin: 0; padding: 0; }
+/* Override Pico CSS nav ul flex layout — sidebar items must stack vertically */
+.sidebar-content ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: block;
+}
+.sidebar-content li {
+  display: block;
+  width: 100%;
+}
 .sidebar-content li a {
   display: block;
   padding: 0.375rem 1.5rem;
@@ -144,7 +186,7 @@ body {
 .sidebar-toggle {
   display: none;
   position: fixed;
-  top: 1rem;
+  top: calc(var(--header-height) + 0.75rem);
   left: 1rem;
   z-index: 200;
   background: var(--primary);
@@ -166,11 +208,12 @@ body {
 
 .content {
   margin-left: var(--sidebar-width);
+  margin-top: var(--header-height);
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: calc(100vh - var(--header-height));
   padding: 0;
 }
 
@@ -233,8 +276,9 @@ article img { border-radius: 12px; }
 /* --- Print ---------------------------------------------------------- */
 
 @media print {
+  .top-header { display: none !important; }
   .sidebar, .sidebar-toggle { display: none !important; }
-  .content { margin-left: 0 !important; }
+  .content { margin-left: 0 !important; margin-top: 0 !important; }
   article { max-width: none; padding: 0; }
   .report-footer { display: none; }
 }

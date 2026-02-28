@@ -261,7 +261,7 @@ class HtmlBookReportGeneratorTest {
     String html = Files.readString(htmlOutputDir.resolve("intro.html"));
     assertTrue(
         html.contains("<img src=\"small_icon_full.png\""),
-        "Should include project icon in sidebar header");
+        "Should include project icon in top header");
     assertTrue(
         Files.exists(htmlOutputDir.resolve("small_icon_full.png")),
         "Should write icon file to output directory");
@@ -442,5 +442,62 @@ class HtmlBookReportGeneratorTest {
 
     String css = Files.readString(htmlOutputDir.resolve("truedoctales.css"));
     assertTrue(css.contains("@media print"), "CSS should include print styles");
+  }
+
+  @Test
+  void generate_shouldIncludeTopHeaderBar() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String html = Files.readString(htmlOutputDir.resolve("intro.html"));
+    assertTrue(html.contains("class=\"top-header\""), "Should include a top header bar");
+    assertTrue(
+        html.contains("class=\"top-header-brand\""), "Should include brand link in top header");
+  }
+
+  @Test
+  void generate_shouldIncludeThemeToggle() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String html = Files.readString(htmlOutputDir.resolve("intro.html"));
+    assertTrue(html.contains("id=\"theme-toggle\""), "Should include a theme toggle button");
+    assertTrue(html.contains("data-theme"), "Should use Pico data-theme attribute for theming");
+  }
+
+  @Test
+  void generate_shouldUseTitleFromMetaJsonWhenPresent() throws IOException {
+    Files.writeString(markdownDir.resolve("00_intro.md"), "# Markdown Title\n");
+    Path ch = Files.createDirectories(markdownDir.resolve("01_chapter"));
+    Files.writeString(ch.resolve("01_story.md"), "# Markdown Story Title\n");
+    Files.writeString(
+        ch.resolve("meta.json"), "{\"path\": \"01_chapter\", \"title\": \"Meta Chapter Title\"}");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String storyHtml = Files.readString(htmlOutputDir.resolve("01_chapter/01_story.html"));
+    assertTrue(
+        storyHtml.contains("Meta Chapter Title"),
+        "Should use title from meta.json instead of parsing markdown heading");
+  }
+
+  @Test
+  void generate_shouldFallBackToMarkdownTitleWhenNoMetaJson() throws IOException {
+    Files.writeString(markdownDir.resolve("00_intro.md"), "# Markdown Title\n");
+    Path ch = Files.createDirectories(markdownDir.resolve("01_chapter"));
+    Files.writeString(ch.resolve("01_story.md"), "# Markdown Story Title\n");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String storyHtml = Files.readString(htmlOutputDir.resolve("01_chapter/01_story.html"));
+    assertTrue(
+        storyHtml.contains("Markdown Story Title"),
+        "Should fall back to markdown heading when no meta.json exists");
   }
 }
