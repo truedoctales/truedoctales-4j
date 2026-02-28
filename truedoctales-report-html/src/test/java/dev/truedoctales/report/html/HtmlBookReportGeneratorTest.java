@@ -178,6 +178,36 @@ class HtmlBookReportGeneratorTest {
   }
 
   @Test
+  void generate_shouldCopyBookRootAssetFolder() throws IOException {
+    Files.writeString(markdownDir.resolve("00_intro.md"), "# Intro\n");
+    Path assetsDir = Files.createDirectories(markdownDir.resolve("assets"));
+    Files.writeString(assetsDir.resolve("icon.png"), "fake-icon-data");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    assertTrue(
+        Files.exists(htmlOutputDir.resolve("assets/icon.png")),
+        "Should copy asset folder at book root level");
+  }
+
+  @Test
+  void generate_shouldCopyChapterLevelAssetFolder() throws IOException {
+    Files.writeString(markdownDir.resolve("00_intro.md"), "# Intro\n");
+    Path ch = Files.createDirectories(markdownDir.resolve("01_chapter"));
+    Files.writeString(ch.resolve("01_story.md"), "# Story\n");
+    Path chAssets = Files.createDirectories(ch.resolve("assets"));
+    Files.writeString(chAssets.resolve("diagram.png"), "fake-diagram-data");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    assertTrue(
+        Files.exists(htmlOutputDir.resolve("01_chapter/assets/diagram.png")),
+        "Should copy asset folder at chapter level");
+  }
+
+  @Test
   void generate_shouldHandleEmptyDirectory() throws IOException {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
 

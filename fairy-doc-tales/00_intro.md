@@ -1,6 +1,6 @@
 # True Doc Tales - Living Documentation Through Fairy Tales
 
-![Grimm Brothers Fairy Tales](https://picsum.photos/800/600?random=1)
+![True Doc Tales](assets/big_icon_full.png)
 
 Welcome to True Doc Tales, a framework for creating **living documentation** - documentation that executes as tests and validates itself with every run.
 
@@ -145,4 +145,4 @@ With True Doc Tales, your documentation:
 
 *Once upon a time, there was documentation that always told the truth...*
 
-![Fairy Tale Illustration](https://picsum.photos/600/400?random=2)
+![True Doc Tales](assets/big_icon_full.png)
