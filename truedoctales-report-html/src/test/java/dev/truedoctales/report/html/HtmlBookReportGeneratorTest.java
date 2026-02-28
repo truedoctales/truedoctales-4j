@@ -381,4 +381,69 @@ class HtmlBookReportGeneratorTest {
         storyHtml.contains("<details class=\"nav-tree\" open"),
         "Chapter group containing active page should be expanded");
   }
+
+  @Test
+  void generate_shouldIncludeFavicon() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String html = Files.readString(htmlOutputDir.resolve("intro.html"));
+    assertTrue(
+        html.contains("<link rel=\"icon\" type=\"image/png\" href=\"small_icon_full.png\">"),
+        "Should include favicon link");
+  }
+
+  @Test
+  void generate_shouldIncludeFaviconWithDepthPrefix() throws IOException {
+    Files.writeString(markdownDir.resolve("00_intro.md"), "# Book Intro\n");
+    Path ch = Files.createDirectories(markdownDir.resolve("01_chapter"));
+    Files.writeString(ch.resolve("01_story.md"), "# Story\n");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String storyHtml = Files.readString(htmlOutputDir.resolve("01_chapter/01_story.html"));
+    assertTrue(
+        storyHtml.contains("href=\"../small_icon_full.png\""),
+        "Nested pages should use relative path to favicon");
+  }
+
+  @Test
+  void generate_shouldIncludeBrandedFooter() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String html = Files.readString(htmlOutputDir.resolve("intro.html"));
+    assertTrue(html.contains("class=\"report-footer\""), "Should include branded footer");
+    assertTrue(html.contains("truedoctales-4j"), "Footer should link to project repository");
+  }
+
+  @Test
+  void generate_shouldIncludeGoogleFonts() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String html = Files.readString(htmlOutputDir.resolve("intro.html"));
+    assertTrue(
+        html.contains("fonts.googleapis.com"),
+        "Should include Google Fonts for premium typography");
+    assertTrue(html.contains("family=Inter"), "Should load Inter font family");
+  }
+
+  @Test
+  void generate_cssShouldIncludePrintStyles() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String css = Files.readString(htmlOutputDir.resolve("truedoctales.css"));
+    assertTrue(css.contains("@media print"), "CSS should include print styles");
+  }
 }
