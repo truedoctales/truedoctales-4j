@@ -1,6 +1,9 @@
-# True Doc Tales - Living Documentation Through Fairy Tales
+# True Doc Tales
 
-![Grimm Brothers Fairy Tales](https://picsum.photos/800/600?random=1)
+*Fairy tales become reality*
+
+
+![True Doc Tales](assets/big_icon_full.png)
 
 Welcome to True Doc Tales, a framework for creating **living documentation** - documentation that executes as tests and validates itself with every run.
 
@@ -86,15 +89,13 @@ The patterns are universal, but the stories make them unforgettable AND verifiab
 
 ```mermaid
 graph TD
-    A[Book of Grimm Stories] --> B[Prequels: Character Setup]
+    A[Book of Grimm Stories] --> B[Prequels Character Setup]
     A --> C[Chapter 1: Framework Basics]
     A --> D[Chapter 2: The Brave Little Tailor]
     A --> E[Chapter 3: The Devil with Three Golden Hairs]
     A --> F[Chapter 4: Jorinde and Joringel]
-    
     B --> B1[Create Heroes]
-    B --> B2[Create Villains]
-    
+    B --> B2[Create Villains]    
     C --> C1[Hello World Example]
     D --> D1[Cleverness Over Strength]
     E --> E1[Multi-Stage Quest]
@@ -145,4 +146,4 @@ With True Doc Tales, your documentation:
 
 *Once upon a time, there was documentation that always told the truth...*
 
-![Fairy Tale Illustration](https://picsum.photos/600/400?random=2)
+![True Doc Tales](assets/big_icon_full.png)

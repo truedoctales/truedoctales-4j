@@ -56,6 +56,36 @@ class BookReportGeneratorTest {
   }
 
   @Test
+  void generate_shouldCopyBookRootAssetFolder() throws IOException {
+    Files.writeString(bookDir.resolve("00_intro.md"), "# Intro\n");
+    Path assetsDir = Files.createDirectories(bookDir.resolve("assets"));
+    Files.writeString(assetsDir.resolve("icon.png"), "fake-icon-data");
+
+    BookReportGenerator generator = new BookReportGenerator(bookDir, executionDir, outputDir);
+    generator.generate();
+
+    assertTrue(
+        Files.exists(outputDir.resolve("assets/icon.png")),
+        "Should copy asset folder at book root level");
+  }
+
+  @Test
+  void generate_shouldCopyChapterLevelAssetFolder() throws IOException {
+    Files.writeString(bookDir.resolve("00_intro.md"), "# Intro\n");
+    Path chapterDir = Files.createDirectories(bookDir.resolve("01_chapter"));
+    Files.writeString(chapterDir.resolve("01_story.md"), "# Story\n");
+    Path chAssets = Files.createDirectories(chapterDir.resolve("assets"));
+    Files.writeString(chAssets.resolve("diagram.png"), "fake-diagram-data");
+
+    BookReportGenerator generator = new BookReportGenerator(bookDir, executionDir, outputDir);
+    generator.generate();
+
+    assertTrue(
+        Files.exists(outputDir.resolve("01_chapter/assets/diagram.png")),
+        "Should copy asset folder at chapter level");
+  }
+
+  @Test
   void generate_shouldEnrichMarkdownWithExecutionResults() throws IOException {
     String storyContent = "# Story\n\n## Scene: Test\n\n> **Greeting** Say Hello\n";
     Path chapterDir = Files.createDirectories(bookDir.resolve("01_chapter"));

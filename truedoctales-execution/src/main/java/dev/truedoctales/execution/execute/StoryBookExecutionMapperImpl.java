@@ -5,7 +5,6 @@ import dev.truedoctales.api.model.story.*;
 import java.util.*;
 import java.util.function.Function;
 import java.util.logging.Logger;
-import org.slf4j.LoggerFactory;
 
 /// Maps story book models to execution models with bound steps.
 ///
@@ -14,9 +13,7 @@ import org.slf4j.LoggerFactory;
 public class StoryBookExecutionMapperImpl implements Function<StoryBookModel, StoryBookExecution> {
 
   private static final Logger LOGGER =
-      java.util.logging.Logger.getLogger(StoryBookExecutionMapperImpl.class.getName());
-  private static final org.slf4j.Logger log =
-      LoggerFactory.getLogger(StoryBookExecutionMapperImpl.class);
+      Logger.getLogger(StoryBookExecutionMapperImpl.class.getName());
 
   private final Set<PlotBinding> plotBindings;
   private final ChapterExecutionMapper chapterExecutionMapper = new ChapterExecutionMapper();
@@ -129,10 +126,10 @@ public class StoryBookExecutionMapperImpl implements Function<StoryBookModel, St
     List<StepBinding> matchingBindings = findMatchingStepBindings(stepCall);
 
     if (matchingBindings.size() > 1) {
-      log.warn(
-          "Multiple bindings found for step call: {}. Matching bindings: {}",
-          stepCall,
-          matchingBindings);
+      LOGGER.warning(
+          () ->
+              "Multiple bindings found for step call: %s. Matching bindings: %s"
+                  .formatted(stepCall, matchingBindings));
     }
     return matchingBindings.stream()
         .sorted(Comparator.comparing((StepBinding m) -> m.pattern().length()).reversed())

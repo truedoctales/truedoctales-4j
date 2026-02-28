@@ -1,4 +1,4 @@
-# Setup: Create Fairy Tale Villains
+# Create Fairy Tale Villains
 
 This prequel story sets up the wicked villains from the Grimm Brothers fairy tales.
 

@@ -41,7 +41,6 @@ sequenceDiagram
     participant T as Tailor
     participant G1 as First Giant
     participant G2 as Second Giant
-    
     T->>T: Climb tree above giants
     T->>G1: Drop rock on chest
     G1->>G2: "Why did you hit me?"

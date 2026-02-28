@@ -24,6 +24,7 @@
     <module>truedoctales-parser</module>
     <module>truedoctales-execution</module>
     <module>truedoctales-report-json</module>
+    <module>truedoctales-report-html</module>
     <module>truedoctales-report-markdown</module>
     <module>truedoctales-maven-plugin</module>
     <module>truedoctales-sample-domain</module>

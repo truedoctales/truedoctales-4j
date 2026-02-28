@@ -1,6 +1,5 @@
 package dev.truedoctales.api.model.listener;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import dev.truedoctales.api.model.execution.SceneExecution;
 import java.util.List;
 
@@ -9,10 +8,7 @@ import java.util.List;
 /// @param stepResults the results of all steps within this scene
 /// @param status the overall execution status of the scene
 public record SceneExecutionResult(
-    String title,
-    Integer lineNumber,
-    List<StepExecutionResult> stepResults,
-    @JsonProperty("status") ExecutionStatus status)
+    String title, Integer lineNumber, List<StepExecutionResult> stepResults, ExecutionStatus status)
     implements HasExecutionStatus {
 
   /// Creates a scene execution result with computed status.

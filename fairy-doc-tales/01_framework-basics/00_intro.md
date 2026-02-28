@@ -1,4 +1,4 @@
-# Chapter 1: Framework Basics - Technical Reference
+# Framework Basics - Technical Reference
 
 This chapter serves as a technical reference guide for the True Doc Tales framework. It demonstrates all available operations in a step-by-step, progressive manner without narrative embellishment.
 

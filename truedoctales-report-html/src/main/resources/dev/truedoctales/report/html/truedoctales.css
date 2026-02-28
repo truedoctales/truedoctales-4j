@@ -1,0 +1,291 @@
+/* ========================================================================
+   True Doc Tales — Report Layout
+   Pico CSS handles all content styling (typography, tables, code, etc.).
+   This file only provides the sidebar layout, navigation, and overrides.
+   ======================================================================== */
+
+:root {
+  --sidebar-width: 290px;
+  --header-height: 3.75rem;
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --primary-light: #3b82f6;
+  --primary-bg: #eff6ff;
+  --border-light: #f1f5f9;
+}
+
+/* --- Layout override — Pico defaults to centered container;
+       we need a header + sidebar + content layout instead. ---------- */
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+/* --- Top Header Bar ------------------------------------------------- */
+
+.top-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--header-height);
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1.25rem;
+  z-index: 150;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+  flex-shrink: 0;
+}
+.top-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: white;
+}
+.top-header-brand:hover { color: white; text-decoration: none; }
+.top-header-brand img {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  margin: 0;
+}
+.top-header-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.top-header-brand-text .brand-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.top-header-brand-text .brand-subtitle {
+  font-size: 0.65rem;
+  font-weight: 400;
+  opacity: 0.85;
+  letter-spacing: 0.02em;
+}
+.theme-toggle {
+  position: absolute;
+  right: 1.25rem;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: white;
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+.theme-toggle:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+/* Dark-mode header — use a subdued slate instead of the light-mode blue */
+[data-theme="dark"] .top-header {
+  background: linear-gradient(135deg, #1e293b, #334155);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* --- Sidebar -------------------------------------------------------- */
+
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--pico-card-background-color, #f8fafc);
+  border-right: 1px solid var(--pico-muted-border-color, #e2e8f0);
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  height: calc(100vh - var(--header-height));
+  overflow-y: auto;
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+.sidebar::-webkit-scrollbar { width: 6px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--pico-muted-border-color, #e2e8f0); border-radius: 3px; }
+.sidebar::-webkit-scrollbar-thumb:hover { background: var(--pico-muted-color, #64748b); }
+
+.sidebar-content {
+  padding: 0.75rem 0;
+  flex: 1;
+  overflow-y: auto;
+}
+.sidebar-content .nav-group-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--pico-muted-color, #64748b);
+  padding: 1rem 1.5rem 0.375rem;
+}
+.sidebar-content .nav-tree {
+  border-bottom: 1px solid var(--border-light);
+}
+.sidebar-content .nav-tree summary {
+  padding: 0.625rem 1.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--pico-color, #1e293b);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  transition: background 0.15s, color 0.15s;
+}
+.sidebar-content .nav-tree summary::-webkit-details-marker { display: none; }
+
+.sidebar-content .nav-tree summary:hover {
+  background: var(--border-light);
+  color: var(--primary);
+}
+.sidebar-content .nav-tree ul {
+  padding-left: 0.5rem;
+  padding-bottom: 0.375rem;
+}
+/* Override Pico CSS nav ul flex layout — sidebar items must stack vertically */
+.sidebar-content ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: block;
+}
+.sidebar-content li {
+  display: block;
+  width: 100%;
+}
+.sidebar-content li a {
+  display: block;
+  padding: 0.375rem 1.5rem;
+  color: var(--pico-secondary-color, #475569);
+  text-decoration: none;
+  font-size: 0.84rem;
+  border-left: 3px solid transparent;
+  transition: all 0.15s ease;
+  line-height: 1.5;
+}
+.sidebar-content li a:hover {
+  background: var(--border-light);
+  border-left-color: var(--primary-light);
+  color: var(--primary);
+}
+.sidebar-content li a.active {
+  background: var(--primary-bg);
+  border-left-color: var(--primary);
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: calc(var(--header-height) + 0.75rem);
+  left: 1rem;
+  z-index: 200;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.625rem 0.875rem;
+  font-size: 1.25rem;
+  cursor: pointer;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+  transition: background 0.15s, transform 0.15s;
+}
+.sidebar-toggle:hover {
+  background: var(--primary-dark);
+  transform: scale(1.05);
+}
+
+/* --- Main Content --------------------------------------------------- */
+
+.content {
+  margin-left: var(--sidebar-width);
+  margin-top: var(--header-height);
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--header-height));
+  padding: 0;
+}
+
+article {
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 2.5rem 3rem 4rem;
+  width: 100%;
+  flex: 1;
+}
+
+/* Pico overrides — tighten spacing for documentation context */
+article h1:first-child { margin-top: 0; }
+article img { border-radius: 12px; }
+
+/* --- Mermaid diagrams ----------------------------------------------- */
+
+.mermaid {
+  background: var(--pico-card-background-color, white);
+  padding: 2rem;
+  border: 1px solid var(--pico-muted-border-color, #e2e8f0);
+  border-radius: 12px;
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+/* --- Footer --------------------------------------------------------- */
+
+.report-footer {
+  border-top: 1px solid var(--pico-muted-border-color, #e2e8f0);
+  padding: 2rem 3rem;
+  text-align: center;
+  color: var(--pico-muted-color, #64748b);
+  font-size: 0.8rem;
+  line-height: 1.6;
+  background: var(--pico-card-background-color, #f8fafc);
+}
+.report-footer a { font-weight: 600; }
+.report-footer .footer-brand {
+  font-weight: 700;
+  color: var(--pico-secondary-color, #475569);
+  font-size: 0.85rem;
+}
+
+/* --- Responsive ----------------------------------------------------- */
+
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-toggle { display: block; }
+  .content { margin-left: 0; }
+  article { padding: 2rem 1.25rem 3rem; }
+  .report-footer { padding: 1.5rem 1.25rem; }
+}
+
+@media (max-width: 480px) {
+  article { padding: 1.5rem 1rem 2.5rem; }
+}
+
+/* --- Print ---------------------------------------------------------- */
+
+@media print {
+  .top-header { display: none !important; }
+  .sidebar, .sidebar-toggle { display: none !important; }
+  .content { margin-left: 0 !important; margin-top: 0 !important; }
+  article { max-width: none; padding: 0; }
+  .report-footer { display: none; }
+}

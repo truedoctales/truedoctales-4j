@@ -25,6 +25,11 @@
   <dependencies>
     <dependency>
       <groupId>dev.truedoctales</groupId>
+      <artifactId>truedoctales-report-html</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>dev.truedoctales</groupId>
       <artifactId>truedoctales-report-markdown</artifactId>
       <version>${project.version}</version>
     </dependency>

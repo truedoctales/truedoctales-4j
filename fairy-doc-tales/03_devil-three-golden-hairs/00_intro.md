@@ -1,4 +1,4 @@
-# Chapter 3: The Devil with the Three Golden Hairs
+# The Devil with the Three Golden Hairs
 
 ![The Devil with Three Golden Hairs](https://picsum.photos/500/400?random=7)
 
@@ -47,7 +47,6 @@ graph TB
     M --> N[Solve Tree Riddle]
     N --> O[Solve Ferryman Riddle]
     O --> P[Marry Princess]
-    
     style F fill:#f66
     style G fill:#6f6
     style P fill:#6f6
