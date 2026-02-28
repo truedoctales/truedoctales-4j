@@ -1,10 +1,12 @@
 package dev.truedoctales.report.html;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -24,6 +26,9 @@ import org.commonmark.renderer.html.HtmlRenderer;
 public class HtmlBookReportGenerator {
 
   private static final Logger logger = Logger.getLogger(HtmlBookReportGenerator.class.getName());
+
+  private static final String CSS_RESOURCE = "truedoctales.css";
+  private static final String ICON_RESOURCE = "small_icon_full.png";
 
   private final Path markdownDirectory;
   private final Path htmlOutputDirectory;
@@ -51,6 +56,7 @@ public class HtmlBookReportGenerator {
 
     List<NavEntry> navigation = buildNavigation();
     copyNonMarkdownFiles();
+    copyStaticAssets();
 
     for (NavEntry entry : navigation) {
       String markdown = Files.readString(entry.sourcePath());
@@ -88,11 +94,22 @@ public class HtmlBookReportGenerator {
               throws IOException {
             if (!file.toString().endsWith(".md")) {
               Path target = htmlOutputDirectory.resolve(markdownDirectory.relativize(file));
-              Files.copy(file, target, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+              Files.copy(file, target, StandardCopyOption.REPLACE_EXISTING);
             }
             return FileVisitResult.CONTINUE;
           }
         });
+  }
+
+  private void copyStaticAssets() throws IOException {
+    for (String resource : List.of(CSS_RESOURCE, ICON_RESOURCE)) {
+      try (InputStream in = getClass().getResourceAsStream(resource)) {
+        if (in != null) {
+          Files.copy(
+              in, htmlOutputDirectory.resolve(resource), StandardCopyOption.REPLACE_EXISTING);
+        }
+      }
+    }
   }
 
   private List<NavEntry> buildNavigation() throws IOException {
@@ -204,14 +221,13 @@ public class HtmlBookReportGenerator {
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>%s - True Doc Tales</title>
-          <style>
-        %s
-          </style>
+          <link rel="stylesheet" href="%struedoctales.css">
         </head>
         <body>
           <nav class="sidebar" id="sidebar">
             <div class="sidebar-header">
-              <h2>📖 True Doc Tales</h2>
+              <img src="%ssmall_icon_full.png" alt="True Doc Tales">
+              <h2>True Doc Tales</h2>
             </div>
             <div class="sidebar-content">
         %s
@@ -234,7 +250,11 @@ public class HtmlBookReportGenerator {
         </html>
         """
         .formatted(
-            escapeHtml(title), getCss(), navHtml.replace("DEPTH_PREFIX/", depthPrefix), bodyHtml);
+            escapeHtml(title),
+            depthPrefix,
+            depthPrefix,
+            navHtml.replace("DEPTH_PREFIX/", depthPrefix),
+            bodyHtml);
   }
 
   private String computeDepthPrefix(String htmlRelativePath) {
@@ -316,213 +336,6 @@ public class HtmlBookReportGenerator {
         .replace("<", "&lt;")
         .replace(">", "&gt;")
         .replace("\"", "&quot;");
-  }
-
-  private String getCss() {
-    return """
-        :root {
-          --sidebar-width: 280px;
-          --primary: #2563eb;
-          --primary-light: #3b82f6;
-          --bg: #ffffff;
-          --bg-sidebar: #f8fafc;
-          --text: #1e293b;
-          --text-muted: #64748b;
-          --border: #e2e8f0;
-          --success: #16a34a;
-          --error: #dc2626;
-          --warning: #d97706;
-          --skip: #6366f1;
-          --code-bg: #f1f5f9;
-          --shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { font-size: 16px; }
-        body {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-          color: var(--text);
-          background: var(--bg);
-          display: flex;
-          min-height: 100vh;
-        }
-        .sidebar {
-          width: var(--sidebar-width);
-          background: var(--bg-sidebar);
-          border-right: 1px solid var(--border);
-          position: fixed;
-          top: 0;
-          left: 0;
-          height: 100vh;
-          overflow-y: auto;
-          transition: transform 0.3s ease;
-          z-index: 100;
-        }
-        .sidebar-header {
-          padding: 1.5rem;
-          border-bottom: 1px solid var(--border);
-          background: var(--primary);
-          color: white;
-        }
-        .sidebar-header h2 { font-size: 1.1rem; font-weight: 600; }
-        .sidebar-content { padding: 1rem 0; }
-        .sidebar-content h3 {
-          font-size: 0.75rem;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          color: var(--text-muted);
-          padding: 0.75rem 1.5rem 0.25rem;
-        }
-        .sidebar-content .nav-group-label {
-          font-size: 0.75rem;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          color: var(--text-muted);
-          padding: 0.75rem 1.5rem 0.25rem;
-        }
-        .sidebar-content .nav-tree {
-          border-bottom: 1px solid var(--border);
-        }
-        .sidebar-content .nav-tree summary {
-          display: block;
-          padding: 0.5rem 1.5rem;
-          font-size: 0.8rem;
-          font-weight: 600;
-          color: var(--text);
-          cursor: pointer;
-          list-style: none;
-          user-select: none;
-          transition: background 0.15s;
-        }
-        .sidebar-content .nav-tree summary::-webkit-details-marker { display: none; }
-        .sidebar-content .nav-tree summary::before {
-          content: '▶';
-          display: inline-block;
-          margin-right: 0.5rem;
-          font-size: 0.6rem;
-          transition: transform 0.2s;
-          vertical-align: middle;
-        }
-        .sidebar-content .nav-tree[open] > summary::before {
-          transform: rotate(90deg);
-        }
-        .sidebar-content .nav-tree summary:hover {
-          background: var(--border);
-        }
-        .sidebar-content .nav-tree ul {
-          padding-left: 0.5rem;
-        }
-        .sidebar-content ul { list-style: none; }
-        .sidebar-content li a {
-          display: block;
-          padding: 0.4rem 1.5rem;
-          color: var(--text);
-          text-decoration: none;
-          font-size: 0.875rem;
-          border-left: 3px solid transparent;
-          transition: background 0.15s, border-color 0.15s;
-        }
-        .sidebar-content li a:hover {
-          background: #e2e8f0;
-          border-left-color: var(--primary-light);
-        }
-        .sidebar-content li a.active {
-          background: #dbeafe;
-          border-left-color: var(--primary);
-          font-weight: 600;
-          color: var(--primary);
-        }
-        .sidebar-toggle {
-          display: none;
-          position: fixed;
-          top: 1rem;
-          left: 1rem;
-          z-index: 200;
-          background: var(--primary);
-          color: white;
-          border: none;
-          border-radius: 6px;
-          padding: 0.5rem 0.75rem;
-          font-size: 1.25rem;
-          cursor: pointer;
-          box-shadow: var(--shadow);
-        }
-        .content {
-          margin-left: var(--sidebar-width);
-          flex: 1;
-          min-width: 0;
-        }
-        article {
-          max-width: 52rem;
-          margin: 0 auto;
-          padding: 2.5rem 3rem;
-          line-height: 1.7;
-        }
-        h1 { font-size: 2rem; font-weight: 700; margin: 2rem 0 1rem; color: var(--text); border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; }
-        h2 { font-size: 1.5rem; font-weight: 600; margin: 1.75rem 0 0.75rem; color: var(--text); }
-        h3 { font-size: 1.25rem; font-weight: 600; margin: 1.5rem 0 0.5rem; }
-        h4 { font-size: 1.1rem; font-weight: 600; margin: 1.25rem 0 0.5rem; }
-        p { margin: 0.75rem 0; }
-        a { color: var(--primary); text-decoration: none; }
-        a:hover { text-decoration: underline; }
-        blockquote {
-          border-left: 4px solid var(--primary);
-          background: #f0f7ff;
-          padding: 0.75rem 1rem;
-          margin: 1rem 0;
-          border-radius: 0 6px 6px 0;
-        }
-        blockquote p { margin: 0.25rem 0; }
-        code {
-          font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
-          background: var(--code-bg);
-          padding: 0.15rem 0.4rem;
-          border-radius: 4px;
-          font-size: 0.875em;
-        }
-        pre {
-          background: var(--code-bg);
-          border: 1px solid var(--border);
-          border-radius: 8px;
-          padding: 1rem 1.25rem;
-          overflow-x: auto;
-          margin: 1rem 0;
-        }
-        pre code { background: none; padding: 0; }
-        table {
-          border-collapse: collapse;
-          width: 100%;
-          margin: 1rem 0;
-          font-size: 0.9rem;
-        }
-        th, td {
-          border: 1px solid var(--border);
-          padding: 0.5rem 0.75rem;
-          text-align: left;
-        }
-        th { background: var(--bg-sidebar); font-weight: 600; }
-        tr:nth-child(even) { background: #fafafa; }
-        img { max-width: 100%; height: auto; border-radius: 8px; margin: 1rem 0; }
-        ul, ol { margin: 0.5rem 0 0.5rem 1.5rem; }
-        li { margin: 0.25rem 0; }
-        hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
-        .mermaid {
-          background: white;
-          padding: 1.5rem;
-          border: 1px solid var(--border);
-          border-radius: 8px;
-          margin: 1rem 0;
-          text-align: center;
-        }
-        @media (max-width: 768px) {
-          .sidebar { transform: translateX(-100%); }
-          .sidebar.open { transform: translateX(0); }
-          .sidebar-toggle { display: block; }
-          .content { margin-left: 0; }
-          article { padding: 1.5rem 1rem; }
-        }
-        """;
   }
 
   /// Represents a navigation entry for the sidebar.

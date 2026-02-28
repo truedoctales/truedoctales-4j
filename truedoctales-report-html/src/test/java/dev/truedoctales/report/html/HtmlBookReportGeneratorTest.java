@@ -115,10 +115,18 @@ class HtmlBookReportGeneratorTest {
     generator.generate();
 
     String html = Files.readString(htmlOutputDir.resolve("intro.html"));
-    assertTrue(html.contains("<style>"), "Should include embedded CSS");
-    assertTrue(html.contains("--primary"), "Should include CSS custom properties");
-    assertTrue(html.contains(".sidebar"), "Should include sidebar styles");
-    assertTrue(html.contains(".content"), "Should include content styles");
+    assertTrue(
+        html.contains("<link rel=\"stylesheet\" href=\"truedoctales.css\">"),
+        "Should link to external CSS file");
+    assertFalse(html.contains("<style>"), "Should not include inline CSS");
+
+    assertTrue(
+        Files.exists(htmlOutputDir.resolve("truedoctales.css")),
+        "Should write CSS file to output directory");
+    String css = Files.readString(htmlOutputDir.resolve("truedoctales.css"));
+    assertTrue(css.contains("--primary"), "CSS should include custom properties");
+    assertTrue(css.contains(".sidebar"), "CSS should include sidebar styles");
+    assertTrue(css.contains(".content"), "CSS should include content styles");
   }
 
   @Test
@@ -208,7 +216,25 @@ class HtmlBookReportGeneratorTest {
 
     String html = Files.readString(htmlOutputDir.resolve("intro.html"));
     assertTrue(html.contains("viewport"), "Should include viewport meta tag");
-    assertTrue(html.contains("@media"), "Should include responsive CSS media queries");
+
+    String css = Files.readString(htmlOutputDir.resolve("truedoctales.css"));
+    assertTrue(css.contains("@media"), "CSS should include responsive media queries");
+  }
+
+  @Test
+  void generate_shouldIncludeProjectIcon() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String html = Files.readString(htmlOutputDir.resolve("intro.html"));
+    assertTrue(
+        html.contains("<img src=\"small_icon_full.png\""),
+        "Should include project icon in sidebar header");
+    assertTrue(
+        Files.exists(htmlOutputDir.resolve("small_icon_full.png")),
+        "Should write icon file to output directory");
   }
 
   @Test
@@ -245,6 +271,24 @@ class HtmlBookReportGeneratorTest {
     assertFalse(
         introHtml.contains("<details class=\"nav-tree\" open"),
         "Chapter groups should be collapsed by default when not active");
+  }
+
+  @Test
+  void generate_shouldUseCssDepthPrefixForNestedPages() throws IOException {
+    Files.writeString(markdownDir.resolve("00_intro.md"), "# Book Intro\n");
+    Path ch = Files.createDirectories(markdownDir.resolve("01_chapter"));
+    Files.writeString(ch.resolve("01_story.md"), "# Story\n");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String storyHtml = Files.readString(htmlOutputDir.resolve("01_chapter/01_story.html"));
+    assertTrue(
+        storyHtml.contains("href=\"../truedoctales.css\""),
+        "Nested pages should use relative path to CSS");
+    assertTrue(
+        storyHtml.contains("src=\"../small_icon_full.png\""),
+        "Nested pages should use relative path to icon");
   }
 
   @Test
