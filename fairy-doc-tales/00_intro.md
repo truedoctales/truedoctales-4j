@@ -89,15 +89,13 @@ The patterns are universal, but the stories make them unforgettable AND verifiab
 
 ```mermaid
 graph TD
-    A[Book of Grimm Stories] --> B[Prequels: Character Setup]
+    A[Book of Grimm Stories] --> B[Prequels Character Setup]
     A --> C[Chapter 1: Framework Basics]
     A --> D[Chapter 2: The Brave Little Tailor]
     A --> E[Chapter 3: The Devil with Three Golden Hairs]
     A --> F[Chapter 4: Jorinde and Joringel]
-    
     B --> B1[Create Heroes]
-    B --> B2[Create Villains]
-    
+    B --> B2[Create Villains]    
     C --> C1[Hello World Example]
     D --> D1[Cleverness Over Strength]
     E --> E1[Multi-Stage Quest]

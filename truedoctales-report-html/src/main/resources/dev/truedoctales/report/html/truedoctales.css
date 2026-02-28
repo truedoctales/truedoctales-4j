@@ -135,18 +135,7 @@ body {
   transition: background 0.15s, color 0.15s;
 }
 .sidebar-content .nav-tree summary::-webkit-details-marker { display: none; }
-.sidebar-content .nav-tree summary::before {
-  content: '';
-  display: inline-block;
-  width: 1.1em;
-  height: 1.1em;
-  margin-right: 0.4rem;
-  vertical-align: -0.15em;
-  background: url("frog-sitting.svg") no-repeat center / contain;
-}
-.sidebar-content .nav-tree[open] > summary::before {
-  background-image: url("frog-jumping.svg");
-}
+
 .sidebar-content .nav-tree summary:hover {
   background: var(--border-light);
   color: var(--primary);

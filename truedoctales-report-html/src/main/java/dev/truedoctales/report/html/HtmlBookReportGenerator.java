@@ -31,8 +31,6 @@ public class HtmlBookReportGenerator {
 
   private static final String CSS_RESOURCE = "truedoctales.css";
   private static final String ICON_RESOURCE = "small_icon_full.png";
-  private static final String FROG_SITTING_RESOURCE = "frog-sitting.svg";
-  private static final String FROG_JUMPING_RESOURCE = "frog-jumping.svg";
 
   private final Path markdownDirectory;
   private final Path htmlOutputDirectory;
@@ -106,8 +104,7 @@ public class HtmlBookReportGenerator {
   }
 
   private void copyStaticAssets() throws IOException {
-    for (String resource :
-        List.of(CSS_RESOURCE, ICON_RESOURCE, FROG_SITTING_RESOURCE, FROG_JUMPING_RESOURCE)) {
+    for (String resource : List.of(CSS_RESOURCE, ICON_RESOURCE)) {
       try (InputStream in = getClass().getResourceAsStream(resource)) {
         if (in != null) {
           Files.copy(
