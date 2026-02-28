@@ -1,4 +1,4 @@
-# Setup: Create Fairy Tale Heroes
+# Create Fairy Tale Heroes
 
 This prequel story sets up the brave heroes of the Grimm Brothers fairy tales.
 
