@@ -132,6 +132,12 @@ body {
   box-shadow: 4px 0 20px rgba(0, 0, 0, .1);
 }
 
+/* Keep sidebar pinned while a flyout panel is open */
+.sidebar.flyout-open {
+  transform: translateX(0);
+  box-shadow: 4px 0 20px rgba(0, 0, 0, .1);
+}
+
 /* Icon handle — visible in the collapsed strip, hides when sidebar is open */
 .sidebar-handle {
   position: absolute;
@@ -238,6 +244,22 @@ body {
 }
 .flyout-menu.flyout-visible { display: block; }
 
+/* Story items inside the global flyout panel (#nav-flyout is outside .sidebar-content) */
+#nav-flyout li { display: block; list-style: none; }
+#nav-flyout li a {
+  display: block;
+  padding: 0.375rem 1.25rem;
+  color: var(--bs-secondary-color);
+  text-decoration: none;
+  font-size: 0.84rem;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+#nav-flyout li a:hover { background: var(--bs-tertiary-bg); color: var(--bs-primary); }
+#nav-flyout li a:focus { outline: 2px solid var(--bs-primary); outline-offset: -2px; }
+#nav-flyout li a.active { color: var(--bs-primary); font-weight: 600; }
+
 /* Reset Bootstrap's nav/list defaults inside the sidebar */
 .sidebar-content ul {
   list-style: none;
@@ -245,6 +267,8 @@ body {
   padding: 0;
   display: block;
 }
+/* Data-holder story lists must stay hidden inside the sidebar */
+.sidebar-content .chapter-stories { display: none; }
 .sidebar-content li { display: block; width: 100%; }
 .sidebar-content li a {
   display: block;

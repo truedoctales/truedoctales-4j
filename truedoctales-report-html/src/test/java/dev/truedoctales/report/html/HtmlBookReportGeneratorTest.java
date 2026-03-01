@@ -287,8 +287,11 @@ class HtmlBookReportGeneratorTest {
         shellHtml.contains("class=\"nav-chapter\""),
         "Shell nav should use .nav-chapter divs for OS-style flyout chapter groups");
     assertTrue(
-        shellHtml.contains("class=\"flyout-menu\""),
-        "Shell nav chapter groups should have a .flyout-menu submenu");
+        shellHtml.contains("class=\"chapter-stories\""),
+        "Shell nav should use .chapter-stories as hidden data holder inside each chapter group");
+    assertTrue(
+        shellHtml.contains("id=\"nav-flyout\""),
+        "Shell should include a global #nav-flyout panel element outside the sidebar");
   }
 
   @Test
@@ -545,18 +548,21 @@ class HtmlBookReportGeneratorTest {
   }
 
   @Test
-  void generate_shouldFallBackToMarkdownTitleWhenNoMetaJson() throws IOException {
-    Files.writeString(markdownDir.resolve("00_intro.md"), "# Markdown Title\n");
-    Path ch = Files.createDirectories(markdownDir.resolve("01_chapter"));
-    Files.writeString(ch.resolve("01_story.md"), "# Markdown Story Title\n");
+  void generate_shouldIncludeVimStyleKeyboardNavigationShortcuts() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
 
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    // The story title falls back to the markdown heading and appears in the shell nav
     String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
     assertTrue(
-        shellHtml.contains("Markdown Story Title"),
-        "Shell nav should fall back to markdown heading when no meta.json exists");
+        shellHtml.contains("e.key === ':'"),
+        "Shell JS should support ':' keyboard shortcut to open navigation (vim-style)");
+    assertTrue(
+        shellHtml.contains("ArrowDown"),
+        "Shell JS should support ArrowDown key to navigate sidebar items");
+    assertTrue(
+        shellHtml.contains("ArrowRight"),
+        "Shell JS should support ArrowRight key to enter a chapter flyout");
   }
 }
