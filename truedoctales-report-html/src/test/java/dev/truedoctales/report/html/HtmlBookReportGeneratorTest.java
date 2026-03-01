@@ -273,7 +273,7 @@ class HtmlBookReportGeneratorTest {
   }
 
   @Test
-  void generate_shouldUseCollapsibleTreeForChapterGroups() throws IOException {
+  void generate_shouldUseFlyoutMenuForChapterGroups() throws IOException {
     Files.writeString(markdownDir.resolve("00_intro.md"), "# Book Intro\n");
     Path ch = Files.createDirectories(markdownDir.resolve("01_chapter-basics"));
     Files.writeString(ch.resolve("00_intro.md"), "# Chapter 1\n");
@@ -284,14 +284,15 @@ class HtmlBookReportGeneratorTest {
 
     String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
     assertTrue(
-        shellHtml.contains("<details class=\"nav-tree\""),
-        "Shell nav should use <details> for collapsible chapter groups");
+        shellHtml.contains("class=\"nav-chapter\""),
+        "Shell nav should use .nav-chapter divs for OS-style flyout chapter groups");
     assertTrue(
-        shellHtml.contains("<summary>"), "Shell nav chapter groups should have a <summary> toggle");
+        shellHtml.contains("class=\"flyout-menu\""),
+        "Shell nav chapter groups should have a .flyout-menu submenu");
   }
 
   @Test
-  void generate_shouldCollapseChapterGroupsByDefault() throws IOException {
+  void generate_shouldNotUseCollapsibleDetailsForChapterGroups() throws IOException {
     Files.writeString(markdownDir.resolve("00_intro.md"), "# Book Intro\n");
     Path ch1 = Files.createDirectories(markdownDir.resolve("01_chapter"));
     Files.writeString(ch1.resolve("01_story.md"), "# Story 1\n");
@@ -301,11 +302,11 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    // With SPA, all groups start collapsed; the JS router opens the active one at runtime
+    // Flyout menus use divs, not <details> elements
     String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
     assertFalse(
-        shellHtml.contains("<details class=\"nav-tree\" open"),
-        "Chapter groups should be collapsed by default in the SPA shell");
+        shellHtml.contains("<details"),
+        "Chapter groups should use flyout divs, not <details> elements");
   }
 
   @Test
@@ -381,11 +382,12 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    // With SPA, the JS router opens the chapter group that contains the active page at runtime
+    // With flyout menus, chapter groups show their stories in a fixed-positioned panel on hover;
+    // the active page is highlighted via the .active class on its link
     String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
     assertTrue(
-        shellHtml.contains("d.open = true"),
-        "Shell JS should expand the chapter group that contains the active page");
+        shellHtml.contains("flyout-visible"),
+        "Shell JS should use .flyout-visible to show the chapter's story list");
   }
 
   @Test
@@ -517,6 +519,19 @@ class HtmlBookReportGeneratorTest {
   }
 
   @Test
+  void generate_shouldIncludeSidebarHandleWithIcon() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    assertTrue(
+        shellHtml.contains("class=\"sidebar-handle\""),
+        "Sidebar should include a handle button with the brand icon");
+  }
+
+  @Test
   void generate_shouldIncludeSidebarPullTabInCss() throws IOException {
     Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
 
@@ -525,8 +540,8 @@ class HtmlBookReportGeneratorTest {
 
     String css = Files.readString(htmlOutputDir.resolve("truedoctales.css"));
     assertTrue(
-        css.contains(".sidebar::after"),
-        "CSS should include a visible pull-tab handle for the collapsed sidebar state");
+        css.contains(".sidebar-handle"),
+        "CSS should include styles for the icon-based sidebar handle");
   }
 
   @Test

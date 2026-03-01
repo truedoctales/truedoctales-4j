@@ -281,6 +281,9 @@ public class HtmlBookReportGenerator {
             <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">🌙</button>
           </header>
           <nav class="sidebar" id="sidebar">
+            <button class="sidebar-handle" id="sidebar-handle" aria-label="Toggle navigation">
+              <img src="small_icon_full.png" alt="True Doc Tales">
+            </button>
             <div class="sidebar-content">
         %s
             </div>
@@ -313,13 +316,10 @@ public class HtmlBookReportGenerator {
                 return stack.join('/');
               }
 
-              // Mark the current page active in the sidebar and expand its chapter group
+              // Mark the current page active in the sidebar
               function updateActiveNav(path) {
                 document.querySelectorAll('.sidebar-content a').forEach(function (a) {
                   a.classList.toggle('active', a.getAttribute('href') === '#' + path);
-                });
-                document.querySelectorAll('details.nav-tree').forEach(function (d) {
-                  if (d.querySelector('a.active')) { d.open = true; }
                 });
               }
 
@@ -380,20 +380,31 @@ public class HtmlBookReportGenerator {
                 loadContent(location.hash.slice(1));
               });
 
-              // Hover-open / hover-close for chapter groups in the sidebar
-              document.querySelectorAll('details.nav-tree').forEach(function (details) {
-                var hoverOpened = false;
-                details.addEventListener('mouseenter', function () {
-                  if (!details.open) { details.open = true; hoverOpened = true; }
-                });
-                details.addEventListener('mouseleave', function () {
-                  if (hoverOpened) { details.open = false; hoverOpened = false; }
+              // OS-style flyout menus — positioned fixed to the right of the sidebar on hover/focus
+              document.querySelectorAll('.nav-chapter').forEach(function (chapter) {
+                var flyout = chapter.querySelector('.flyout-menu');
+                if (!flyout) { return; }
+                function showFlyout() {
+                  var rect = chapter.getBoundingClientRect();
+                  var sidebar = document.getElementById('sidebar');
+                  flyout.style.top = rect.top + 'px';
+                  flyout.style.left = sidebar.getBoundingClientRect().right + 'px';
+                  flyout.classList.add('flyout-visible');
+                }
+                function hideFlyout() {
+                  flyout.classList.remove('flyout-visible');
+                }
+                chapter.addEventListener('mouseenter', showFlyout);
+                chapter.addEventListener('mouseleave', hideFlyout);
+                chapter.addEventListener('focusin', showFlyout);
+                chapter.addEventListener('focusout', function (e) {
+                  if (!chapter.contains(e.relatedTarget)) { hideFlyout(); }
                 });
               });
 
-              // Chapter-link click navigates without toggling the <details>
-              document.querySelectorAll('.nav-tree summary .chapter-link').forEach(function (link) {
-                link.addEventListener('click', function (e) { e.stopPropagation(); });
+              // Sidebar handle (icon button) — opens sidebar on mobile tap
+              document.getElementById('sidebar-handle').addEventListener('click', function () {
+                document.getElementById('sidebar').classList.toggle('open');
               });
 
               // Mobile sidebar toggle
@@ -461,7 +472,7 @@ public class HtmlBookReportGenerator {
         if (currentGroup != null) {
           sb.append("        </ul>\n");
           if (!"Book".equals(currentGroup)) {
-            sb.append("      </details>\n");
+            sb.append("      </div>\n");
           }
         }
         if ("Book".equals(group)) {
@@ -470,8 +481,8 @@ public class HtmlBookReportGenerator {
               .append("</div>\n");
           sb.append("        <ul>\n");
         } else {
-          sb.append("      <details class=\"nav-tree\">\n");
-          sb.append("        <summary>");
+          sb.append("      <div class=\"nav-chapter\">\n");
+          sb.append("        <div class=\"nav-chapter-row\">");
           if (intro != null) {
             sb.append("<a href=\"#")
                 .append(intro.htmlRelativePath())
@@ -481,9 +492,9 @@ public class HtmlBookReportGenerator {
           } else {
             sb.append(escapeHtml(group));
           }
-          sb.append("<span class=\"toggle-arrow\"></span>");
-          sb.append("</summary>\n");
-          sb.append("        <ul>\n");
+          sb.append("<span class=\"flyout-arrow\" aria-hidden=\"true\">&#x203A;</span>");
+          sb.append("</div>\n");
+          sb.append("        <ul class=\"flyout-menu\">\n");
         }
         currentGroup = group;
       }
@@ -502,15 +513,15 @@ public class HtmlBookReportGenerator {
     if (currentGroup != null) {
       sb.append("        </ul>\n");
       if (!"Book".equals(currentGroup)) {
-        sb.append("      </details>\n");
+        sb.append("      </div>\n");
       }
     }
     return sb.toString();
   }
 
   /// Returns {@code true} if the entry is a chapter intro file (filename starts with {@code 00_}
-  /// inside a subdirectory). These files are shown as the clickable summary link for the chapter
-  /// group instead of as a separate list item.
+  /// inside a subdirectory). These files are shown as the clickable chapter-row link for the
+  /// chapter group instead of as a separate flyout menu item.
   private boolean isChapterIntro(NavEntry entry) {
     String path = entry.relativePath();
     int slashIdx = path.lastIndexOf('/');
