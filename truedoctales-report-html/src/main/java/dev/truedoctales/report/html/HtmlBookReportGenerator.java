@@ -291,6 +291,17 @@ public class HtmlBookReportGenerator {
             document.querySelectorAll('.nav-tree summary .chapter-link').forEach(function(link) {
               link.addEventListener('click', function(e) { e.stopPropagation(); });
             });
+            // Hover-open / hover-close for chapter groups.
+            // Only closes on mouseleave if the hover itself opened the group.
+            document.querySelectorAll('details.nav-tree').forEach(function(details) {
+              var hoverOpened = false;
+              details.addEventListener('mouseenter', function() {
+                if (!details.open) { details.open = true; hoverOpened = true; }
+              });
+              details.addEventListener('mouseleave', function() {
+                if (hoverOpened) { details.open = false; hoverOpened = false; }
+              });
+            });
             document.getElementById('sidebar-toggle').addEventListener('click', function() {
               document.getElementById('sidebar').classList.toggle('open');
             });
