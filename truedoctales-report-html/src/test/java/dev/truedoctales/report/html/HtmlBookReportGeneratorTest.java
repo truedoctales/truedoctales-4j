@@ -501,6 +501,35 @@ class HtmlBookReportGeneratorTest {
   }
 
   @Test
+  void generate_shouldPreserveMermaidSourceForRetheming() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    assertTrue(
+        shellHtml.contains("mermaidSource"),
+        "Shell JS should save mermaid source text before first render");
+    assertTrue(
+        shellHtml.contains("removeAttribute('data-processed')"),
+        "Shell JS should remove data-processed so mermaid can re-render on theme change");
+  }
+
+  @Test
+  void generate_shouldIncludeSidebarPullTabInCss() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String css = Files.readString(htmlOutputDir.resolve("truedoctales.css"));
+    assertTrue(
+        css.contains(".sidebar::after"),
+        "CSS should include a visible pull-tab handle for the collapsed sidebar state");
+  }
+
+  @Test
   void generate_shouldFallBackToMarkdownTitleWhenNoMetaJson() throws IOException {
     Files.writeString(markdownDir.resolve("00_intro.md"), "# Markdown Title\n");
     Path ch = Files.createDirectories(markdownDir.resolve("01_chapter"));

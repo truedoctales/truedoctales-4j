@@ -323,6 +323,25 @@ public class HtmlBookReportGenerator {
                 });
               }
 
+              // Save mermaid diagram source before first render so it can be restored on theme change
+              function saveMermaidSources(container) {
+                container.querySelectorAll('.mermaid').forEach(function (el) {
+                  if (!el.dataset.mermaidSource) {
+                    el.dataset.mermaidSource = el.textContent.trim();
+                  }
+                });
+              }
+
+              // Restore source text and clear processed flag so mermaid can re-render with new theme
+              function resetMermaidElements(container) {
+                container.querySelectorAll('.mermaid').forEach(function (el) {
+                  if (el.dataset.mermaidSource) {
+                    el.removeAttribute('data-processed');
+                    el.textContent = el.dataset.mermaidSource;
+                  }
+                });
+              }
+
               // Fetch an HTML fragment and inject it into the content area
               function loadContent(path) {
                 var reqPath = path || defaultPage;
@@ -335,7 +354,9 @@ public class HtmlBookReportGenerator {
                           + '</code>. <a href="#' + defaultPage + '">Return to home</a></p></article>';
                   })
                   .then(function (html) {
-                    document.getElementById('page-content').innerHTML = html;
+                    var container = document.getElementById('page-content');
+                    container.innerHTML = html;
+                    saveMermaidSources(container);
                     updateActiveNav(currentPath);
                     if (typeof mermaid !== 'undefined') {
                       mermaid.run({ querySelector: '#page-content .mermaid' });
@@ -396,6 +417,7 @@ public class HtmlBookReportGenerator {
                 toggle.textContent = next === 'dark' ? '☀️' : '🌙';
                 if (typeof mermaid !== 'undefined') {
                   mermaid.initialize({ startOnLoad: false, theme: next === 'dark' ? 'dark' : 'default' });
+                  resetMermaidElements(document.getElementById('page-content'));
                   mermaid.run({ querySelector: '#page-content .mermaid' });
                 }
               });
