@@ -43,11 +43,13 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String introHtml = Files.readString(htmlOutputDir.resolve("00_intro.html"));
-    assertTrue(introHtml.contains("<nav class=\"sidebar\""), "Should have sidebar navigation");
-    assertTrue(introHtml.contains("Book Intro"), "Should contain page title in navigation");
-    assertTrue(introHtml.contains("My Story"), "Should contain other pages in navigation");
-    assertTrue(introHtml.contains("01_chapter/01_story.html"), "Should link to chapter page");
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    assertTrue(
+        shellHtml.contains("<nav class=\"sidebar\""), "Shell should have sidebar navigation");
+    assertTrue(shellHtml.contains("Book Intro"), "Shell nav should contain page title");
+    assertTrue(shellHtml.contains("My Story"), "Shell nav should contain other pages");
+    assertTrue(
+        shellHtml.contains("01_chapter/01_story.html"), "Shell nav should link to chapter page");
   }
 
   @Test
@@ -81,8 +83,8 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String html = Files.readString(htmlOutputDir.resolve("intro.html"));
-    assertTrue(html.contains("mermaid"), "Should include mermaid.js reference");
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    assertTrue(shellHtml.contains("mermaid"), "Shell should include mermaid.js reference");
   }
 
   @Test
@@ -114,11 +116,11 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String html = Files.readString(htmlOutputDir.resolve("intro.html"));
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
     assertTrue(
-        html.contains("<link rel=\"stylesheet\" href=\"truedoctales.css\">"),
-        "Should link to external CSS file");
-    assertFalse(html.contains("<style>"), "Should not include inline CSS");
+        shellHtml.contains("<link rel=\"stylesheet\" href=\"truedoctales.css\">"),
+        "Shell should link to external CSS file");
+    assertFalse(shellHtml.contains("<style>"), "Shell should not include inline CSS");
 
     assertTrue(
         Files.exists(htmlOutputDir.resolve("truedoctales.css")),
@@ -161,8 +163,11 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String storyHtml = Files.readString(htmlOutputDir.resolve("01_chapter/01_story.html"));
-    assertTrue(storyHtml.contains("class=\"active\""), "Should mark active entry");
+    // With SPA, active state is managed by the JS router, not baked into the HTML
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    assertTrue(
+        shellHtml.contains("toggle('active'"),
+        "Shell JS should manage active navigation state dynamically");
   }
 
   @Test
@@ -244,8 +249,8 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String html = Files.readString(htmlOutputDir.resolve("intro.html"));
-    assertTrue(html.contains("viewport"), "Should include viewport meta tag");
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    assertTrue(shellHtml.contains("viewport"), "Shell should include viewport meta tag");
 
     String css = Files.readString(htmlOutputDir.resolve("truedoctales.css"));
     assertTrue(css.contains("@media"), "CSS should include responsive media queries");
@@ -258,10 +263,10 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String html = Files.readString(htmlOutputDir.resolve("intro.html"));
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
     assertTrue(
-        html.contains("<img src=\"small_icon_full.png\""),
-        "Should include project icon in top header");
+        shellHtml.contains("<img src=\"small_icon_full.png\""),
+        "Shell should include project icon in top header");
     assertTrue(
         Files.exists(htmlOutputDir.resolve("small_icon_full.png")),
         "Should write icon file to output directory");
@@ -277,12 +282,12 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String introHtml = Files.readString(htmlOutputDir.resolve("00_intro.html"));
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
     assertTrue(
-        introHtml.contains("<details class=\"nav-tree\""),
-        "Chapter groups should use <details> for collapsible tree");
+        shellHtml.contains("<details class=\"nav-tree\""),
+        "Shell nav should use <details> for collapsible chapter groups");
     assertTrue(
-        introHtml.contains("<summary>"), "Chapter groups should have a <summary> toggle label");
+        shellHtml.contains("<summary>"), "Shell nav chapter groups should have a <summary> toggle");
   }
 
   @Test
@@ -296,15 +301,15 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    // When viewing the intro (root), no chapter groups should be open
-    String introHtml = Files.readString(htmlOutputDir.resolve("00_intro.html"));
+    // With SPA, all groups start collapsed; the JS router opens the active one at runtime
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
     assertFalse(
-        introHtml.contains("<details class=\"nav-tree\" open"),
-        "Chapter groups should be collapsed by default when not active");
+        shellHtml.contains("<details class=\"nav-tree\" open"),
+        "Chapter groups should be collapsed by default in the SPA shell");
   }
 
   @Test
-  void generate_shouldUseCssDepthPrefixForNestedPages() throws IOException {
+  void generate_shellShouldUseRootLevelAssetPaths() throws IOException {
     Files.writeString(markdownDir.resolve("00_intro.md"), "# Book Intro\n");
     Path ch = Files.createDirectories(markdownDir.resolve("01_chapter"));
     Files.writeString(ch.resolve("01_story.md"), "# Story\n");
@@ -312,13 +317,14 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String storyHtml = Files.readString(htmlOutputDir.resolve("01_chapter/01_story.html"));
+    // The SPA shell always lives at the output root, so no depth prefix is needed
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
     assertTrue(
-        storyHtml.contains("href=\"../truedoctales.css\""),
-        "Nested pages should use relative path to CSS");
+        shellHtml.contains("href=\"truedoctales.css\""),
+        "SPA shell should reference CSS at root level");
     assertTrue(
-        storyHtml.contains("src=\"../small_icon_full.png\""),
-        "Nested pages should use relative path to icon");
+        shellHtml.contains("src=\"small_icon_full.png\""),
+        "SPA shell should reference icon at root level");
   }
 
   @Test
@@ -375,11 +381,11 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    // When viewing a story in chapter 1, that chapter group should be expanded
-    String storyHtml = Files.readString(htmlOutputDir.resolve("01_chapter/01_story.html"));
+    // With SPA, the JS router opens the chapter group that contains the active page at runtime
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
     assertTrue(
-        storyHtml.contains("<details class=\"nav-tree\" open"),
-        "Chapter group containing active page should be expanded");
+        shellHtml.contains("d.open = true"),
+        "Shell JS should expand the chapter group that contains the active page");
   }
 
   @Test
@@ -389,14 +395,14 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String html = Files.readString(htmlOutputDir.resolve("intro.html"));
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
     assertTrue(
-        html.contains("<link rel=\"icon\" type=\"image/png\" href=\"small_icon_full.png\">"),
-        "Should include favicon link");
+        shellHtml.contains("<link rel=\"icon\" type=\"image/png\" href=\"small_icon_full.png\">"),
+        "Shell should include favicon link");
   }
 
   @Test
-  void generate_shouldIncludeFaviconWithDepthPrefix() throws IOException {
+  void generate_shellFaviconAtRootLevel() throws IOException {
     Files.writeString(markdownDir.resolve("00_intro.md"), "# Book Intro\n");
     Path ch = Files.createDirectories(markdownDir.resolve("01_chapter"));
     Files.writeString(ch.resolve("01_story.md"), "# Story\n");
@@ -404,10 +410,11 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String storyHtml = Files.readString(htmlOutputDir.resolve("01_chapter/01_story.html"));
+    // The SPA shell is always at the root; no depth prefix required for the favicon
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
     assertTrue(
-        storyHtml.contains("href=\"../small_icon_full.png\""),
-        "Nested pages should use relative path to favicon");
+        shellHtml.contains("href=\"small_icon_full.png\""),
+        "SPA shell should reference favicon at root level without depth prefix");
   }
 
   @Test
@@ -417,20 +424,22 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String html = Files.readString(htmlOutputDir.resolve("intro.html"));
-    assertTrue(html.contains("class=\"report-footer\""), "Should include branded footer");
-    assertTrue(html.contains("truedoctales-4j"), "Footer should link to project repository");
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    assertTrue(
+        shellHtml.contains("class=\"report-footer\""), "Shell should include branded footer");
+    assertTrue(shellHtml.contains("truedoctales-4j"), "Footer should link to project repository");
   }
 
   @Test
-  void generate_shouldIncludePicoCssFramework() throws IOException {
+  void generate_shouldIncludeBootstrapCssFramework() throws IOException {
     Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
 
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String html = Files.readString(htmlOutputDir.resolve("intro.html"));
-    assertTrue(html.contains("picocss/pico"), "Should include Pico CSS framework from CDN");
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    assertTrue(
+        shellHtml.contains("bootstrap"), "Shell should include Bootstrap framework from CDN");
   }
 
   @Test
@@ -451,10 +460,11 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String html = Files.readString(htmlOutputDir.resolve("intro.html"));
-    assertTrue(html.contains("class=\"top-header\""), "Should include a top header bar");
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    assertTrue(shellHtml.contains("class=\"top-header\""), "Shell should include a top header bar");
     assertTrue(
-        html.contains("class=\"top-header-brand\""), "Should include brand link in top header");
+        shellHtml.contains("class=\"top-header-brand\""),
+        "Shell should include brand link in top header");
   }
 
   @Test
@@ -464,9 +474,12 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String html = Files.readString(htmlOutputDir.resolve("intro.html"));
-    assertTrue(html.contains("id=\"theme-toggle\""), "Should include a theme toggle button");
-    assertTrue(html.contains("data-theme"), "Should use Pico data-theme attribute for theming");
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    assertTrue(
+        shellHtml.contains("id=\"theme-toggle\""), "Shell should include a theme toggle button");
+    assertTrue(
+        shellHtml.contains("data-bs-theme"),
+        "Shell should use Bootstrap data-bs-theme attribute for theming");
   }
 
   @Test
@@ -480,10 +493,11 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String storyHtml = Files.readString(htmlOutputDir.resolve("01_chapter/01_story.html"));
+    // With SPA, the title appears in the shell nav; the story fragment contains the markdown
+    // heading
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
     assertTrue(
-        storyHtml.contains("Meta Chapter Title"),
-        "Should use title from meta.json instead of parsing markdown heading");
+        shellHtml.contains("Meta Chapter Title"), "Shell nav should use title from meta.json");
   }
 
   @Test
@@ -495,9 +509,10 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String storyHtml = Files.readString(htmlOutputDir.resolve("01_chapter/01_story.html"));
+    // The story title falls back to the markdown heading and appears in the shell nav
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
     assertTrue(
-        storyHtml.contains("Markdown Story Title"),
-        "Should fall back to markdown heading when no meta.json exists");
+        shellHtml.contains("Markdown Story Title"),
+        "Shell nav should fall back to markdown heading when no meta.json exists");
   }
 }

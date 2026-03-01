@@ -1,22 +1,26 @@
 /* ========================================================================
    True Doc Tales — Report Layout
-   Pico CSS handles all content styling (typography, tables, code, etc.).
-   This file only provides the sidebar layout, navigation, and overrides.
+   Bootstrap 5 handles all base styling (typography, tables, code, etc.).
+   This file provides the SPA shell layout, sidebar, and Bootstrap overrides.
    ======================================================================== */
 
+/* Override Bootstrap's primary colour to match the True Doc Tales brand */
 :root {
+  --bs-primary: #2563eb;
+  --bs-primary-rgb: 37, 99, 235;
+  --bs-link-color: #2563eb;
+  --bs-link-hover-color: #1d4ed8;
+  /* Keep --primary as an alias so downstream code can use either */
+  --primary: var(--bs-primary);
+  --primary-dark: #1d4ed8;
+  --primary-light: #3b82f6;
+  --primary-bg: rgba(var(--bs-primary-rgb), 0.08);
   --sidebar-width: 290px;
   --sidebar-edge: 12px;
   --header-height: 3.75rem;
-  --primary: #2563eb;
-  --primary-dark: #1d4ed8;
-  --primary-light: #3b82f6;
-  --primary-bg: #eff6ff;
-  --border-light: #f1f5f9;
 }
 
-/* --- Layout override — Pico defaults to centered container;
-       we need a header + sidebar + content layout instead. ---------- */
+/* --- Body layout ---------------------------------------------------- */
 
 body {
   display: flex;
@@ -35,13 +39,13 @@ body {
   right: 0;
   height: var(--header-height);
   background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
-  color: white;
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0 1.25rem;
-  z-index: 150;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+  z-index: 1030;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .12);
   flex-shrink: 0;
   box-sizing: border-box;
 }
@@ -50,17 +54,17 @@ body {
   align-items: center;
   gap: 0.75rem;
   text-decoration: none;
-  color: white;
+  color: #fff;
   max-height: 100%;
 }
-.top-header-brand:hover { color: white; text-decoration: none; }
+.top-header-brand:hover { color: #fff; text-decoration: none; }
 .top-header-brand img {
   width: auto;
   height: calc(var(--header-height) - 0.75rem);
   max-height: 48px;
   aspect-ratio: 1;
   border-radius: 6px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .2);
   margin: 0;
   flex-shrink: 0;
 }
@@ -83,9 +87,9 @@ body {
 .theme-toggle {
   position: absolute;
   right: 1.25rem;
-  background: rgba(255,255,255,0.15);
-  border: 1px solid rgba(255,255,255,0.25);
-  color: white;
+  background: rgba(255, 255, 255, .15);
+  border: 1px solid rgba(255, 255, 255, .25);
+  color: #fff;
   border-radius: 6px;
   padding: 0.3rem 0.6rem;
   font-size: 0.95rem;
@@ -95,40 +99,37 @@ body {
   display: flex;
   align-items: center;
 }
-.theme-toggle:hover {
-  background: rgba(255,255,255,0.25);
-}
+.theme-toggle:hover { background: rgba(255, 255, 255, .25); }
 
-/* Dark-mode header — use a subdued slate instead of the light-mode blue */
-[data-theme="dark"] .top-header {
+/* Dark-mode header — subdued slate instead of the light-mode blue gradient */
+[data-bs-theme="dark"] .top-header {
   background: linear-gradient(135deg, #1e293b, #334155);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
 }
 
 /* --- Sidebar -------------------------------------------------------- */
 
 .sidebar {
   width: var(--sidebar-width);
-  background: var(--pico-card-background-color, #f8fafc);
-  border-right: 1px solid var(--pico-muted-border-color, #e2e8f0);
+  background: var(--bs-body-bg);
+  border-right: 1px solid var(--bs-border-color);
   position: fixed;
   top: var(--header-height);
   left: 0;
   height: calc(100vh - var(--header-height));
-  /* Hover slide-in: collapsed to --sidebar-edge wide strip */
+  /* Collapsed to --sidebar-edge strip; slides in on hover */
   transform: translateX(calc(var(--sidebar-edge) - var(--sidebar-width)));
-  transition: transform 0.25s cubic-bezier(0.4,0,0.2,1), box-shadow 0.25s;
-  z-index: 100;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s;
+  z-index: 1020;
   display: flex;
   flex-direction: column;
   padding: 0;
-  /* overflow is handled by .sidebar-content only — avoids double scrollbar */
 }
 
 .sidebar:hover,
 .sidebar:focus-within {
   transform: translateX(0);
-  box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+  box-shadow: 4px 0 20px rgba(0, 0, 0, .1);
 }
 
 .sidebar-content {
@@ -138,18 +139,22 @@ body {
 }
 .sidebar-content::-webkit-scrollbar { width: 6px; }
 .sidebar-content::-webkit-scrollbar-track { background: transparent; }
-.sidebar-content::-webkit-scrollbar-thumb { background: var(--pico-muted-border-color, #e2e8f0); border-radius: 3px; }
-.sidebar-content::-webkit-scrollbar-thumb:hover { background: var(--pico-muted-color, #64748b); }
+.sidebar-content::-webkit-scrollbar-thumb {
+  background: var(--bs-border-color);
+  border-radius: 3px;
+}
+.sidebar-content::-webkit-scrollbar-thumb:hover { background: var(--bs-secondary-color); }
+
 .sidebar-content .nav-group-label {
   font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--pico-muted-color, #64748b);
+  color: var(--bs-secondary-color);
   padding: 1rem 1.5rem 0.375rem;
 }
 .sidebar-content .nav-tree {
-  border-bottom: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--bs-border-color);
 }
 .sidebar-content .nav-tree summary {
   padding: 0.625rem 1.5rem;
@@ -164,31 +169,21 @@ body {
 .sidebar-content .nav-tree summary::-webkit-details-marker { display: none; }
 .sidebar-content .nav-tree summary::marker { display: none; }
 
-/* Chapter title link — styled as a section header, not a nav link */
+/* Chapter title link — styled as a section header */
 .sidebar-content .nav-tree .chapter-link {
   flex: 1;
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--pico-color, #1e293b);
+  color: var(--bs-body-color);
   text-decoration: none;
   padding: 0;
-  border-left: none;
-  background: none;
   line-height: 1.4;
   transition: color 0.15s;
 }
-.sidebar-content .nav-tree .chapter-link:hover {
-  color: var(--primary);
-  background: none;
-  border-left: none;
-}
-.sidebar-content .nav-tree .chapter-link.active {
-  color: var(--primary);
-  background: none;
-  border-left: none;
-}
+.sidebar-content .nav-tree .chapter-link:hover,
+.sidebar-content .nav-tree .chapter-link.active { color: var(--bs-primary); }
 
-/* Toggle arrow indicator */
+/* Toggle arrow */
 .sidebar-content .nav-tree .toggle-arrow {
   flex-shrink: 0;
   width: 1.125rem;
@@ -196,7 +191,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--pico-muted-color, #64748b);
+  color: var(--bs-secondary-color);
 }
 .sidebar-content .nav-tree .toggle-arrow::after {
   content: "▸";
@@ -205,48 +200,40 @@ body {
   display: block;
   line-height: 1;
 }
-.sidebar-content .nav-tree[open] > summary .toggle-arrow::after {
-  transform: rotate(90deg);
-}
+.sidebar-content .nav-tree[open] > summary .toggle-arrow::after { transform: rotate(90deg); }
+.sidebar-content .nav-tree summary:hover { background: var(--bs-tertiary-bg); }
 
-.sidebar-content .nav-tree summary:hover {
-  background: var(--border-light);
-}
-.sidebar-content .nav-tree ul {
-  padding-left: 0.5rem;
-  padding-bottom: 0.375rem;
-}
-/* Override Pico CSS nav ul flex layout — sidebar items must stack vertically */
+.sidebar-content .nav-tree ul { padding-left: 0.5rem; padding-bottom: 0.375rem; }
+
+/* Reset Bootstrap's nav/list defaults inside the sidebar */
 .sidebar-content ul {
   list-style: none;
   margin: 0;
   padding: 0;
   display: block;
 }
-.sidebar-content li {
-  display: block;
-  width: 100%;
-}
+.sidebar-content li { display: block; width: 100%; }
 .sidebar-content li a {
   display: block;
   padding: 0.375rem 1.5rem;
-  color: var(--pico-secondary-color, #475569);
+  color: var(--bs-secondary-color);
   text-decoration: none;
   font-size: 0.84rem;
-  font-weight: 600;
+  font-weight: 500;
   border-left: 3px solid transparent;
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
   line-height: 1.5;
 }
 .sidebar-content li a:hover {
-  background: var(--border-light);
+  background: var(--bs-tertiary-bg);
   border-left-color: var(--primary-light);
-  color: var(--primary);
+  color: var(--bs-primary);
 }
 .sidebar-content li a.active {
   background: var(--primary-bg);
-  border-left-color: var(--primary);
-  color: var(--primary);
+  border-left-color: var(--bs-primary);
+  color: var(--bs-primary);
+  font-weight: 600;
 }
 
 .sidebar-toggle {
@@ -254,23 +241,20 @@ body {
   position: fixed;
   top: 5px;
   left: 1rem;
-  z-index: 200;
-  background: var(--primary);
-  color: white;
+  z-index: 1040;
+  background: var(--bs-primary);
+  color: #fff;
   border: none;
   border-radius: 8px;
   padding: 0.625rem 0.875rem;
   font-size: 1.25rem;
   cursor: pointer;
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1);
   transition: background 0.15s, transform 0.15s;
 }
-.sidebar-toggle:hover {
-  background: var(--primary-dark);
-  transform: scale(1.05);
-}
+.sidebar-toggle:hover { background: var(--primary-dark); transform: scale(1.05); }
 
-/* --- Main Content --------------------------------------------------- */
+/* --- Main content area --------------------------------------------- */
 
 .content {
   margin-left: var(--sidebar-edge);
@@ -283,6 +267,14 @@ body {
   padding: 0;
 }
 
+/* page-content hosts the lazily loaded <article> fragments */
+#page-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
 article {
   max-width: 52rem;
   margin: 0 auto;
@@ -290,17 +282,33 @@ article {
   width: 100%;
   flex: 1;
 }
-
-/* Pico overrides — tighten spacing for documentation context */
 article h1:first-child { margin-top: 0; }
-article img { border-radius: 12px; }
+article img { border-radius: 12px; max-width: 100%; }
+
+/* Bootstrap-quality table styles for markdown-generated tables */
+article table {
+  width: 100%;
+  margin-bottom: 1rem;
+  vertical-align: top;
+  border-color: var(--bs-border-color);
+  border-collapse: collapse;
+}
+article table > :not(caption) > * > * {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--bs-border-color);
+}
+article thead > tr > th {
+  font-weight: 600;
+  border-bottom-width: 2px;
+  border-bottom-color: var(--bs-border-color);
+}
 
 /* --- Mermaid diagrams ----------------------------------------------- */
 
 .mermaid {
-  background: var(--pico-card-background-color, white);
+  background: var(--bs-body-bg);
   padding: 2rem;
-  border: 1px solid var(--pico-muted-border-color, #e2e8f0);
+  border: 1px solid var(--bs-border-color);
   border-radius: 12px;
   margin: 1.5rem 0;
   text-align: center;
@@ -309,28 +317,31 @@ article img { border-radius: 12px; }
 /* --- Footer --------------------------------------------------------- */
 
 .report-footer {
-  border-top: 1px solid var(--pico-muted-border-color, #e2e8f0);
+  border-top: 1px solid var(--bs-border-color);
   padding: 2rem 3rem;
   text-align: center;
-  color: var(--pico-muted-color, #64748b);
+  color: var(--bs-secondary-color);
   font-size: 0.8rem;
   line-height: 1.6;
-  background: var(--pico-card-background-color, #f8fafc);
+  background: var(--bs-body-bg);
 }
 .report-footer a { font-weight: 600; }
 .report-footer .footer-brand {
   font-weight: 700;
-  color: var(--pico-secondary-color, #475569);
+  color: var(--bs-body-color);
   font-size: 0.85rem;
 }
 
 /* --- Responsive ----------------------------------------------------- */
 
 @media (max-width: 768px) {
-  /* On mobile, sidebar is fully hidden until toggle is pressed */
-  .sidebar { transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); }
-  .sidebar:hover, .sidebar:focus-within { transform: translateX(-100%); box-shadow: none; }
-  .sidebar.open { transform: translateX(0) !important; box-shadow: 4px 0 20px rgba(0,0,0,0.15); }
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .sidebar:hover,
+  .sidebar:focus-within { transform: translateX(-100%); box-shadow: none; }
+  .sidebar.open { transform: translateX(0) !important; box-shadow: 4px 0 20px rgba(0, 0, 0, .15); }
   .sidebar-toggle { display: block; }
   .content { margin-left: 0; }
   article { padding: 2rem 1.25rem 3rem; }

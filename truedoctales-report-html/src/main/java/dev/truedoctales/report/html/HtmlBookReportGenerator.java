@@ -22,11 +22,14 @@ import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
 
-/// Generates a professional HTML report from enriched markdown files.
+/// Generates a Bootstrap-based single-page-application HTML report from enriched markdown files.
 ///
-/// The generator converts each markdown file to a styled HTML page and creates an
-/// {@code index.html} with sidebar navigation linking all chapters and stories.
-/// Mermaid diagrams are rendered client-side via the mermaid.js library.
+/// <p>The generator produces one {@code index.html} SPA shell (Bootstrap navbar + sidebar +
+/// JS router) and one lightweight {@code <article>} HTML fragment per story. Navigation links
+/// use hash-based routing so the browser never leaves {@code index.html}; content is fetched
+/// and injected on demand without a full page reload.
+///
+/// <p>Mermaid diagrams are rendered client-side via the mermaid.js library.
 public class HtmlBookReportGenerator {
 
   private static final Logger logger = Logger.getLogger(HtmlBookReportGenerator.class.getName());
@@ -53,6 +56,10 @@ public class HtmlBookReportGenerator {
 
   /// Generates the full HTML report with navigation.
   ///
+  /// <p>Each markdown file is converted to a lightweight {@code <article>} HTML fragment.
+  /// A single {@code index.html} SPA shell contains the full Bootstrap layout and a
+  /// JavaScript router that fetches and injects the fragments on demand.
+  ///
   /// @throws IOException if reading or writing files fails
   public void generate() throws IOException {
     logger.info("Generating HTML report from: " + markdownDirectory);
@@ -65,10 +72,10 @@ public class HtmlBookReportGenerator {
     for (NavEntry entry : navigation) {
       String markdown = Files.readString(entry.sourcePath());
       String bodyHtml = convertMarkdownToHtml(markdown);
-      String fullHtml = wrapInTemplate(entry.title(), bodyHtml, navigation, entry);
+      String fragmentHtml = buildFragmentHtml(bodyHtml);
       Path outputPath = htmlOutputDirectory.resolve(entry.htmlRelativePath());
       Files.createDirectories(outputPath.getParent());
-      Files.writeString(outputPath, fullHtml);
+      Files.writeString(outputPath, fragmentHtml);
       logger.info("  HTML: " + entry.htmlRelativePath());
     }
 
@@ -231,43 +238,46 @@ public class HtmlBookReportGenerator {
   }
 
   private void generateIndexHtml(List<NavEntry> navigation) throws IOException {
-    // Redirect to first page
-    String firstPage = navigation.getFirst().htmlRelativePath();
-    String indexHtml =
-        "<!DOCTYPE html>\n<html><head><meta http-equiv=\"refresh\" content=\"0; url="
-            + firstPage
-            + "\"><title>True Doc Tales Report</title></head>"
-            + "<body><p>Redirecting to <a href=\""
-            + firstPage
-            + "\">report</a>...</p></body></html>\n";
-    Files.writeString(htmlOutputDirectory.resolve("index.html"), indexHtml);
+    String navHtml = buildNavigationHtml(navigation);
+    String defaultPage = navigation.getFirst().htmlRelativePath();
+    String shellHtml = buildShellHtml(navHtml, defaultPage);
+    Files.writeString(htmlOutputDirectory.resolve("index.html"), shellHtml);
   }
 
-  private String wrapInTemplate(
-      String title, String bodyHtml, List<NavEntry> navigation, NavEntry current) {
-    String navHtml = buildNavigationHtml(navigation, current);
-    String depthPrefix = computeDepthPrefix(current.htmlRelativePath());
+  /// Returns a lightweight HTML fragment containing only the {@code <article>} element.
+  /// These fragments are fetched and injected into the SPA shell by the JS router.
+  private String buildFragmentHtml(String bodyHtml) {
+    return "<article>\n" + bodyHtml + "</article>\n";
+  }
 
+  /// Builds the SPA shell HTML by substituting the pre-built navigation and default page
+  /// path into the static template.  A {@code %} in the navigation HTML is escaped so it
+  /// is not misinterpreted as a format specifier.
+  private String buildShellHtml(String navHtml, String defaultPage) {
+    return shellTemplate().formatted(navHtml.replace("%", "%%"), defaultPage);
+  }
+
+  private static String shellTemplate() {
     return """
         <!DOCTYPE html>
-        <html lang="en" data-theme="light">
+        <html lang="en" data-bs-theme="light">
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>%s - True Doc Tales</title>
-          <link rel="icon" type="image/png" href="%ssmall_icon_full.png">
-          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
-          <link rel="stylesheet" href="%struedoctales.css">
+          <title>True Doc Tales</title>
+          <link rel="icon" type="image/png" href="small_icon_full.png">
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+          <link rel="stylesheet" href="truedoctales.css">
         </head>
         <body>
           <header class="top-header">
-            <a class="top-header-brand" href="%sindex.html">
-              <img src="%ssmall_icon_full.png" alt="True Doc Tales">
+            <a class="top-header-brand" href="index.html">
+              <img src="small_icon_full.png" alt="True Doc Tales">
               <span class="top-header-brand-text">
                 <span class="brand-title">True Doc Tales</span>
                 <span class="brand-subtitle">Fairy tales become reality</span>
               </span>
-           </a>
+            </a>
             <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">🌙</button>
           </header>
           <nav class="sidebar" id="sidebar">
@@ -277,80 +287,139 @@ public class HtmlBookReportGenerator {
           </nav>
           <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle navigation">☰</button>
           <main class="content">
-            <article>
-        %s
-            </article>
+            <div id="page-content"></div>
             <footer class="report-footer">
               <span class="footer-brand">True Doc Tales</span> &mdash; Fairy tales become reality<br>
               Generated by <a href="https://github.com/truedoctales/truedoctales-4j">truedoctales-4j</a>
             </footer>
           </main>
+          <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
           <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
           <script>
-            // Clicking a chapter-link navigates without toggling the <details>
-            document.querySelectorAll('.nav-tree summary .chapter-link').forEach(function(link) {
-              link.addEventListener('click', function(e) { e.stopPropagation(); });
-            });
-            // Hover-open / hover-close for chapter groups.
-            // Only closes on mouseleave if the hover itself opened the group.
-            document.querySelectorAll('details.nav-tree').forEach(function(details) {
-              var hoverOpened = false;
-              details.addEventListener('mouseenter', function() {
-                if (!details.open) { details.open = true; hoverOpened = true; }
+            (function () {
+              var defaultPage = '%s';
+              var currentPath = '';
+
+              // Resolve a relative path against a base path (handles ../ segments)
+              function resolvePath(base, rel) {
+                if (!rel || rel.charAt(0) === '#' || rel.indexOf('//') !== -1 || rel.indexOf(':') !== -1) {
+                  return rel;
+                }
+                var stack = base.split('/');
+                stack.pop();
+                rel.split('/').forEach(function (s) {
+                  if (s === '..') { stack.pop(); } else if (s !== '.') { stack.push(s); }
+                });
+                return stack.join('/');
+              }
+
+              // Mark the current page active in the sidebar and expand its chapter group
+              function updateActiveNav(path) {
+                document.querySelectorAll('.sidebar-content a').forEach(function (a) {
+                  a.classList.toggle('active', a.getAttribute('href') === '#' + path);
+                });
+                document.querySelectorAll('details.nav-tree').forEach(function (d) {
+                  if (d.querySelector('a.active')) { d.open = true; }
+                });
+              }
+
+              // Fetch an HTML fragment and inject it into the content area
+              function loadContent(path) {
+                var reqPath = path || defaultPage;
+                currentPath = reqPath;
+                fetch(reqPath)
+                  .then(function (r) {
+                    return r.ok
+                      ? r.text()
+                      : '<article><h1>Page not found</h1><p>Could not load <code>' + reqPath
+                          + '</code>. <a href="#' + defaultPage + '">Return to home</a></p></article>';
+                  })
+                  .then(function (html) {
+                    document.getElementById('page-content').innerHTML = html;
+                    updateActiveNav(currentPath);
+                    if (typeof mermaid !== 'undefined') {
+                      mermaid.run({ querySelector: '#page-content .mermaid' });
+                    }
+                    document.querySelector('.content').scrollTop = 0;
+                  });
+              }
+
+              // Intercept internal link clicks within the content area
+              document.addEventListener('click', function (e) {
+                var a = e.target.closest('#page-content a[href]');
+                if (!a) { return; }
+                var href = a.getAttribute('href');
+                if (href && href.charAt(0) !== '#' && href.indexOf('//') === -1 && href.indexOf(':') === -1) {
+                  e.preventDefault();
+                  location.hash = '#' + resolvePath(currentPath, href);
+                }
               });
-              details.addEventListener('mouseleave', function() {
-                if (hoverOpened) { details.open = false; hoverOpened = false; }
+
+              window.addEventListener('hashchange', function () {
+                loadContent(location.hash.slice(1));
               });
-            });
-            document.getElementById('sidebar-toggle').addEventListener('click', function() {
-              document.getElementById('sidebar').classList.toggle('open');
-            });
-            (function() {
-              var toggle = document.getElementById
-              ('theme-toggle');
-              var html = document.documentElement;
+
+              // Hover-open / hover-close for chapter groups in the sidebar
+              document.querySelectorAll('details.nav-tree').forEach(function (details) {
+                var hoverOpened = false;
+                details.addEventListener('mouseenter', function () {
+                  if (!details.open) { details.open = true; hoverOpened = true; }
+                });
+                details.addEventListener('mouseleave', function () {
+                  if (hoverOpened) { details.open = false; hoverOpened = false; }
+                });
+              });
+
+              // Chapter-link click navigates without toggling the <details>
+              document.querySelectorAll('.nav-tree summary .chapter-link').forEach(function (link) {
+                link.addEventListener('click', function (e) { e.stopPropagation(); });
+              });
+
+              // Mobile sidebar toggle
+              document.getElementById('sidebar-toggle').addEventListener('click', function () {
+                document.getElementById('sidebar').classList.toggle('open');
+              });
+
+              // Theme toggle — uses Bootstrap data-bs-theme; no page reload needed
+              var toggle = document.getElementById('theme-toggle');
+              var htmlEl = document.documentElement;
               var stored = localStorage.getItem('truedoctales-theme');
               if (stored) {
-                html.setAttribute('data-theme', stored);
+                htmlEl.setAttribute('data-bs-theme', stored);
                 toggle.textContent = stored === 'dark' ? '☀️' : '🌙';
               }
-              toggle.addEventListener('click', function() {
-                var current = html.getAttribute('data-theme') || 'light';
-                var next = current === 'dark' ? 'light' : 'dark';
+              toggle.addEventListener('click', function () {
+                var cur = htmlEl.getAttribute('data-bs-theme') || 'light';
+                var next = cur === 'dark' ? 'light' : 'dark';
+                htmlEl.setAttribute('data-bs-theme', next);
                 localStorage.setItem('truedoctales-theme', next);
-                location.reload();
+                toggle.textContent = next === 'dark' ? '☀️' : '🌙';
+                if (typeof mermaid !== 'undefined') {
+                  mermaid.initialize({ startOnLoad: false, theme: next === 'dark' ? 'dark' : 'default' });
+                  mermaid.run({ querySelector: '#page-content .mermaid' });
+                }
               });
+
+              // Mermaid initialisation (startOnLoad: false; we call run() after each load)
               if (typeof mermaid !== 'undefined') {
-                var theme = (html.getAttribute('data-theme') === 'dark') ? 'dark' : 'default';
-                mermaid.initialize({ startOnLoad: true, theme: theme });
+                mermaid.initialize({
+                  startOnLoad: false,
+                  theme: htmlEl.getAttribute('data-bs-theme') === 'dark' ? 'dark' : 'default'
+                });
               }
-            })();
+
+              // Load the initial page from the URL hash or fall back to the first page
+              loadContent(location.hash ? location.hash.slice(1) : null);
+            }());
           </script>
         </body>
         </html>
-        """
-        .formatted(
-            escapeHtml(title),
-            depthPrefix,
-            depthPrefix,
-            depthPrefix,
-            depthPrefix,
-            navHtml.replace("DEPTH_PREFIX/", depthPrefix),
-            bodyHtml);
+        """;
   }
 
-  private String computeDepthPrefix(String htmlRelativePath) {
-    long depth = htmlRelativePath.chars().filter(c -> c == '/').count();
-    if (depth == 0) {
-      return "";
-    }
-    return "../".repeat((int) depth);
-  }
-
-  private String buildNavigationHtml(List<NavEntry> navigation, NavEntry current) {
+  private String buildNavigationHtml(List<NavEntry> navigation) {
     StringBuilder sb = new StringBuilder();
     String currentGroup = null;
-    String activeGroup = getGroupLabel(current.relativePath());
 
     // Pre-scan: find the chapter intro (first 00_-prefixed file) for each non-Book group
     Map<String, NavEntry> chapterIntros = new LinkedHashMap<>();
@@ -379,16 +448,12 @@ public class HtmlBookReportGenerator {
               .append("</div>\n");
           sb.append("        <ul>\n");
         } else {
-          String openAttr = group.equals(activeGroup) ? " open" : "";
-          sb.append("      <details class=\"nav-tree\"").append(openAttr).append(">\n");
+          sb.append("      <details class=\"nav-tree\">\n");
           sb.append("        <summary>");
           if (intro != null) {
-            String linkClass = intro.equals(current) ? "chapter-link active" : "chapter-link";
-            sb.append("<a href=\"DEPTH_PREFIX/")
+            sb.append("<a href=\"#")
                 .append(intro.htmlRelativePath())
-                .append("\" class=\"")
-                .append(linkClass)
-                .append("\">")
+                .append("\" class=\"chapter-link\">")
                 .append(escapeHtml(group))
                 .append("</a>");
           } else {
@@ -406,12 +471,9 @@ public class HtmlBookReportGenerator {
         continue;
       }
 
-      String activeClass = entry.equals(current) ? " class=\"active\"" : "";
-      sb.append("          <li><a href=\"DEPTH_PREFIX/")
+      sb.append("          <li><a href=\"#")
           .append(entry.htmlRelativePath())
-          .append("\"")
-          .append(activeClass)
-          .append(">")
+          .append("\">")
           .append(escapeHtml(entry.title()))
           .append("</a></li>\n");
     }
