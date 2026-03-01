@@ -10,7 +10,9 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -285,6 +287,10 @@ public class HtmlBookReportGenerator {
           </main>
           <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
           <script>
+            // Clicking a chapter-link navigates without toggling the <details>
+            document.querySelectorAll('.nav-tree summary .chapter-link').forEach(function(link) {
+              link.addEventListener('click', function(e) { e.stopPropagation(); });
+            });
             document.getElementById('sidebar-toggle').addEventListener('click', function() {
               document.getElementById('sidebar').classList.toggle('open');
             });
@@ -335,8 +341,20 @@ public class HtmlBookReportGenerator {
     String currentGroup = null;
     String activeGroup = getGroupLabel(current.relativePath());
 
+    // Pre-scan: find the chapter intro (first 00_-prefixed file) for each non-Book group
+    Map<String, NavEntry> chapterIntros = new LinkedHashMap<>();
     for (NavEntry entry : navigation) {
       String group = getGroupLabel(entry.relativePath());
+      if (!"Book".equals(group) && !chapterIntros.containsKey(group) && isChapterIntro(entry)) {
+        chapterIntros.put(group, entry);
+      }
+    }
+
+    for (NavEntry entry : navigation) {
+      String group = getGroupLabel(entry.relativePath());
+      NavEntry intro = chapterIntros.get(group);
+      boolean isIntroEntry = entry.equals(intro);
+
       if (!group.equals(currentGroup)) {
         if (currentGroup != null) {
           sb.append("        </ul>\n");
@@ -352,11 +370,31 @@ public class HtmlBookReportGenerator {
         } else {
           String openAttr = group.equals(activeGroup) ? " open" : "";
           sb.append("      <details class=\"nav-tree\"").append(openAttr).append(">\n");
-          sb.append("        <summary>").append(escapeHtml(group)).append("</summary>\n");
+          sb.append("        <summary>");
+          if (intro != null) {
+            String linkClass = intro.equals(current) ? "chapter-link active" : "chapter-link";
+            sb.append("<a href=\"DEPTH_PREFIX/")
+                .append(intro.htmlRelativePath())
+                .append("\" class=\"")
+                .append(linkClass)
+                .append("\">")
+                .append(escapeHtml(group))
+                .append("</a>");
+          } else {
+            sb.append(escapeHtml(group));
+          }
+          sb.append("<span class=\"toggle-arrow\"></span>");
+          sb.append("</summary>\n");
           sb.append("        <ul>\n");
         }
         currentGroup = group;
       }
+
+      // Skip the chapter intro entry — it is already shown as the summary link
+      if (isIntroEntry) {
+        continue;
+      }
+
       String activeClass = entry.equals(current) ? " class=\"active\"" : "";
       sb.append("          <li><a href=\"DEPTH_PREFIX/")
           .append(entry.htmlRelativePath())
@@ -373,6 +411,19 @@ public class HtmlBookReportGenerator {
       }
     }
     return sb.toString();
+  }
+
+  /// Returns {@code true} if the entry is a chapter intro file (filename starts with {@code 00_}
+  /// inside a subdirectory). These files are shown as the clickable summary link for the chapter
+  /// group instead of as a separate list item.
+  private boolean isChapterIntro(NavEntry entry) {
+    String path = entry.relativePath();
+    int slashIdx = path.lastIndexOf('/');
+    if (slashIdx < 0) {
+      return false;
+    }
+    String fileName = path.substring(slashIdx + 1);
+    return fileName.startsWith("00_");
   }
 
   private String getGroupLabel(String relativePath) {
