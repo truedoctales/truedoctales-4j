@@ -579,16 +579,19 @@ public class HtmlBookReportGenerator {
               .append("</div>\n");
           sb.append("        <ul>\n");
         } else {
+          String dir = entry.relativePath().substring(0, entry.relativePath().indexOf('/'));
+          Integer chapterNum = extractLeadingNumber(dir);
           sb.append("      <div class=\"nav-chapter\">\n");
           sb.append("        <div class=\"nav-chapter-row\">");
           if (intro != null) {
             sb.append("<a href=\"#")
                 .append(intro.htmlRelativePath())
                 .append("\" class=\"chapter-link\">")
+                .append(numberBadge(chapterNum))
                 .append(escapeHtml(group))
                 .append("</a>");
           } else {
-            sb.append(escapeHtml(group));
+            sb.append(numberBadge(chapterNum)).append(escapeHtml(group));
           }
           sb.append("<span class=\"flyout-arrow\" aria-hidden=\"true\">&#x203A;</span>");
           sb.append("</div>\n");
@@ -605,6 +608,7 @@ public class HtmlBookReportGenerator {
       sb.append("          <li><a href=\"#")
           .append(entry.htmlRelativePath())
           .append("\">")
+          .append(numberBadge(extractLeadingNumber(storyBaseName(entry.relativePath()))))
           .append(escapeHtml(entry.title()))
           .append("</a></li>\n");
     }
@@ -649,6 +653,41 @@ public class HtmlBookReportGenerator {
       }
     }
     return capitalized.toString();
+  }
+
+  /// Returns the base name (no extension, no path prefix) of a story relative path, used to
+  /// extract the leading number. E.g. "01_chapter/02_story.md" → "02_story".
+  private static String storyBaseName(String relativePath) {
+    int slash = relativePath.lastIndexOf('/');
+    String name = slash >= 0 ? relativePath.substring(slash + 1) : relativePath;
+    int dot = name.lastIndexOf('.');
+    return dot > 0 ? name.substring(0, dot) : name;
+  }
+
+  /// Extracts the leading numeric prefix before the first {@code _}, e.g. {@code "01_story"} → 1.
+  /// Returns {@code null} when no such prefix exists or the text before {@code _} is not a number.
+  private static Integer extractLeadingNumber(String name) {
+    int underscore = name.indexOf('_');
+    if (underscore <= 0) {
+      return null;
+    }
+    try {
+      return Integer.parseInt(name.substring(0, underscore));
+    } catch (NumberFormatException e) {
+      return null;
+    }
+  }
+
+  /// Emits a {@code <span class="nav-number" aria-hidden="true">N</span>} badge when
+  /// {@code number} is non-null, otherwise returns an empty string.
+  /// The span is aria-hidden because the number is already part of the link's accessible text.
+  private String numberBadge(Integer number) {
+    if (number == null) {
+      return "";
+    }
+    return "<span class=\"nav-number\" aria-hidden=\"true\">"
+        + escapeHtml(number.toString())
+        + "</span>";
   }
 
   private String escapeHtml(String text) {

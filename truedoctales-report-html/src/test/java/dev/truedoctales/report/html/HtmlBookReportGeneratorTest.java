@@ -565,4 +565,58 @@ class HtmlBookReportGeneratorTest {
         shellHtml.contains("ArrowRight"),
         "Shell JS should support ArrowRight key to enter a chapter flyout");
   }
+
+  @Test
+  void generate_shouldDisplayChapterNumberInNavigation() throws IOException {
+    Files.writeString(markdownDir.resolve("00_intro.md"), "# Book Intro\n");
+    Path ch = Files.createDirectories(markdownDir.resolve("02_brave-tailor"));
+    Files.writeString(ch.resolve("01_story.md"), "# A Story\n");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    assertTrue(
+        shellHtml.contains("<span class=\"nav-number\" aria-hidden=\"true\">2</span>"),
+        "Chapter row should display the chapter number badge (2 from '02_brave-tailor')");
+  }
+
+  @Test
+  void generate_shouldDisplayStoryNumberInNavigation() throws IOException {
+    Files.writeString(markdownDir.resolve("00_intro.md"), "# Book Intro\n");
+    Path ch = Files.createDirectories(markdownDir.resolve("01_chapter"));
+    Files.writeString(ch.resolve("03_my-story.md"), "# My Story\n");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    assertTrue(
+        shellHtml.contains("<span class=\"nav-number\" aria-hidden=\"true\">3</span>"),
+        "Story item should display the story number badge (3 from '03_my-story.md')");
+  }
+
+  @Test
+  void generate_shouldNotDisplayNumberForEntriesWithoutNumericPrefix() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Book Intro\n");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    assertFalse(
+        shellHtml.contains("class=\"nav-number\""),
+        "No nav-number badge should appear when filenames have no NN_ prefix");
+  }
+
+  @Test
+  void generate_shouldIncludeNavNumberCssClass() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String css = Files.readString(htmlOutputDir.resolve("truedoctales.css"));
+    assertTrue(css.contains(".nav-number"), "CSS should include .nav-number styles");
+  }
 }

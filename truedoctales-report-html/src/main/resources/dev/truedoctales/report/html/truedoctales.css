@@ -228,6 +228,18 @@ body {
   line-height: 1;
 }
 
+/* Chapter / story number badge shown before the title */
+.nav-number {
+  display: inline-block;
+  min-width: 1.4em;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--bs-secondary-color);
+  opacity: 0.65;
+  letter-spacing: 0;
+  flex-shrink: 0;
+}
+
 /* Flyout submenu — positioned via JS to the right of the sidebar */
 .flyout-menu {
   position: fixed;
