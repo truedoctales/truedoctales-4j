@@ -27,6 +27,7 @@ public class JupiterStoryTestExecutor implements JuniperStoryTestBuilder {
 
   private final StoryExecutionListener executionListener;
   private final StepExecutor stepExecutor;
+  private final PlotRegistry plotRegistry;
 
   /// Creates a new JUnit executor with the given registry and listener.
   ///
@@ -36,10 +37,12 @@ public class JupiterStoryTestExecutor implements JuniperStoryTestBuilder {
       PlotRegistry plotRegistry, StoryExecutionListener executionListener) {
     this.executionListener = executionListener;
     this.stepExecutor = new StepExecutor(plotRegistry, executionListener);
+    this.plotRegistry = plotRegistry;
   }
 
   @Override
   public Stream<DynamicNode> buildDynamicTests(StoryBookExecution book, Path storyPath) {
+    executionListener.onPlotBindings(plotRegistry.getBindings());
 
     StoryExecution story = book.loadStory(storyPath);
     ChapterExecution chapter = book.findChapterForStory(story).orElseThrow();

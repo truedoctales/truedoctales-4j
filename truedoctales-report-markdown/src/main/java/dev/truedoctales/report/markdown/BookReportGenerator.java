@@ -71,6 +71,7 @@ public class BookReportGenerator {
 
     copyBookFiles();
     enrichWithExecutionResults();
+    new PlotGlossaryGenerator(executionDirectory, outputDirectory).generate();
 
     logger.info("Report generated in: " + outputDirectory);
   }

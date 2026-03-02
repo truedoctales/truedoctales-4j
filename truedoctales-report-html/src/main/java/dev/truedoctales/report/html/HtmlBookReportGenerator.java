@@ -228,6 +228,22 @@ public class HtmlBookReportGenerator {
       }
     }
 
+    // Add plot glossary if plot-glossary.md exists in the markdown output
+    if (markdownDirectory != null) {
+      Path glossaryMd = markdownDirectory.resolve("plot-glossary.md");
+      if (Files.isRegularFile(glossaryMd)) {
+        entries.add(
+            new NavEntry(
+                glossaryMd,
+                "plot-glossary.md",
+                "plot-glossary.html",
+                "Plot Glossary",
+                false,
+                null,
+                "Reference"));
+      }
+    }
+
     return entries;
   }
 
