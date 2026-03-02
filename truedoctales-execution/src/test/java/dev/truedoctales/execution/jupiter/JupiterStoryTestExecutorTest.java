@@ -126,7 +126,7 @@ class JupiterStoryTestExecutorTest {
         new StepExecution(binding, new StepCall("TestPlot", "test binding"), List.of(), 0);
     SceneExecution scene = new SceneExecution("Test Scene", 0, List.of(step));
     StoryExecution story = new StoryExecution(storyPath, "Test Story", List.of(), List.of(scene));
-    ChapterExecution intro = new ChapterExecution(introPath, "Intro", List.of(story));
+    ChapterExecution intro = new ChapterExecution(0, introPath, "Intro", List.of(story));
     return new StoryBookExecution(bookPath, "Test Book", intro, List.of());
   }
 

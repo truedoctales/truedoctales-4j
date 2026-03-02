@@ -83,6 +83,7 @@ public class StoryBookExecutionMapperImpl implements Function<StoryBookModel, St
       }
       LOGGER.info("Build execution model for chapter: " + chapterModel.title());
       return new ChapterExecution(
+          chapterModel.number(),
           chapterModel.path(),
           chapterModel.title(),
           chapterModel.stories().stream().map(storyExecutionMapper).toList());

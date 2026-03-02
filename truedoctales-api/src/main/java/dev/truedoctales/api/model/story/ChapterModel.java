@@ -15,4 +15,7 @@ import org.jspecify.annotations.NonNull;
 /// A Chapter contains StoryModels representing individual story files within the chapter
 /// directory.
 public record ChapterModel(
-    @NonNull Path path, @NonNull String title, @NonNull List<StoryModel> stories) {}
+    @NonNull Integer number,
+    @NonNull Path path,
+    @NonNull String title,
+    @NonNull List<StoryModel> stories) {}
