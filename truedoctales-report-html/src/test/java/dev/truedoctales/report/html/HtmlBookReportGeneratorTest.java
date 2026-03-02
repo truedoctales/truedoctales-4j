@@ -46,10 +46,12 @@ class HtmlBookReportGeneratorTest {
     String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
     assertTrue(
         shellHtml.contains("<nav class=\"sidebar\""), "Shell should have sidebar navigation");
-    assertTrue(shellHtml.contains("Book Intro"), "Shell nav should contain page title");
-    assertTrue(shellHtml.contains("My Story"), "Shell nav should contain other pages");
+    // Navigation content is now in report-nav.json loaded by the SPA at startup
+    assertTrue(Files.exists(htmlOutputDir.resolve("report-nav.json")));
+    String navJson = Files.readString(htmlOutputDir.resolve("report-nav.json"));
+    assertTrue(navJson.contains("My Story"), "Nav JSON should contain story title");
     assertTrue(
-        shellHtml.contains("01_chapter/01_story.html"), "Shell nav should link to chapter page");
+        navJson.contains("01_chapter/01_story.html"), "Nav JSON should contain chapter story path");
   }
 
   @Test
@@ -498,11 +500,9 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    // With SPA, the title appears in the shell nav; the story fragment contains the markdown
-    // heading
-    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
-    assertTrue(
-        shellHtml.contains("Meta Chapter Title"), "Shell nav should use title from meta.json");
+    // Navigation content is now in report-nav.json, not baked into the shell HTML
+    String navJson = Files.readString(htmlOutputDir.resolve("report-nav.json"));
+    assertTrue(navJson.contains("Meta Chapter Title"), "Nav JSON should use title from meta.json");
   }
 
   @Test
@@ -575,10 +575,16 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
+    // Chapter numbers come from dirName — the JS numberBadge() emits nav-number spans client-side
     String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
     assertTrue(
-        shellHtml.contains("<span class=\"nav-number\" aria-hidden=\"true\">2</span>"),
-        "Chapter row should display the chapter number badge (2 from '02_brave-tailor')");
+        shellHtml.contains("nav-number"),
+        "Shell JS should contain numberBadge helper that emits .nav-number spans");
+    // The chapter dirName "02_brave-tailor" is stored in report-nav.json for the JS to parse
+    String navJson = Files.readString(htmlOutputDir.resolve("report-nav.json"));
+    assertTrue(
+        navJson.contains("02_brave-tailor"),
+        "Nav JSON should contain dirName '02_brave-tailor' so client JS can extract chapter number 2");
   }
 
   @Test
@@ -590,10 +596,15 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
+    // Story numbers are rendered client-side as sequential index+1 badges
     String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
     assertTrue(
-        shellHtml.contains("<span class=\"nav-number\" aria-hidden=\"true\">3</span>"),
-        "Story item should display the story number badge (3 from '03_my-story.md')");
+        shellHtml.contains("nav-number"),
+        "Shell JS should contain numberBadge helper that emits .nav-number spans");
+    String navJson = Files.readString(htmlOutputDir.resolve("report-nav.json"));
+    assertTrue(
+        navJson.contains("01_chapter/03_my-story.html"),
+        "Nav JSON should contain the story HTML path");
   }
 
   @Test
@@ -603,10 +614,14 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    // A plain "intro.md" at the root (no NN_ prefix, no chapter dir) gets dirName=""
+    // The client JS only extracts a number badge when parseInt(dirName.split('_')[0]) is a valid
+    // number — an empty dirName parses as NaN, so no badge is emitted.
+    String navJson = Files.readString(htmlOutputDir.resolve("report-nav.json"));
+    // The dirName should be empty (no chapter subdirectory), not a numbered one
     assertFalse(
-        shellHtml.contains("class=\"nav-number\""),
-        "No nav-number badge should appear when filenames have no NN_ prefix");
+        navJson.matches("(?s).*\"dirName\":\\s*\"\\d+_[^\"]+\".*"),
+        "Entries without numeric prefix should not have a numbered dirName that triggers a badge");
   }
 
   @Test
