@@ -126,7 +126,9 @@ public class JsonStoryListener extends PersistStoryListener {
     String filename = "meta.json";
     Path chapterMeta = outputChapterDir.resolve(filename);
     objectMapper.writeValue(
-        chapterMeta.toFile(), new ChapterMeta(chapterResult.getPath(), chapterResult.getTitle()));
+        chapterMeta.toFile(),
+        new ChapterMeta(
+            chapterResult.getNumber(), chapterResult.getPath(), chapterResult.getTitle()));
   }
 
   private void writeStoryJson(StoryExecutionResult storyResult) throws IOException {
@@ -144,5 +146,5 @@ public class JsonStoryListener extends PersistStoryListener {
   /// Simple record to hold book metadata.
   record BookMetadata(String title) {}
 
-  record ChapterMeta(String path, String title) {}
+  record ChapterMeta(Integer number, String path, String title) {}
 }
