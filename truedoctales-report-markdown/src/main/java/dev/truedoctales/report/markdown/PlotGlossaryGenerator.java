@@ -10,33 +10,27 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-/// Generates a {@code plot-glossary.md} file from a {@code plot-registry.json} produced by the
+/// Generates a plot glossary from a {@code plot-registry.json} produced by the
 /// {@code JsonStoryListener}.
 ///
-/// <p>The glossary lists every registered plot with its available steps, providing an
-/// informational reference that complements the story-based test reports.
-///
-/// <h3>Example output</h3>
-///
-/// <pre>
-/// # Plot Glossary
-///
-/// A reference of all available plots and their steps.
-///
-/// ## Hero
-///
-/// | Step | Input Type |
-/// |------|-----------|
-/// | Create hero | SEQUENCE |
-/// | Hero exists | SEQUENCE |
-/// </pre>
+/// <p>Produces:
+/// <ul>
+///   <li>{@code plot-glossary.md} — index listing all plots with links to their detail pages
+///   <li>{@code plots/<PlotId>.md} — one detail page per plot with an H2 section per step,
+///       its variables, and a usage example
+/// </ul>
 public class PlotGlossaryGenerator {
 
   private static final Logger logger = Logger.getLogger(PlotGlossaryGenerator.class.getName());
 
   static final String PLOT_REGISTRY_FILE = "plot-registry.json";
   static final String PLOT_GLOSSARY_FILE = "plot-glossary.md";
+  static final String PLOTS_DIR = "plots";
+
+  private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\$\\{([^}]+)\\}");
 
   private final Path executionDirectory;
   private final Path outputDirectory;
@@ -45,14 +39,14 @@ public class PlotGlossaryGenerator {
   /// Creates a new plot glossary generator.
   ///
   /// @param executionDirectory directory containing {@code plot-registry.json}
-  /// @param outputDirectory directory where {@code plot-glossary.md} will be written
+  /// @param outputDirectory directory where glossary files will be written
   public PlotGlossaryGenerator(Path executionDirectory, Path outputDirectory) {
     this.executionDirectory = executionDirectory;
     this.outputDirectory = outputDirectory;
     this.objectMapper = createObjectMapper();
   }
 
-  /// Generates {@code plot-glossary.md} if {@code plot-registry.json} exists.
+  /// Generates the plot glossary index and one page per plot.
   ///
   /// @throws IOException if reading or writing files fails
   public void generate() throws IOException {
@@ -69,48 +63,120 @@ public class PlotGlossaryGenerator {
       return;
     }
 
-    String markdown = buildMarkdown(plotsNode);
+    List<JsonNode> plots = sortedPlots(plotsNode);
+
     Files.createDirectories(outputDirectory);
+    Path plotsDir = Files.createDirectories(outputDirectory.resolve(PLOTS_DIR));
+
+    // Write one page per plot
+    for (JsonNode plot : plots) {
+      String plotId = plot.path("plotId").asText("(unknown)");
+      String plotPageMarkdown = buildPlotPageMarkdown(plot);
+      Path plotFile = plotsDir.resolve(plotId + ".md");
+      Files.writeString(plotFile, plotPageMarkdown);
+      logger.info("Plot page written to: " + plotFile);
+    }
+
+    // Write index
+    String indexMarkdown = buildIndexMarkdown(plots);
     Path glossaryFile = outputDirectory.resolve(PLOT_GLOSSARY_FILE);
-    Files.writeString(glossaryFile, markdown);
-    logger.info("Plot glossary written to: " + glossaryFile);
+    Files.writeString(glossaryFile, indexMarkdown);
+    logger.info("Plot glossary index written to: " + glossaryFile);
   }
 
-  private String buildMarkdown(JsonNode plotsNode) {
-    StringBuilder md = new StringBuilder();
-    md.append("# Plot Glossary\n\n");
-    md.append("A reference of all available plots and their steps.\n");
-
+  private List<JsonNode> sortedPlots(JsonNode plotsNode) {
     List<JsonNode> plots = new ArrayList<>();
     plotsNode.forEach(plots::add);
     plots.sort(
-        (a, b) -> {
-          String aId = a.path("plotId").asText("");
-          String bId = b.path("plotId").asText("");
-          return aId.compareToIgnoreCase(bId);
-        });
+        (a, b) -> a.path("plotId").asText("").compareToIgnoreCase(b.path("plotId").asText("")));
+    return plots;
+  }
 
+  /// Builds the index page listing all plots with links to their detail pages.
+  private String buildIndexMarkdown(List<JsonNode> plots) {
+    StringBuilder md = new StringBuilder();
+    md.append("# Plot Glossary\n\n");
+    md.append("A reference of all available plots and their steps.\n\n");
+    md.append("| Plot | Steps |\n");
+    md.append("|------|-------|\n");
     for (JsonNode plot : plots) {
       String plotId = plot.path("plotId").asText("(unknown)");
-      md.append("\n## ").append(plotId).append("\n\n");
-
       JsonNode steps = plot.get("steps");
-      if (steps == null || !steps.isArray() || !steps.iterator().hasNext()) {
-        md.append("_No steps registered._\n");
-        continue;
-      }
+      int stepCount = (steps != null && steps.isArray()) ? steps.size() : 0;
+      md.append("| [")
+          .append(plotId)
+          .append("](plots/")
+          .append(plotId)
+          .append(".md) | ")
+          .append(stepCount)
+          .append(" step")
+          .append(stepCount == 1 ? "" : "s")
+          .append(" |\n");
+    }
+    return md.toString();
+  }
 
-      md.append("| Step | Input Type |\n");
-      md.append("|------|------------|\n");
-      steps.forEach(
-          step -> {
-            String pattern = step.path("pattern").asText("");
-            String inputType = step.path("inputType").asText("SEQUENCE");
-            md.append("| ").append(pattern).append(" | ").append(inputType).append(" |\n");
-          });
+  /// Builds the detail page for a single plot.
+  private String buildPlotPageMarkdown(JsonNode plot) {
+    String plotId = plot.path("plotId").asText("(unknown)");
+    StringBuilder md = new StringBuilder();
+    md.append("# ").append(plotId).append("\n\n");
+    md.append("> Plot binding reference for the **").append(plotId).append("** plot.\n");
+
+    JsonNode steps = plot.get("steps");
+    if (steps == null || !steps.isArray() || !steps.iterator().hasNext()) {
+      md.append("\n_No steps registered._\n");
+      return md.toString();
     }
 
+    steps.forEach(step -> appendStepSection(md, plotId, step));
     return md.toString();
+  }
+
+  /// Appends a single step section (H2 + variables + usage example) to the builder.
+  private void appendStepSection(StringBuilder md, String plotId, JsonNode step) {
+    String pattern = step.path("pattern").asText("");
+    String inputType = step.path("inputType").asText("SEQUENCE");
+    List<String> variables = extractVariables(pattern);
+
+    md.append("\n## ").append(pattern).append("\n\n");
+    md.append("Pattern: `").append(pattern).append("`\n");
+
+    if (!variables.isEmpty()) {
+      md.append("\n### Variables\n\n");
+      md.append("| Variable | Description |\n");
+      md.append("|----------|-------------|\n");
+      for (String var : variables) {
+        md.append("| `").append(var).append("` | – |\n");
+      }
+    }
+
+    md.append("\n### Usage Example\n\n");
+    if (variables.isEmpty()) {
+      md.append("```\n> **").append(plotId).append("** ").append(pattern).append("\n```\n");
+    } else {
+      // Show table invocation format (same for SEQUENCE and BATCH)
+      md.append("```\n> **").append(plotId).append("** ").append(pattern).append("\n");
+      md.append("> |");
+      variables.forEach(v -> md.append(" ").append(v).append(" |"));
+      md.append("\n> |");
+      variables.forEach(v -> md.append(" ---- |"));
+      md.append("\n> |");
+      variables.forEach(v -> md.append(" value |"));
+      md.append("\n```\n");
+    }
+
+    md.append("\n---\n");
+  }
+
+  /// Extracts variable names from a step pattern, e.g. {@code ${name}} → {@code name}.
+  static List<String> extractVariables(String pattern) {
+    List<String> vars = new ArrayList<>();
+    Matcher m = VARIABLE_PATTERN.matcher(pattern);
+    while (m.find()) {
+      vars.add(m.group(1));
+    }
+    return vars;
   }
 
   private ObjectMapper createObjectMapper() {

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -34,8 +35,9 @@ class PlotGlossaryGeneratorTest {
   }
 
   @Test
-  void generate_shouldCreateGlossaryFromPlotRegistry() throws IOException {
-    String plotRegistry =
+  void generate_shouldCreateIndexAndPerPlotPages() throws IOException {
+    Files.writeString(
+        executionDir.resolve("plot-registry.json"),
         """
         {
           "plots": [
@@ -48,95 +50,122 @@ class PlotGlossaryGeneratorTest {
             }
           ]
         }
-        """;
-    Files.writeString(executionDir.resolve("plot-registry.json"), plotRegistry);
+        """);
 
     new PlotGlossaryGenerator(executionDir, outputDir).generate();
 
-    Path glossaryFile = outputDir.resolve("plot-glossary.md");
-    assertTrue(Files.exists(glossaryFile), "Should create plot-glossary.md");
+    // Index page
+    assertTrue(Files.exists(outputDir.resolve("plot-glossary.md")), "Should create index");
+    String index = Files.readString(outputDir.resolve("plot-glossary.md"));
+    assertTrue(index.contains("# Plot Glossary"), "Index should have title");
+    assertTrue(index.contains("[Hero](plots/Hero.md)"), "Index should link to plot page");
 
-    String content = Files.readString(glossaryFile);
-    assertTrue(content.contains("# Plot Glossary"), "Should have title");
-    assertTrue(content.contains("## Hero"), "Should contain plot heading");
-    assertTrue(content.contains("Create hero"), "Should list step pattern");
-    assertTrue(content.contains("Hero exists"), "Should list step pattern");
-    assertTrue(content.contains("SEQUENCE"), "Should include inputType");
+    // Per-plot page
+    Path plotPage = outputDir.resolve("plots/Hero.md");
+    assertTrue(Files.exists(plotPage), "Should create per-plot page");
+    String content = Files.readString(plotPage);
+    assertTrue(content.contains("# Hero"), "Plot page should have title");
+    assertTrue(content.contains("## Create hero"), "Step should be H2");
+    assertTrue(content.contains("## Hero exists"), "Step should be H2");
   }
 
   @Test
-  void generate_shouldSortPlotsByName() throws IOException {
-    String plotRegistry =
+  void generate_perPlotPage_shouldShowVariablesSection() throws IOException {
+    Files.writeString(
+        executionDir.resolve("plot-registry.json"),
         """
         {
           "plots": [
-            { "plotId": "Zorro",  "steps": [{ "plot": "Zorro",  "pattern": "zorro step",  "inputType": "SEQUENCE" }] },
-            { "plotId": "Alpha",  "steps": [{ "plot": "Alpha",  "pattern": "alpha step",  "inputType": "SEQUENCE" }] }
-          ]
-        }
-        """;
-    Files.writeString(executionDir.resolve("plot-registry.json"), plotRegistry);
-
-    new PlotGlossaryGenerator(executionDir, outputDir).generate();
-
-    String content = Files.readString(outputDir.resolve("plot-glossary.md"));
-    int alphaPos = content.indexOf("## Alpha");
-    int zorroPos = content.indexOf("## Zorro");
-    assertTrue(alphaPos < zorroPos, "Plots should be sorted alphabetically");
-  }
-
-  @Test
-  void generate_shouldHandleEmptyStepsList() throws IOException {
-    String plotRegistry =
-        """
-        {
-          "plots": [
-            { "plotId": "EmptyPlot", "steps": [] }
-          ]
-        }
-        """;
-    Files.writeString(executionDir.resolve("plot-registry.json"), plotRegistry);
-
-    new PlotGlossaryGenerator(executionDir, outputDir).generate();
-
-    String content = Files.readString(outputDir.resolve("plot-glossary.md"));
-    assertTrue(content.contains("## EmptyPlot"), "Should list the plot heading");
-    assertTrue(content.contains("_No steps registered._"), "Should indicate no steps");
-  }
-
-  @Test
-  void generate_shouldHandleMultiplePlots() throws IOException {
-    String plotRegistry =
-        """
-        {
-          "plots": [
-            {
-              "plotId": "Fight",
-              "steps": [
-                { "plot": "Fight", "pattern": "Attack fails", "inputType": "SEQUENCE" },
-                { "plot": "Fight", "pattern": "Defeat with skill", "inputType": "SEQUENCE" }
-              ]
-            },
             {
               "plotId": "Hero",
               "steps": [
-                { "plot": "Hero", "pattern": "Create hero", "inputType": "SEQUENCE" },
-                { "plot": "Hero", "pattern": "Grant skill", "inputType": "BATCH" }
+                { "plot": "Hero", "pattern": "Create hero ${id} ${name}", "inputType": "SEQUENCE" }
               ]
             }
           ]
         }
-        """;
-    Files.writeString(executionDir.resolve("plot-registry.json"), plotRegistry);
+        """);
 
     new PlotGlossaryGenerator(executionDir, outputDir).generate();
 
-    String content = Files.readString(outputDir.resolve("plot-glossary.md"));
-    assertTrue(content.contains("## Fight"), "Should contain Fight plot");
-    assertTrue(content.contains("## Hero"), "Should contain Hero plot");
-    assertTrue(content.contains("Attack fails"), "Should list Fight step");
-    assertTrue(content.contains("Grant skill"), "Should list Hero step");
-    assertTrue(content.contains("BATCH"), "Should include BATCH inputType");
+    String content = Files.readString(outputDir.resolve("plots/Hero.md"));
+    assertTrue(content.contains("### Variables"), "Should have Variables section");
+    assertTrue(content.contains("`id`"), "Should list variable id");
+    assertTrue(content.contains("`name`"), "Should list variable name");
+    assertTrue(content.contains("### Usage Example"), "Should have Usage Example section");
+  }
+
+  @Test
+  void generate_perPlotPage_shouldShowUsageExampleWithoutVariables() throws IOException {
+    Files.writeString(
+        executionDir.resolve("plot-registry.json"),
+        """
+        {
+          "plots": [
+            {
+              "plotId": "Greeting",
+              "steps": [
+                { "plot": "Greeting", "pattern": "Say Hello", "inputType": "SEQUENCE" }
+              ]
+            }
+          ]
+        }
+        """);
+
+    new PlotGlossaryGenerator(executionDir, outputDir).generate();
+
+    String content = Files.readString(outputDir.resolve("plots/Greeting.md"));
+    assertTrue(content.contains("### Usage Example"), "Should have usage example");
+    assertTrue(content.contains("> **Greeting** Say Hello"), "Usage should reference the plot");
+    assertTrue(
+        content.contains("```\n> **Greeting** Say Hello\n```"),
+        "Usage should be wrapped in code block");
+    assertFalse(content.contains("### Variables"), "No variables section when pattern has none");
+  }
+
+  @Test
+  void generate_shouldSortPlotsByNameInIndex() throws IOException {
+    Files.writeString(
+        executionDir.resolve("plot-registry.json"),
+        """
+        {
+          "plots": [
+            { "plotId": "Zorro",  "steps": [{ "plot": "Zorro",  "pattern": "z step", "inputType": "SEQUENCE" }] },
+            { "plotId": "Alpha",  "steps": [{ "plot": "Alpha",  "pattern": "a step", "inputType": "SEQUENCE" }] }
+          ]
+        }
+        """);
+
+    new PlotGlossaryGenerator(executionDir, outputDir).generate();
+
+    String index = Files.readString(outputDir.resolve("plot-glossary.md"));
+    assertTrue(index.indexOf("Alpha") < index.indexOf("Zorro"), "Index should sort alphabetically");
+  }
+
+  @Test
+  void generate_shouldHandleEmptyStepsList() throws IOException {
+    Files.writeString(
+        executionDir.resolve("plot-registry.json"),
+        """
+        { "plots": [ { "plotId": "Empty", "steps": [] } ] }
+        """);
+
+    new PlotGlossaryGenerator(executionDir, outputDir).generate();
+
+    String content = Files.readString(outputDir.resolve("plots/Empty.md"));
+    assertTrue(content.contains("# Empty"), "Should still create plot page");
+    assertTrue(content.contains("_No steps registered._"), "Should indicate no steps");
+  }
+
+  @Test
+  void extractVariables_shouldReturnEmptyListForPatternWithNoVars() {
+    assertEquals(List.of(), PlotGlossaryGenerator.extractVariables("Create hero"));
+  }
+
+  @Test
+  void extractVariables_shouldExtractAllVariableNames() {
+    List<String> vars = PlotGlossaryGenerator.extractVariables("Create hero ${id} ${name} ${age}");
+    assertEquals(List.of("id", "name", "age"), vars);
   }
 
   @Test
@@ -145,7 +174,8 @@ class PlotGlossaryGeneratorTest {
     Files.createDirectories(bookDir);
     Files.writeString(bookDir.resolve("00_intro.md"), "# Book Introduction\n");
 
-    String plotRegistry =
+    Files.writeString(
+        executionDir.resolve("plot-registry.json"),
         """
         {
           "plots": [
@@ -155,13 +185,12 @@ class PlotGlossaryGeneratorTest {
             }
           ]
         }
-        """;
-    Files.writeString(executionDir.resolve("plot-registry.json"), plotRegistry);
+        """);
 
     new BookReportGenerator(bookDir, executionDir, outputDir).generate();
 
-    Path glossaryFile = outputDir.resolve("plot-glossary.md");
-    assertTrue(Files.exists(glossaryFile), "BookReportGenerator should generate plot-glossary.md");
-    assertTrue(Files.readString(glossaryFile).contains("## Hero"));
+    assertTrue(Files.exists(outputDir.resolve("plot-glossary.md")));
+    assertTrue(Files.exists(outputDir.resolve("plots/Hero.md")));
+    assertTrue(Files.readString(outputDir.resolve("plots/Hero.md")).contains("## Create hero"));
   }
 }
