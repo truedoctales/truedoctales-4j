@@ -73,9 +73,9 @@ public class SimplePlotRegistry implements PlotRegistry {
   }
 
   private List<String> getStepHeaders(Method method) {
-    List<String> varNames = getVarNames(method);
-    if (!varNames.isEmpty()) {
-      return varNames;
+    VarMetadata varMeta = extractVarMetadata(method);
+    if (!varMeta.names.isEmpty()) {
+      return varMeta.names;
     }
     Step annotation = method.getAnnotation(Step.class);
     return annotation != null && annotation.headers().length > 0
@@ -84,33 +84,23 @@ public class SimplePlotRegistry implements PlotRegistry {
   }
 
   private List<String> getStepVariableDescriptions(Method method) {
-    List<String> varDescs = getVarDescriptions(method);
-    if (!varDescs.isEmpty()) {
-      return varDescs;
-    }
-    return List.of();
+    VarMetadata varMeta = extractVarMetadata(method);
+    return varMeta.descriptions;
   }
 
-  private List<String> getVarNames(Method method) {
+  private record VarMetadata(List<String> names, List<String> descriptions) {}
+
+  private VarMetadata extractVarMetadata(Method method) {
     List<String> names = new ArrayList<>();
+    List<String> descriptions = new ArrayList<>();
     for (Parameter param : method.getParameters()) {
       Var var = param.getAnnotation(Var.class);
       if (var != null) {
         names.add(var.value());
+        descriptions.add(var.description());
       }
     }
-    return names;
-  }
-
-  private List<String> getVarDescriptions(Method method) {
-    List<String> descs = new ArrayList<>();
-    for (Parameter param : method.getParameters()) {
-      Var var = param.getAnnotation(Var.class);
-      if (var != null) {
-        descs.add(var.description());
-      }
-    }
-    return descs;
+    return new VarMetadata(List.copyOf(names), List.copyOf(descriptions));
   }
 
   @Override
