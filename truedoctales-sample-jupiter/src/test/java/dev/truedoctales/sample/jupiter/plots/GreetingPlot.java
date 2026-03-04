@@ -27,11 +27,7 @@ public class GreetingPlot {
       value = "Greet ${name} ${count} times",
       description = "Greets the person the given number of times and verifies the output.",
       headers = {"expected"},
-      variableDescriptions = {
-        "Name of the person to greet",
-        "How many times to greet",
-        "Expected greeting lines"
-      })
+      variableDescriptions = {"Name of the person to greet", "How many times to greet"})
   public void greetSomeoneMultipleTimes(
       String name, Integer count, List<Map<String, String>> expected) {
     List<String> list =
