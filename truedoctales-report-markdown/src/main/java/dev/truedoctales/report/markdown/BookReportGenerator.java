@@ -71,6 +71,7 @@ public class BookReportGenerator {
 
     copyBookFiles();
     enrichWithExecutionResults();
+    new PlotGlossaryGenerator(executionDirectory, outputDirectory).generate();
 
     logger.info("Report generated in: " + outputDirectory);
   }
@@ -165,6 +166,15 @@ public class BookReportGenerator {
       return executionPath;
     }
     return null;
+  }
+
+  /// Returns the relative path prefix from a story file to the {@code plots/} directory.
+  ///
+  /// <p>Example: story at {@code 01_chapter/01_story.md} → {@code "../plots/"}
+  static String computePlotsRelPath(String storyRelativePath) {
+    java.nio.file.Path parent = java.nio.file.Path.of(storyRelativePath).getParent();
+    int depth = (parent == null) ? 0 : parent.getNameCount();
+    return "../".repeat(depth) + PlotGlossaryGenerator.PLOTS_DIR + "/";
   }
 
   private ObjectMapper createObjectMapper() {

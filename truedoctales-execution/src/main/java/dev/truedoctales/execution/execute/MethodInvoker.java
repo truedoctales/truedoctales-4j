@@ -43,7 +43,7 @@ public class MethodInvoker {
       throws Exception {
     return switch (inputType) {
       case NONE -> invokeWithoutParameters(instance, method);
-      case SEQUENCE -> {
+      case AUTO, SEQUENCE -> {
         if (maps.isEmpty()) {
           yield invokeWithVariables(instance, method, variables);
         } else {

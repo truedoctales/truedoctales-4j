@@ -210,6 +210,174 @@ class StoryReportMergerTest {
     assertFalse(merged.contains("some message"));
   }
 
+  @Test
+  void merge_shouldExpandVariablesInStepLine() {
+    String markdown =
+        """
+        # My Story
+
+        ## Scene: Test
+
+        > **Greeting** Greet ${name}
+
+        """;
+
+    StepExecutionResult step =
+        new StepExecutionResult(
+            1,
+            "Greeting",
+            "Greet ${name}",
+            InputType.SEQUENCE,
+            Map.of("name", "Alice"),
+            List.of(),
+            ExecutionStatus.SUCCESS,
+            null,
+            null);
+    StoryExecutionResult result = buildStoryResult(List.of(step));
+    String merged = merger.merge(markdown, result);
+
+    assertTrue(merged.contains("> **Greeting** Greet Alice ✅"), "Variable should be expanded");
+    assertFalse(merged.contains("${name}"), "Placeholder should be replaced");
+  }
+
+  @Test
+  void merge_shouldExpandMultipleVariablesInStepLine() {
+    String markdown =
+        """
+        > **Greeting** Greet ${name} ${count} times
+        """;
+
+    StepExecutionResult step =
+        new StepExecutionResult(
+            1,
+            "Greeting",
+            "Greet ${name} ${count} times",
+            InputType.SEQUENCE,
+            Map.of("name", "John", "count", "3"),
+            List.of(),
+            ExecutionStatus.SUCCESS,
+            null,
+            null);
+    StoryExecutionResult result = buildStoryResult(List.of(step));
+    String merged = merger.merge(markdown, result);
+
+    assertTrue(merged.contains("> **Greeting** Greet John 3 times ✅"));
+  }
+
+  @Test
+  void merge_shouldShowDescriptionAfterStepLine() {
+    String markdown =
+        """
+        > **Hero** Create hero
+        """;
+
+    StepExecutionResult step =
+        new StepExecutionResult(
+            1,
+            "Hero",
+            "Create hero",
+            InputType.SEQUENCE,
+            Map.of(),
+            List.of(),
+            ExecutionStatus.SUCCESS,
+            null,
+            null,
+            "Creates a new hero with the given attributes.");
+    StoryExecutionResult result = buildStoryResult(List.of(step));
+    String merged = merger.merge(markdown, result);
+
+    assertTrue(merged.contains("> **Hero** Create hero ✅"));
+    assertTrue(
+        merged.contains("> _Creates a new hero with the given attributes._"),
+        "Description should appear as blockquote italic after step line");
+  }
+
+  @Test
+  void merge_shouldNotShowEmptyDescription() {
+    String markdown =
+        """
+        > **Hero** Create hero
+        """;
+
+    StepExecutionResult step =
+        new StepExecutionResult(
+            1,
+            "Hero",
+            "Create hero",
+            InputType.SEQUENCE,
+            Map.of(),
+            List.of(),
+            ExecutionStatus.SUCCESS,
+            null,
+            null,
+            "");
+    StoryExecutionResult result = buildStoryResult(List.of(step));
+    String merged = merger.merge(markdown, result);
+
+    assertFalse(merged.contains("> _"), "Empty description should produce no italic blockquote");
+  }
+
+  @Test
+  void merge_shouldShowBatchColumnNamesForBatchStep() {
+    String markdown =
+        """
+        > **Hero** Create hero
+        """;
+
+    // LinkedHashMap ensures predictable column order in the test assertion
+    Map<String, String> row1 = new java.util.LinkedHashMap<>();
+    row1.put("id", "1");
+    row1.put("name", "Tailor");
+    row1.put("species", "Human");
+    Map<String, String> row2 = new java.util.LinkedHashMap<>();
+    row2.put("id", "2");
+    row2.put("name", "Giant");
+    row2.put("species", "Giant");
+    StepExecutionResult step =
+        new StepExecutionResult(
+            1,
+            "Hero",
+            "Create hero",
+            InputType.BATCH,
+            Map.of(),
+            List.of(row1, row2),
+            ExecutionStatus.SUCCESS,
+            null,
+            null);
+    StoryExecutionResult result = buildStoryResult(List.of(step));
+    String merged = merger.merge(markdown, result);
+
+    assertTrue(
+        merged.contains("[id, name, species]"), "BATCH step should show column names in brackets");
+    assertTrue(merged.contains("✅"));
+  }
+
+  @Test
+  void merge_shouldNotShowBatchColumnsForSequenceStep() {
+    String markdown =
+        """
+        > **Hero** Create hero
+        """;
+
+    List<Map<String, String>> stepData = List.of(Map.of("id", "1", "name", "Tailor"));
+    StepExecutionResult step =
+        new StepExecutionResult(
+            1,
+            "Hero",
+            "Create hero",
+            InputType.SEQUENCE,
+            Map.of(),
+            stepData,
+            ExecutionStatus.SUCCESS,
+            null,
+            null);
+    StoryExecutionResult result = buildStoryResult(List.of(step));
+    String merged = merger.merge(markdown, result);
+
+    assertFalse(
+        merged.contains("[id, name]"), "SEQUENCE step should not show column bracket annotation");
+  }
+
   // Helper methods
 
   private StoryExecutionResult buildStoryResult(List<StepExecutionResult> steps) {

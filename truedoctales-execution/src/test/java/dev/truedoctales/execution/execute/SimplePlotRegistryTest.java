@@ -140,6 +140,79 @@ class SimplePlotRegistryTest {
     assertTrue(plot2.anotherCalled);
   }
 
+  @Test
+  void getBindings_shouldUseBatchTypeFromAnnotation() {
+    // Arrange - register a plot with a step that explicitly declares BATCH type
+    registry.register(new AnnotatedTypePlot());
+
+    // Act
+    Set<PlotBinding> bindings = registry.getBindings();
+
+    // Assert
+    StepBinding batchStep =
+        bindings.stream()
+            .flatMap(b -> b.steps().stream())
+            .filter(s -> s.pattern().equals("Batch step"))
+            .findFirst()
+            .orElseThrow();
+    assertEquals(
+        InputType.BATCH, batchStep.inputType(), "@Step.type=BATCH should override auto-detection");
+  }
+
+  @Test
+  void getBindings_shouldPropagateDescriptionFromAnnotation() {
+    // Arrange
+    registry.register(new AnnotatedTypePlot());
+
+    // Act
+    Set<PlotBinding> bindings = registry.getBindings();
+
+    // Assert
+    StepBinding describedStep =
+        bindings.stream()
+            .flatMap(b -> b.steps().stream())
+            .filter(s -> s.pattern().equals("Described step"))
+            .findFirst()
+            .orElseThrow();
+    assertEquals("A helpful description.", describedStep.description());
+  }
+
+  @Test
+  void getBindings_shouldUseAutoDetectionWhenTypeIsAuto() {
+    // Arrange - register a plot with a Collection param (should auto-detect BATCH)
+    registry.register(new AnnotatedTypePlot());
+
+    // Act
+    Set<PlotBinding> bindings = registry.getBindings();
+
+    // Assert: step with Collection param and no explicit type should still auto-detect as BATCH
+    StepBinding autoStep =
+        bindings.stream()
+            .flatMap(b -> b.steps().stream())
+            .filter(s -> s.pattern().equals("Auto batch step"))
+            .findFirst()
+            .orElseThrow();
+    assertEquals(
+        InputType.BATCH, autoStep.inputType(), "Collection param should auto-detect as BATCH");
+  }
+
+  @Plot("AnnotatedTypePlot")
+  public static class AnnotatedTypePlot {
+
+    @Step(value = "Batch step", type = InputType.BATCH)
+    public void batchStep(String param) {
+      // explicit BATCH override even though no Collection param
+    }
+
+    @Step(value = "Described step", description = "A helpful description.")
+    public void describedStep() {}
+
+    @Step("Auto batch step")
+    public void autoBatchStep(List<Map<String, String>> rows) {
+      // no explicit type — should auto-detect BATCH from List param
+    }
+  }
+
   @Plot("TestPlot")
   public static class TestPlot {
     boolean simpleCalled = false;

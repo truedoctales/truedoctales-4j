@@ -45,17 +45,27 @@ public class SimplePlotRegistry implements PlotRegistry {
                                 new StepBinding(
                                     entry.getKey(),
                                     e.getKey(),
-                                    getInputType(e.getValue().method())))
+                                    getInputType(e.getValue().method()),
+                                    getStepDescription(e.getValue().method())))
                         .toList()))
         .collect(Collectors.toSet());
   }
 
   public InputType getInputType(Method method) {
+    Step annotation = method.getAnnotation(Step.class);
+    if (annotation != null && annotation.type() != InputType.AUTO) {
+      return annotation.type();
+    }
     return Stream.of(method.getParameterTypes())
         .filter(Collection.class::isAssignableFrom)
         .findFirst()
         .map(x -> InputType.BATCH)
         .orElse(InputType.SEQUENCE);
+  }
+
+  private String getStepDescription(Method method) {
+    Step annotation = method.getAnnotation(Step.class);
+    return annotation != null ? annotation.description() : "";
   }
 
   @Override

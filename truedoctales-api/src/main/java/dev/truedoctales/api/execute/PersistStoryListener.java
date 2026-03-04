@@ -40,6 +40,7 @@ public class PersistStoryListener extends LoggingStoryExecutionListener
   @Override
   public void startChapter(ChapterModel execution) {
     ChapterExecutionResult chapterResult = new ChapterExecutionResult();
+    chapterResult.setNumber(execution.number());
     chapterResult.setPath(execution.path().toString());
     chapterResult.setTitle(execution.title());
     book.addChapterResult(chapterResult);
@@ -49,6 +50,7 @@ public class PersistStoryListener extends LoggingStoryExecutionListener
   public void startStory(StoryExecution execution) {
 
     var currentStory = new StoryExecutionResult();
+    currentStory.setNumber(execution.number());
     currentStory.setPath(execution.path().toString());
     currentStory.setTitle(execution.title());
     if (stories.isEmpty()) {

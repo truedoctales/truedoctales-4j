@@ -114,6 +114,7 @@ public class StoryExtension
     }
 
     StoryExecutionResult executionResult = new StoryExecutionResult();
+    executionResult.setNumber(parseNumber(storyAnnotation.storyPath()));
     executionResult.setPath(storyAnnotation.storyPath());
     executionResult.setTitle(storyAnnotation.title());
 
@@ -122,6 +123,16 @@ public class StoryExtension
     getStore(context).put(SCENE_DESCRIPTIONS_NAMESPACE, new LinkedHashMap<>());
 
     System.out.println("StoryExtension: Initialized for story: " + storyAnnotation.storyPath());
+  }
+
+  private Integer parseNumber(String s) {
+    Path path = Paths.get(s);
+    String fileName = path.getFileName().toString();
+    var pattern = java.util.regex.Pattern.compile("^(\\d+)_.+").matcher(fileName);
+    if (pattern.find()) {
+      return Integer.parseInt(pattern.group(1));
+    }
+    throw new IllegalArgumentException("Invalid story path format, expected 'NNN_name.md': " + s);
   }
 
   @Override

@@ -99,7 +99,8 @@ public class ReportMojo extends AbstractMojo {
       markdownSource = tempMarkdownDir;
     }
     Path htmlOutput = outputDirectory.resolveSibling("truedoctales-html");
-    new HtmlBookReportGenerator(markdownSource, htmlOutput).generate();
+    // Pass the JSON execution directory so navigation is built from JSON, not re-parsed markdown.
+    new HtmlBookReportGenerator(markdownSource, executionDirectory, htmlOutput).generate();
 
     // Clean up temporary markdown if it was created
     if (tempMarkdownDir != null && Files.isDirectory(tempMarkdownDir)) {

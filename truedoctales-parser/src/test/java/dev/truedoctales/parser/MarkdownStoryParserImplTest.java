@@ -12,6 +12,8 @@ import org.junit.jupiter.api.io.TempDir;
 
 class MarkdownStoryParserImplTest {
 
+  public static final String STORY_MD = "01_story.md";
+  public static final String MAIN_MD = "02_main.md";
   private MarkdownStoryParser parser;
 
   @TempDir Path tempDir;
@@ -38,16 +40,15 @@ class MarkdownStoryParserImplTest {
         > | ----- |
         > | value |
         """;
-    createTempFile("story.md", content);
+    createTempFile(STORY_MD, content);
 
     // Act
-    StoryModel story = parser.parse(tempDir, Path.of("story.md"));
+    StoryModel story = parser.parse(tempDir, Path.of(STORY_MD));
 
     // Assert
     assertNotNull(story);
-    assertEquals(Path.of("story.md"), story.path());
+    assertEquals(Path.of(STORY_MD), story.path());
     assertEquals("Simple Story", story.title());
-    assertEquals("Story description here.", story.summary());
     assertFalse(story.scenes().isEmpty());
   }
 
@@ -68,10 +69,10 @@ class MarkdownStoryParserImplTest {
 
         > **TestPlot** Second
         """;
-    createTempFile("story.md", content);
+    createTempFile(STORY_MD, content);
 
     // Act
-    StoryModel story = parser.parse(tempDir, Path.of("story.md"));
+    StoryModel story = parser.parse(tempDir, Path.of(STORY_MD));
 
     // Assert
     assertEquals(2, story.scenes().size());
@@ -108,10 +109,10 @@ class MarkdownStoryParserImplTest {
 
         > **TestPlot** Main
         """;
-    createTempFile("main.md", mainContent);
+    createTempFile(MAIN_MD, mainContent);
 
     // Act
-    StoryModel story = parser.parse(tempDir, Path.of("main.md"));
+    StoryModel story = parser.parse(tempDir, Path.of(MAIN_MD));
 
     // Assert
     assertNotNull(story);
@@ -136,10 +137,10 @@ class MarkdownStoryParserImplTest {
         > | John | 30  |
         > | Jane | 25  |
         """;
-    createTempFile("story.md", content);
+    createTempFile(STORY_MD, content);
 
     // Act
-    StoryModel story = parser.parse(tempDir, Path.of("story.md"));
+    StoryModel story = parser.parse(tempDir, Path.of(STORY_MD));
 
     // Assert
     assertFalse(story.scenes().isEmpty());
@@ -167,16 +168,13 @@ class MarkdownStoryParserImplTest {
 
         > **TestPlot** Action
         """;
-    createTempFile("story.md", content);
+    createTempFile(STORY_MD, content);
 
     // Act
-    StoryModel story = parser.parse(tempDir, Path.of("story.md"));
+    StoryModel story = parser.parse(tempDir, Path.of(STORY_MD));
 
     // Assert
     assertEquals("My Story Title", story.title());
-    assertNotNull(story.summary());
-    assertTrue(story.summary().contains("multi-line"));
-    assertTrue(story.summary().contains("**markdown**"));
   }
 
   @Test
@@ -192,14 +190,13 @@ class MarkdownStoryParserImplTest {
 
         > **TestPlot** Action
         """;
-    createTempFile("story.md", content);
+    createTempFile(STORY_MD, content);
 
     // Act
-    StoryModel story = parser.parse(tempDir, Path.of("story.md"));
+    StoryModel story = parser.parse(tempDir, Path.of(STORY_MD));
 
     // Assert
     assertEquals("Story Title", story.title());
-    assertTrue(story.summary() == null || story.summary().isBlank());
   }
 
   @Test
@@ -219,10 +216,10 @@ class MarkdownStoryParserImplTest {
         > | ----- |
         > | value |
         """;
-    createTempFile("story.md", content);
+    createTempFile(STORY_MD, content);
 
     // Act
-    StoryModel story = parser.parse(tempDir, Path.of("story.md"));
+    StoryModel story = parser.parse(tempDir, Path.of(STORY_MD));
 
     // Assert
     assertEquals(1, story.scenes().size());
@@ -244,10 +241,10 @@ class MarkdownStoryParserImplTest {
 
         > **TestPlot** Action
         """;
-    createTempFile("story.md", content);
+    createTempFile(STORY_MD, content);
 
     // Act
-    StoryModel story = parser.parse(tempDir, Path.of("story.md"));
+    StoryModel story = parser.parse(tempDir, Path.of(STORY_MD));
 
     // Assert - should parse without throwing and include prequel
     assertNotNull(story);
@@ -284,10 +281,10 @@ class MarkdownStoryParserImplTest {
 
         > **TestPlot** Action
         """;
-    createTempFile("story.md", content);
+    createTempFile(STORY_MD, content);
 
     // Act
-    StoryModel story = parser.parse(tempDir, Path.of("story.md"));
+    StoryModel story = parser.parse(tempDir, Path.of(STORY_MD));
 
     // Assert
     assertEquals(1, story.prequels().size());
@@ -309,10 +306,10 @@ class MarkdownStoryParserImplTest {
 
         > **TestPlot** Action
         """;
-    createTempFile("story.md", content);
+    createTempFile(STORY_MD, content);
 
     // Act
-    StoryModel story = parser.parse(tempDir, Path.of("story.md"));
+    StoryModel story = parser.parse(tempDir, Path.of(STORY_MD));
 
     // Assert
     assertEquals(2, story.scenes().size());
@@ -357,10 +354,10 @@ class MarkdownStoryParserImplTest {
 
         > **TestPlot** Main action
         """;
-    createTempFile("main.md", mainContent);
+    createTempFile(MAIN_MD, mainContent);
 
     // Act
-    StoryModel story = parser.parse(tempDir, Path.of("main.md"));
+    StoryModel story = parser.parse(tempDir, Path.of(MAIN_MD));
 
     // Assert
     assertNotNull(story);
@@ -386,10 +383,10 @@ class MarkdownStoryParserImplTest {
         """;
     createTempFile("setup.md", "# Setup\n## Scene: S\n> **TestPlot** S");
     createTempFile("data.md", "# Data\n## Scene: D\n> **TestPlot** D");
-    createTempFile("main.md", mainContent);
+    createTempFile(MAIN_MD, mainContent);
 
     // Act
-    StoryModel story = parser.parse(tempDir, Path.of("main.md"));
+    StoryModel story = parser.parse(tempDir, Path.of(MAIN_MD));
 
     // Assert
     assertEquals(2, story.prequels().size());

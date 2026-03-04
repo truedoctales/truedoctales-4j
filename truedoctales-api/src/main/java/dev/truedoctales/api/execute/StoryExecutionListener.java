@@ -1,5 +1,6 @@
 package dev.truedoctales.api.execute;
 
+import dev.truedoctales.api.model.execution.PlotBinding;
 import dev.truedoctales.api.model.execution.SceneExecution;
 import dev.truedoctales.api.model.execution.StepExecution;
 import dev.truedoctales.api.model.execution.StoryExecution;
@@ -8,6 +9,7 @@ import dev.truedoctales.api.model.listener.StepExecutionResult;
 import dev.truedoctales.api.model.story.ChapterModel;
 import dev.truedoctales.api.model.story.StoryBookModel;
 import java.util.List;
+import java.util.Set;
 
 /// Interface for listening to story execution lifecycle events.
 ///
@@ -22,6 +24,11 @@ public interface StoryExecutionListener {
 
   /// Called when book execution completes.
   default void closeBook() {}
+
+  /// Called once with the full set of plot bindings registered for this book.
+  ///
+  /// @param bindings all registered plot bindings
+  default void onPlotBindings(Set<PlotBinding> bindings) {}
 
   /// Called when a story execution starts.
   ///
@@ -130,6 +137,11 @@ public interface StoryExecutionListener {
     @Override
     public void closeBook() {
       listener.forEach(StoryExecutionListener::closeBook);
+    }
+
+    @Override
+    public void onPlotBindings(Set<PlotBinding> bindings) {
+      listener.forEach(l -> l.onPlotBindings(bindings));
     }
   }
 }

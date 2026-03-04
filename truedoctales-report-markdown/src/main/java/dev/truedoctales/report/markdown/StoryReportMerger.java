@@ -1,18 +1,27 @@
 package dev.truedoctales.report.markdown;
 
+import dev.truedoctales.api.model.execution.InputType;
 import dev.truedoctales.api.model.listener.ExecutionStatus;
 import dev.truedoctales.api.model.listener.SceneExecutionResult;
 import dev.truedoctales.api.model.listener.StepExecutionResult;
 import dev.truedoctales.api.model.listener.StoryExecutionResult;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /// Merges story execution results into the original markdown content.
 ///
-/// For each step declaration line in the markdown, this merger appends a status badge
-/// showing whether the step succeeded, failed, or encountered an error. For failures
-/// and errors, an additional detail line is inserted with the error message.
+/// For each step declaration line in the markdown, this merger:
+/// <ul>
+///   <li>Expands {@code ${variable}} placeholders with the extracted variable values</li>
+///   <li>Appends a status badge (✅ / ❌ / ⚠️ / ⏭️)</li>
+///   <li>For BATCH steps, appends the table column names as a compact annotation</li>
+///   <li>Inserts the {@code @Step} description (if any) as a blockquote italic line</li>
+///   <li>For failures and errors, inserts an additional detail line with the error message</li>
+/// </ul>
 public class StoryReportMerger {
 
   private static final Pattern STEP_DECLARATION =
@@ -39,7 +48,28 @@ public class StoryReportMerger {
 
       if (!stepQueue.isEmpty() && STEP_DECLARATION.matcher(line.trim()).matches()) {
         StepExecutionResult stepResult = stepQueue.poll();
-        merged.append(line).append(" ").append(statusEmoji(stepResult.status())).append("\n");
+
+        // Expand ${varName} placeholders with actual values
+        String annotatedLine = expandVariables(line, stepResult.variables());
+
+        // For BATCH steps with data, append the column names before the status emoji
+        if (stepResult.inputType() == InputType.BATCH
+            && stepResult.stepData() != null
+            && !stepResult.stepData().isEmpty()) {
+          List<String> columns = new ArrayList<>(stepResult.stepData().getFirst().keySet());
+          annotatedLine = annotatedLine + " [" + String.join(", ", columns) + "]";
+        }
+
+        merged
+            .append(annotatedLine)
+            .append(" ")
+            .append(statusEmoji(stepResult.status()))
+            .append("\n");
+
+        // Show description from @Step annotation (if provided) as a blockquote italic line
+        if (stepResult.description() != null && !stepResult.description().isBlank()) {
+          merged.append("> \n> _").append(stepResult.description()).append("_\n");
+        }
 
         if (stepResult.status() != ExecutionStatus.SUCCESS
             && stepResult.errorMessage() != null
@@ -62,6 +92,18 @@ public class StoryReportMerger {
     }
 
     return merged.toString();
+  }
+
+  /// Replaces {@code ${varName}} placeholders in the step line with the extracted variable values.
+  private String expandVariables(String line, Map<String, String> variables) {
+    if (variables == null || variables.isEmpty()) {
+      return line;
+    }
+    String result = line;
+    for (Map.Entry<String, String> entry : variables.entrySet()) {
+      result = result.replace("${" + entry.getKey() + "}", entry.getValue());
+    }
+    return result;
   }
 
   private Deque<StepExecutionResult> buildStepQueue(StoryExecutionResult result) {
