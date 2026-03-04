@@ -185,12 +185,12 @@ public class PlotGlossaryGenerator {
 
   /// Extracts header names from the step JSON node's {@code headers} array.
   static List<String> extractHeaders(JsonNode step) {
-    List<String> hdrs = new ArrayList<>();
+    List<String> headers = new ArrayList<>();
     JsonNode headersNode = step.get("headers");
     if (headersNode != null && headersNode.isArray()) {
-      headersNode.forEach(h -> hdrs.add(h.asText()));
+      headersNode.forEach(h -> headers.add(h.asText()));
     }
-    return hdrs;
+    return headers;
   }
 
   /// Extracts variable names from a step pattern, e.g. {@code ${name}} → {@code name}.
