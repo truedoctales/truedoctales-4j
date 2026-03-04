@@ -557,7 +557,6 @@ public class HtmlBookReportGenerator {
           </header>
           <nav class="sidebar" id="sidebar">
             <button class="sidebar-handle" id="sidebar-handle" aria-label="Toggle navigation">
-              <img src="small_icon_full.png" alt="True Doc Tales">
             </button>
             <div class="sidebar-content" id="sidebar-content">
               <!-- Navigation is built dynamically from report-nav.json -->

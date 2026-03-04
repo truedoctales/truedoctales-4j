@@ -522,19 +522,6 @@ class HtmlBookReportGeneratorTest {
   }
 
   @Test
-  void generate_shouldIncludeSidebarHandleWithIcon() throws IOException {
-    Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
-
-    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
-    generator.generate();
-
-    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
-    assertTrue(
-        shellHtml.contains("class=\"sidebar-handle\""),
-        "Sidebar should include a handle button with the brand icon");
-  }
-
-  @Test
   void generate_shouldIncludeSidebarPullTabInCss() throws IOException {
     Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
 
