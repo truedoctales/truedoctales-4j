@@ -24,7 +24,13 @@ public class HeroPlot {
   @Step(
       value = "Create hero",
       description = "Creates a new hero with the given id, name, species and age.",
-      headers = {"id", "name", "species", "age"})
+      headers = {"id", "name", "species", "age"},
+      variableDescriptions = {
+        "Unique identifier",
+        "Hero name",
+        "Species of the hero",
+        "Age in years"
+      })
   public void createHero(Long id, String name, String species, Integer age) {
     heroService.createHero(id, name, species, age);
   }
@@ -32,7 +38,8 @@ public class HeroPlot {
   @Step(
       value = "Hero exists",
       description = "Asserts that a hero with the given name exists.",
-      headers = {"name"})
+      headers = {"name"},
+      variableDescriptions = {"Hero name to look up"})
   public void heroExists(String name) {
     Assertions.assertTrue(heroService.exists(name), "Hero '" + name + "' should exist");
   }
@@ -40,7 +47,8 @@ public class HeroPlot {
   @Step(
       value = "Grant skill",
       description = "Grants a skill to the hero identified by name.",
-      headers = {"heroName", "skill"})
+      headers = {"heroName", "skill"},
+      variableDescriptions = {"Name of the hero", "Skill to grant"})
   public void grantSkill(String heroName, String skill) {
     boolean success = heroService.grantSkill(heroName, skill);
     Assertions.assertTrue(success, "Hero '" + heroName + "' must exist");
@@ -49,7 +57,8 @@ public class HeroPlot {
   @Step(
       value = "Has skill",
       description = "Asserts that the hero has the specified skill.",
-      headers = {"heroName", "skill"})
+      headers = {"heroName", "skill"},
+      variableDescriptions = {"Name of the hero", "Expected skill"})
   public void hasSkill(String heroName, String skill) {
     Assertions.assertTrue(
         heroService.hasSkill(heroName, skill),
@@ -59,7 +68,8 @@ public class HeroPlot {
   @Step(
       value = "Trophy earned",
       description = "Awards a trophy to the hero.",
-      headers = {"hero", "trophy"})
+      headers = {"hero", "trophy"},
+      variableDescriptions = {"Name of the hero", "Trophy to award"})
   public void trophyEarned(String hero, String trophy) {
     boolean success = heroService.awardTrophy(hero, trophy);
     Assertions.assertTrue(success, "Hero '" + hero + "' must exist");
@@ -68,7 +78,8 @@ public class HeroPlot {
   @Step(
       value = "Level is",
       description = "Asserts that the hero has reached the expected level.",
-      headers = {"hero", "expectedLevel"})
+      headers = {"hero", "expectedLevel"},
+      variableDescriptions = {"Name of the hero", "Expected level number"})
   public void levelIs(String hero, int expectedLevel) {
     Hero heroEntity =
         heroService

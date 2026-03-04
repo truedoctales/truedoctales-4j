@@ -47,7 +47,8 @@ public class SimplePlotRegistry implements PlotRegistry {
                                     e.getKey(),
                                     getInputType(e.getValue().method()),
                                     getStepDescription(e.getValue().method()),
-                                    getStepHeaders(e.getValue().method())))
+                                    getStepHeaders(e.getValue().method()),
+                                    getStepVariableDescriptions(e.getValue().method())))
                         .toList()))
         .collect(Collectors.toSet());
   }
@@ -73,6 +74,13 @@ public class SimplePlotRegistry implements PlotRegistry {
     Step annotation = method.getAnnotation(Step.class);
     return annotation != null && annotation.headers().length > 0
         ? List.of(annotation.headers())
+        : List.of();
+  }
+
+  private List<String> getStepVariableDescriptions(Method method) {
+    Step annotation = method.getAnnotation(Step.class);
+    return annotation != null && annotation.variableDescriptions().length > 0
+        ? List.of(annotation.variableDescriptions())
         : List.of();
   }
 

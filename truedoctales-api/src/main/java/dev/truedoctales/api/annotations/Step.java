@@ -47,6 +47,20 @@ public @interface Step {
   /// ```
   String[] headers() default {};
 
+  /// Optional descriptions for each variable or header column.
+  ///
+  /// Each entry corresponds positionally to a variable extracted from the pattern (e.g.
+  /// {@code ${name}}) or, when no variables are present, to the explicitly declared
+  /// {@link #headers()}. The descriptions are included in the generated plot glossary
+  /// documentation.
+  ///
+  /// Example:
+  /// ```java
+  /// @Step(value = "Greet ${name}", variableDescriptions = {"Name of the person to greet"})
+  /// void greetSomeone(String name) { … }
+  /// ```
+  String[] variableDescriptions() default {};
+
   /// The input type for this step. Defaults to {@link InputType#AUTO}, which auto-detects the
   /// type from the method's parameter types (BATCH when a {@link java.util.Collection} parameter
   /// is present, SEQUENCE otherwise).

@@ -17,7 +17,8 @@ public class AchievementPlot {
   @Step(
       value = "Unlocked",
       description = "Records that the hero has unlocked an achievement.",
-      headers = {"hero", "achievement"})
+      headers = {"hero", "achievement"},
+      variableDescriptions = {"Name of the hero", "Achievement name"})
   public void unlocked(String hero, String achievement) {
     achievements.add(hero + ":" + achievement);
   }

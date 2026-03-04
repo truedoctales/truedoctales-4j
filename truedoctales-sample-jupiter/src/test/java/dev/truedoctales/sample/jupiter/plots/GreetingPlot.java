@@ -15,7 +15,10 @@ public class GreetingPlot {
     System.out.println("Hello, True Doc Tales!");
   }
 
-  @Step(value = "Greet ${name}", description = "Greets the person identified by name.")
+  @Step(
+      value = "Greet ${name}",
+      description = "Greets the person identified by name.",
+      variableDescriptions = {"Name of the person to greet"})
   public void greetSomeone(String name) {
     System.out.println("Hello, " + name + "!");
   }
@@ -23,7 +26,12 @@ public class GreetingPlot {
   @Step(
       value = "Greet ${name} ${count} times",
       description = "Greets the person the given number of times and verifies the output.",
-      headers = {"expected"})
+      headers = {"expected"},
+      variableDescriptions = {
+        "Name of the person to greet",
+        "How many times to greet",
+        "Expected greeting lines"
+      })
   public void greetSomeoneMultipleTimes(
       String name, Integer count, List<Map<String, String>> expected) {
     List<String> list =

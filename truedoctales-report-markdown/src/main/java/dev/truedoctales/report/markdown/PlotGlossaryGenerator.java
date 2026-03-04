@@ -141,6 +141,7 @@ public class PlotGlossaryGenerator {
     String description = step.path("description").asText("");
     List<String> variables = extractVariables(pattern);
     List<String> headers = extractHeaders(step);
+    List<String> varDescs = extractVariableDescriptions(step);
 
     md.append("\n## ").append(pattern).append("\n\n");
 
@@ -156,10 +157,14 @@ public class PlotGlossaryGenerator {
 
     if (!columns.isEmpty()) {
       md.append("\n### ").append(!variables.isEmpty() ? "Variables" : "Headers").append("\n\n");
-      md.append("| ").append(!variables.isEmpty() ? "Variable" : "Header").append(" |\n");
-      md.append("|----------|\n");
-      for (String col : columns) {
-        md.append("| `").append(col).append("` |\n");
+      md.append("| ")
+          .append(!variables.isEmpty() ? "Variable" : "Header")
+          .append(" | Description |\n");
+      md.append("|----------|-------------|\n");
+      for (int i = 0; i < columns.size(); i++) {
+        String col = columns.get(i);
+        String desc = i < varDescs.size() ? varDescs.get(i) : "–";
+        md.append("| `").append(col).append("` | ").append(desc).append(" |\n");
       }
     }
 
@@ -189,6 +194,16 @@ public class PlotGlossaryGenerator {
       headersNode.forEach(h -> headers.add(h.asText()));
     }
     return headers;
+  }
+
+  /// Extracts variable descriptions from the step JSON node's {@code variableDescriptions} array.
+  static List<String> extractVariableDescriptions(JsonNode step) {
+    List<String> descs = new ArrayList<>();
+    JsonNode descsNode = step.get("variableDescriptions");
+    if (descsNode != null && descsNode.isArray()) {
+      descsNode.forEach(d -> descs.add(d.asText()));
+    }
+    return descs;
   }
 
   /// Extracts variable names from a step pattern, e.g. {@code ${name}} → {@code name}.

@@ -26,7 +26,13 @@ public class QuestPlot {
   @Step(
       value = "Create quest",
       description = "Creates a new quest with the given id, name, description and initial status.",
-      headers = {"id", "name", "description", "status"})
+      headers = {"id", "name", "description", "status"},
+      variableDescriptions = {
+        "Unique identifier",
+        "Quest name",
+        "Quest description",
+        "Initial status"
+      })
   public void createQuest(Long id, String name, String description, String status) {
     questService.createQuest(id, name, description, status);
   }
@@ -34,7 +40,8 @@ public class QuestPlot {
   @Step(
       value = "Assign to hero",
       description = "Assigns a quest to a hero. Both must exist.",
-      headers = {"hero", "quest"})
+      headers = {"hero", "quest"},
+      variableDescriptions = {"Name of the hero", "Name of the quest"})
   public void assignToHero(String hero, String quest) {
     Assertions.assertTrue(heroService.exists(hero), "Hero '" + hero + "' must exist");
     Assertions.assertTrue(questService.exists(quest), "Quest '" + quest + "' must exist");
@@ -45,7 +52,8 @@ public class QuestPlot {
   @Step(
       value = "Status is",
       description = "Asserts that the quest has the expected status.",
-      headers = {"quest", "expectedStatus"})
+      headers = {"quest", "expectedStatus"},
+      variableDescriptions = {"Name of the quest", "Expected status value"})
   public void statusIs(String quest, String expectedStatus) {
     Quest q =
         questService
@@ -57,7 +65,8 @@ public class QuestPlot {
   @Step(
       value = "Complete quest",
       description = "Completes the quest assigned to the hero.",
-      headers = {"hero", "quest"})
+      headers = {"hero", "quest"},
+      variableDescriptions = {"Name of the hero", "Name of the quest"})
   public void completeQuest(String hero, String quest) {
     String heroQuest =
         questService

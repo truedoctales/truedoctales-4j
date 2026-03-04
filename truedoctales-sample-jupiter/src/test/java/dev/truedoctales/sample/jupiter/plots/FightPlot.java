@@ -23,7 +23,13 @@ public class FightPlot {
   @Step(
       value = "Attack fails",
       description = "Performs an attack that is expected to fail.",
-      headers = {"attacker", "defender", "weapon", "result"})
+      headers = {"attacker", "defender", "weapon", "result"},
+      variableDescriptions = {
+        "Attacking entity",
+        "Defending entity",
+        "Weapon used",
+        "Expected result"
+      })
   public void attackFails(String attacker, String defender, String weapon, String result) {
     AttackResult attackResult = fightService.attack(attacker, defender, weapon);
     Assertions.assertFalse(attackResult.success(), "Attack should fail");
@@ -33,7 +39,13 @@ public class FightPlot {
   @Step(
       value = "Defeat with skill",
       description = "The hero defeats the monster using a specific skill.",
-      headers = {"hero", "monster", "skill", "outcome"})
+      headers = {"hero", "monster", "skill", "outcome"},
+      variableDescriptions = {
+        "Name of the hero",
+        "Name of the monster",
+        "Skill used",
+        "Expected outcome"
+      })
   public void defeatWithSkill(String hero, String monster, String skill, String outcome) {
     AttackResult attackResult = fightService.defeatWithSkill(hero, monster, skill);
     Assertions.assertTrue(attackResult.success(), "Hero should defeat monster");
