@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import dev.truedoctales.api.annotations.Plot;
 import dev.truedoctales.api.annotations.Step;
+import dev.truedoctales.api.annotations.Var;
 import dev.truedoctales.api.model.execution.InputType;
 import dev.truedoctales.api.model.execution.PlotBinding;
 import dev.truedoctales.api.model.execution.StepBinding;
@@ -196,6 +197,73 @@ class SimplePlotRegistryTest {
         InputType.BATCH, autoStep.inputType(), "Collection param should auto-detect as BATCH");
   }
 
+  @Test
+  void getBindings_shouldExtractHeadersAndDescriptionsFromVarAnnotation() {
+    // Arrange
+    registry.register(new VarAnnotatedPlot());
+
+    // Act
+    Set<PlotBinding> bindings = registry.getBindings();
+
+    // Assert
+    StepBinding step =
+        bindings.stream()
+            .flatMap(b -> b.steps().stream())
+            .filter(s -> s.pattern().equals("Create item"))
+            .findFirst()
+            .orElseThrow();
+    assertEquals(List.of("id", "name"), step.headers(), "@Var should provide header names");
+    assertEquals(
+        List.of("Unique identifier", "Item name"),
+        step.variableDescriptions(),
+        "@Var should provide descriptions");
+  }
+
+  @Test
+  void getBindings_shouldPreferVarAnnotationOverStepHeaders() {
+    // Arrange
+    registry.register(new VarAnnotatedPlot());
+
+    // Act
+    Set<PlotBinding> bindings = registry.getBindings();
+
+    // Assert - the step has @Step headers AND @Var; @Var should win
+    StepBinding step =
+        bindings.stream()
+            .flatMap(b -> b.steps().stream())
+            .filter(s -> s.pattern().equals("Step with fallback"))
+            .findFirst()
+            .orElseThrow();
+    assertEquals(
+        List.of("paramA"), step.headers(), "@Var should take precedence over @Step.headers()");
+    assertEquals(
+        List.of("Description from @Var"),
+        step.variableDescriptions(),
+        "@Var description should be used");
+  }
+
+  @Test
+  void getBindings_shouldFallBackToStepHeadersWhenNoVarAnnotation() {
+    // Arrange
+    registry.register(new VarAnnotatedPlot());
+
+    // Act
+    Set<PlotBinding> bindings = registry.getBindings();
+
+    // Assert - the step has @Step headers but no @Var
+    StepBinding step =
+        bindings.stream()
+            .flatMap(b -> b.steps().stream())
+            .filter(s -> s.pattern().equals("Legacy step"))
+            .findFirst()
+            .orElseThrow();
+    assertEquals(
+        List.of("col1", "col2"),
+        step.headers(),
+        "Should fall back to @Step.headers() when no @Var present");
+    assertEquals(List.of(), step.variableDescriptions(), "No @Var means no variable descriptions");
+  }
+
   @Plot("AnnotatedTypePlot")
   public static class AnnotatedTypePlot {
 
@@ -237,5 +305,25 @@ class SimplePlotRegistryTest {
     public void anotherStep() {
       anotherCalled = true;
     }
+  }
+
+  @Plot("VarAnnotatedPlot")
+  public static class VarAnnotatedPlot {
+
+    @Step("Create item")
+    public void createItem(
+        @Var(value = "id", description = "Unique identifier") Long id,
+        @Var(value = "name", description = "Item name") String name) {}
+
+    @Step(
+        value = "Step with fallback",
+        headers = {"oldHeader"})
+    public void stepWithFallback(
+        @Var(value = "paramA", description = "Description from @Var") String paramA) {}
+
+    @Step(
+        value = "Legacy step",
+        headers = {"col1", "col2"})
+    public void legacyStep(String col1, String col2) {}
   }
 }

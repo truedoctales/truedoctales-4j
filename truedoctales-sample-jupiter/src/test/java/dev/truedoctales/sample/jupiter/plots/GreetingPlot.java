@@ -2,6 +2,7 @@ package dev.truedoctales.sample.jupiter.plots;
 
 import dev.truedoctales.api.annotations.Plot;
 import dev.truedoctales.api.annotations.Step;
+import dev.truedoctales.api.annotations.Var;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
@@ -15,21 +16,19 @@ public class GreetingPlot {
     System.out.println("Hello, True Doc Tales!");
   }
 
-  @Step(
-      value = "Greet ${name}",
-      description = "Greets the person identified by name.",
-      variableDescriptions = {"Name of the person to greet"})
-  public void greetSomeone(String name) {
+  @Step(value = "Greet ${name}", description = "Greets the person identified by name.")
+  public void greetSomeone(
+      @Var(value = "name", description = "Name of the person to greet") String name) {
     System.out.println("Hello, " + name + "!");
   }
 
   @Step(
       value = "Greet ${name} ${count} times",
-      description = "Greets the person the given number of times and verifies the output.",
-      headers = {"expected"},
-      variableDescriptions = {"Name of the person to greet", "How many times to greet"})
+      description = "Greets the person the given number of times and verifies the output.")
   public void greetSomeoneMultipleTimes(
-      String name, Integer count, List<Map<String, String>> expected) {
+      @Var(value = "name", description = "Name of the person to greet") String name,
+      @Var(value = "count", description = "How many times to greet") Integer count,
+      List<Map<String, String>> expected) {
     List<String> list =
         IntStream.range(1, count + 1)
             .boxed()

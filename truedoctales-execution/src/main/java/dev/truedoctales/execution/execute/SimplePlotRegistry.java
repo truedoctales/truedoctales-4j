@@ -2,6 +2,7 @@ package dev.truedoctales.execution.execute;
 
 import dev.truedoctales.api.annotations.Plot;
 import dev.truedoctales.api.annotations.Step;
+import dev.truedoctales.api.annotations.Var;
 import dev.truedoctales.api.execute.PlotRegistry;
 import dev.truedoctales.api.model.execution.InputType;
 import dev.truedoctales.api.model.execution.PlotBinding;
@@ -9,6 +10,7 @@ import dev.truedoctales.api.model.execution.StepBinding;
 import dev.truedoctales.api.model.execution.StepExecution;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -71,6 +73,10 @@ public class SimplePlotRegistry implements PlotRegistry {
   }
 
   private List<String> getStepHeaders(Method method) {
+    List<String> varNames = getVarNames(method);
+    if (!varNames.isEmpty()) {
+      return varNames;
+    }
     Step annotation = method.getAnnotation(Step.class);
     return annotation != null && annotation.headers().length > 0
         ? List.of(annotation.headers())
@@ -78,10 +84,33 @@ public class SimplePlotRegistry implements PlotRegistry {
   }
 
   private List<String> getStepVariableDescriptions(Method method) {
-    Step annotation = method.getAnnotation(Step.class);
-    return annotation != null && annotation.variableDescriptions().length > 0
-        ? List.of(annotation.variableDescriptions())
-        : List.of();
+    List<String> varDescs = getVarDescriptions(method);
+    if (!varDescs.isEmpty()) {
+      return varDescs;
+    }
+    return List.of();
+  }
+
+  private List<String> getVarNames(Method method) {
+    List<String> names = new ArrayList<>();
+    for (Parameter param : method.getParameters()) {
+      Var var = param.getAnnotation(Var.class);
+      if (var != null) {
+        names.add(var.value());
+      }
+    }
+    return names;
+  }
+
+  private List<String> getVarDescriptions(Method method) {
+    List<String> descs = new ArrayList<>();
+    for (Parameter param : method.getParameters()) {
+      Var var = param.getAnnotation(Var.class);
+      if (var != null) {
+        descs.add(var.description());
+      }
+    }
+    return descs;
   }
 
   @Override

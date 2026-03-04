@@ -2,6 +2,7 @@ package dev.truedoctales.sample.jupiter.plots;
 
 import dev.truedoctales.api.annotations.Plot;
 import dev.truedoctales.api.annotations.Step;
+import dev.truedoctales.api.annotations.Var;
 import dev.truedoctales.sample.domain.HeroService;
 import dev.truedoctales.sample.domain.QuestService;
 import dev.truedoctales.sample.domain.QuestService.Quest;
@@ -25,36 +26,29 @@ public class QuestPlot {
 
   @Step(
       value = "Create quest",
-      description = "Creates a new quest with the given id, name, description and initial status.",
-      headers = {"id", "name", "description", "status"},
-      variableDescriptions = {
-        "Unique identifier",
-        "Quest name",
-        "Quest description",
-        "Initial status"
-      })
-  public void createQuest(Long id, String name, String description, String status) {
+      description = "Creates a new quest with the given id, name, description and initial status.")
+  public void createQuest(
+      @Var(value = "id", description = "Unique identifier") Long id,
+      @Var(value = "name", description = "Quest name") String name,
+      @Var(value = "description", description = "Quest description") String description,
+      @Var(value = "status", description = "Initial status") String status) {
     questService.createQuest(id, name, description, status);
   }
 
-  @Step(
-      value = "Assign to hero",
-      description = "Assigns a quest to a hero. Both must exist.",
-      headers = {"hero", "quest"},
-      variableDescriptions = {"Name of the hero", "Name of the quest"})
-  public void assignToHero(String hero, String quest) {
+  @Step(value = "Assign to hero", description = "Assigns a quest to a hero. Both must exist.")
+  public void assignToHero(
+      @Var(value = "hero", description = "Name of the hero") String hero,
+      @Var(value = "quest", description = "Name of the quest") String quest) {
     Assertions.assertTrue(heroService.exists(hero), "Hero '" + hero + "' must exist");
     Assertions.assertTrue(questService.exists(quest), "Quest '" + quest + "' must exist");
     boolean success = questService.assignToHero(hero, quest);
     Assertions.assertTrue(success, "Failed to assign quest to hero");
   }
 
-  @Step(
-      value = "Status is",
-      description = "Asserts that the quest has the expected status.",
-      headers = {"quest", "expectedStatus"},
-      variableDescriptions = {"Name of the quest", "Expected status value"})
-  public void statusIs(String quest, String expectedStatus) {
+  @Step(value = "Status is", description = "Asserts that the quest has the expected status.")
+  public void statusIs(
+      @Var(value = "quest", description = "Name of the quest") String quest,
+      @Var(value = "expectedStatus", description = "Expected status value") String expectedStatus) {
     Quest q =
         questService
             .findByName(quest)
@@ -62,12 +56,10 @@ public class QuestPlot {
     Assertions.assertEquals(expectedStatus, q.status(), "Quest status should be " + expectedStatus);
   }
 
-  @Step(
-      value = "Complete quest",
-      description = "Completes the quest assigned to the hero.",
-      headers = {"hero", "quest"},
-      variableDescriptions = {"Name of the hero", "Name of the quest"})
-  public void completeQuest(String hero, String quest) {
+  @Step(value = "Complete quest", description = "Completes the quest assigned to the hero.")
+  public void completeQuest(
+      @Var(value = "hero", description = "Name of the hero") String hero,
+      @Var(value = "quest", description = "Name of the quest") String quest) {
     String heroQuest =
         questService
             .getHeroQuest(hero)
