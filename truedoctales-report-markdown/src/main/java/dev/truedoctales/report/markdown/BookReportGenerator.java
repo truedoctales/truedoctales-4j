@@ -142,8 +142,7 @@ public class BookReportGenerator {
       }
 
       String originalMarkdown = Files.readString(markdownPath);
-      String plotsRelPath = computePlotsRelPath(result.getPath());
-      String enriched = merger.merge(originalMarkdown, result, plotsRelPath);
+      String enriched = merger.merge(originalMarkdown, result);
 
       Path outputPath = outputDirectory.resolve(result.getPath());
       Files.createDirectories(outputPath.getParent());
