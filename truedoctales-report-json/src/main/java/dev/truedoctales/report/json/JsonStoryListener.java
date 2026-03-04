@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import dev.truedoctales.api.execute.PersistStoryListener;
+import dev.truedoctales.api.model.execution.PlotBinding;
 import dev.truedoctales.api.model.listener.ChapterExecutionResult;
 import dev.truedoctales.api.model.listener.StoryBookExecutionResult;
 import dev.truedoctales.api.model.listener.StoryExecutionResult;
@@ -14,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /// Story execution listener that persists execution results as JSON.
@@ -68,6 +70,19 @@ public class JsonStoryListener extends PersistStoryListener {
     super.startBook(storyBookModel);
     this.currentBookModel = storyBookModel;
     logger.info("JsonStoryListener: startBook called for " + storyBookModel.title());
+  }
+
+  @Override
+  public void onPlotBindings(Set<PlotBinding> bindings) {
+    try {
+      Files.createDirectories(outputDirectory);
+      Path plotRegistryPath = outputDirectory.resolve("plot-registry.json");
+      objectMapper.writeValue(plotRegistryPath.toFile(), new PlotRegistry(bindings));
+      logger.info(
+          "JsonStoryListener: plot-registry.json written with " + bindings.size() + " plots");
+    } catch (IOException e) {
+      logger.warning("Failed to write plot-registry.json: " + e.getMessage());
+    }
   }
 
   @Override
@@ -197,4 +212,7 @@ public class JsonStoryListener extends PersistStoryListener {
   record BookMetadata(String title, boolean hasIntro) {}
 
   record ChapterMeta(Integer number, String path, String title) {}
+
+  /// Record wrapping the full set of plot bindings for JSON serialisation.
+  record PlotRegistry(Set<PlotBinding> plots) {}
 }

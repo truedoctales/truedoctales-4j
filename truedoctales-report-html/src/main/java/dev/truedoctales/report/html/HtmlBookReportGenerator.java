@@ -228,6 +228,44 @@ public class HtmlBookReportGenerator {
       }
     }
 
+    // Add plot glossary index + per-plot pages if plots/ directory exists in markdown output
+    if (markdownDirectory != null) {
+      Path glossaryMd = markdownDirectory.resolve("plot-glossary.md");
+      if (Files.isRegularFile(glossaryMd)) {
+        entries.add(
+            new NavEntry(
+                glossaryMd,
+                "plot-glossary.md",
+                "plot-glossary.html",
+                "Plot Glossary",
+                true,
+                "plots",
+                "Reference"));
+      }
+      Path plotsDir = markdownDirectory.resolve("plots");
+      if (Files.isDirectory(plotsDir)) {
+        try (var stream = Files.list(plotsDir)) {
+          stream
+              .filter(p -> p.getFileName().toString().endsWith(".md"))
+              .sorted()
+              .forEach(
+                  plotMd -> {
+                    String fileName = plotMd.getFileName().toString();
+                    String plotId = fileName.replaceAll("\\.md$", "");
+                    entries.add(
+                        new NavEntry(
+                            plotMd,
+                            "plots/" + fileName,
+                            "plots/" + plotId + ".html",
+                            plotId,
+                            false,
+                            "plots",
+                            "Reference"));
+                  });
+        }
+      }
+    }
+
     return entries;
   }
 
