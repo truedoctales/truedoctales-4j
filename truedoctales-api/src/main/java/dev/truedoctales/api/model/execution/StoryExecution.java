@@ -7,4 +7,4 @@ import java.util.List;
 ///
 /// Represents a complete story ready for execution with its scenes, prequels, and metadata.
 public record StoryExecution(
-    Path path, String title, List<Path> prequels, List<SceneExecution> scenes) {}
+    Integer number, Path path, String title, List<Path> prequels, List<SceneExecution> scenes) {}

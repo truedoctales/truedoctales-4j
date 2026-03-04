@@ -83,6 +83,7 @@ public class StoryBookExecutionMapperImpl implements Function<StoryBookModel, St
       }
       LOGGER.info("Build execution model for chapter: " + chapterModel.title());
       return new ChapterExecution(
+          chapterModel.number(),
           chapterModel.path(),
           chapterModel.title(),
           chapterModel.stories().stream().map(storyExecutionMapper).toList());
@@ -99,6 +100,7 @@ public class StoryBookExecutionMapperImpl implements Function<StoryBookModel, St
       LOGGER.info("Build execution model for story: " + storyModel.title());
 
       return new StoryExecution(
+          storyModel.number(),
           storyModel.path(),
           storyModel.title(),
           storyModel.prequels(),

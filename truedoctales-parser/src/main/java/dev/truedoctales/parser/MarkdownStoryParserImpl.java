@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -50,6 +51,7 @@ public final class MarkdownStoryParserImpl implements MarkdownStoryParser {
   private static final Logger LOGGER = Logger.getLogger(MarkdownStoryParserImpl.class.getName());
   private static final String SCENE_PREFIX = "##";
   private static final String STORY_MARKER = "## Story";
+  private static final Pattern FILE_NUMBER_PATTERN = Pattern.compile("^(\\d+)_.*\\.md$");
 
   @Override
   public StoryModel parse(@NonNull Path rootDir, @NonNull Path storyPath) throws IOException {
@@ -76,12 +78,15 @@ public final class MarkdownStoryParserImpl implements MarkdownStoryParser {
 
     // Build final story model
     String title = headerParser.getTitle().orElseGet(() -> deriveTitle(storyPath));
-    String summary = headerParser.getSummary().orElse(null);
 
     LOGGER.info(() -> "Parsing complete: " + scenes.size() + " scene(s) in '" + title + "'");
 
     return new StoryModel(
-        storyPath, title, summary, headerParser.getPrequelPaths(), List.copyOf(scenes));
+        deriveNumber(storyPath),
+        storyPath,
+        title,
+        headerParser.getPrequelPaths(),
+        List.copyOf(scenes));
   }
 
   private String parseHeaderSection(BufferedReader reader, HeaderParser parser) throws IOException {
@@ -149,5 +154,16 @@ public final class MarkdownStoryParserImpl implements MarkdownStoryParser {
 
   private static String deriveTitle(Path storyPath) {
     return storyPath.getFileName().toString();
+  }
+
+  private static Integer deriveNumber(Path storyPath) {
+    Path filename = storyPath.getFileName();
+    var matcher = FILE_NUMBER_PATTERN.matcher(filename.toString());
+    if (matcher.matches()) {
+      return Integer.parseInt(matcher.group(1));
+    }
+    throw new IllegalArgumentException(
+        "Filename must start with a number followed by an underscore (e.g., '01_story.md'): "
+            + filename);
   }
 }

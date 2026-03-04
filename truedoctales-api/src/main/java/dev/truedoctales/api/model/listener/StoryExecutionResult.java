@@ -8,10 +8,19 @@ import java.util.List;
 /// Contains the story execution, prequel results, and scene results. The status is computed
 /// based on the scene results.
 public class StoryExecutionResult implements HasExecutionStatus {
+  private Integer number;
   private String path;
   private String title;
   private List<StoryExecutionResult> prequelResults;
   private List<SceneExecutionResult> sceneResults;
+
+  public Integer getNumber() {
+    return number;
+  }
+
+  public void setNumber(Integer number) {
+    this.number = number;
+  }
 
   public String getPath() {
     return path;

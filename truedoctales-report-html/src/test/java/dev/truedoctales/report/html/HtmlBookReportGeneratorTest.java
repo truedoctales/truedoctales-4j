@@ -43,11 +43,15 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String introHtml = Files.readString(htmlOutputDir.resolve("00_intro.html"));
-    assertTrue(introHtml.contains("<nav class=\"sidebar\""), "Should have sidebar navigation");
-    assertTrue(introHtml.contains("Book Intro"), "Should contain page title in navigation");
-    assertTrue(introHtml.contains("My Story"), "Should contain other pages in navigation");
-    assertTrue(introHtml.contains("01_chapter/01_story.html"), "Should link to chapter page");
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    assertTrue(
+        shellHtml.contains("<nav class=\"sidebar\""), "Shell should have sidebar navigation");
+    // Navigation content is now in report-nav.json loaded by the SPA at startup
+    assertTrue(Files.exists(htmlOutputDir.resolve("report-nav.json")));
+    String navJson = Files.readString(htmlOutputDir.resolve("report-nav.json"));
+    assertTrue(navJson.contains("My Story"), "Nav JSON should contain story title");
+    assertTrue(
+        navJson.contains("01_chapter/01_story.html"), "Nav JSON should contain chapter story path");
   }
 
   @Test
@@ -81,8 +85,8 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String html = Files.readString(htmlOutputDir.resolve("intro.html"));
-    assertTrue(html.contains("mermaid"), "Should include mermaid.js reference");
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    assertTrue(shellHtml.contains("mermaid"), "Shell should include mermaid.js reference");
   }
 
   @Test
@@ -114,11 +118,11 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String html = Files.readString(htmlOutputDir.resolve("intro.html"));
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
     assertTrue(
-        html.contains("<link rel=\"stylesheet\" href=\"truedoctales.css\">"),
-        "Should link to external CSS file");
-    assertFalse(html.contains("<style>"), "Should not include inline CSS");
+        shellHtml.contains("<link rel=\"stylesheet\" href=\"truedoctales.css\">"),
+        "Shell should link to external CSS file");
+    assertFalse(shellHtml.contains("<style>"), "Shell should not include inline CSS");
 
     assertTrue(
         Files.exists(htmlOutputDir.resolve("truedoctales.css")),
@@ -161,8 +165,11 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String storyHtml = Files.readString(htmlOutputDir.resolve("01_chapter/01_story.html"));
-    assertTrue(storyHtml.contains("class=\"active\""), "Should mark active entry");
+    // With SPA, active state is managed by the JS router, not baked into the HTML
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    assertTrue(
+        shellHtml.contains("toggle('active'"),
+        "Shell JS should manage active navigation state dynamically");
   }
 
   @Test
@@ -244,8 +251,8 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String html = Files.readString(htmlOutputDir.resolve("intro.html"));
-    assertTrue(html.contains("viewport"), "Should include viewport meta tag");
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    assertTrue(shellHtml.contains("viewport"), "Shell should include viewport meta tag");
 
     String css = Files.readString(htmlOutputDir.resolve("truedoctales.css"));
     assertTrue(css.contains("@media"), "CSS should include responsive media queries");
@@ -258,17 +265,17 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String html = Files.readString(htmlOutputDir.resolve("intro.html"));
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
     assertTrue(
-        html.contains("<img src=\"small_icon_full.png\""),
-        "Should include project icon in top header");
+        shellHtml.contains("<img src=\"small_icon_full.png\""),
+        "Shell should include project icon in top header");
     assertTrue(
         Files.exists(htmlOutputDir.resolve("small_icon_full.png")),
         "Should write icon file to output directory");
   }
 
   @Test
-  void generate_shouldUseCollapsibleTreeForChapterGroups() throws IOException {
+  void generate_shouldUseFlyoutMenuForChapterGroups() throws IOException {
     Files.writeString(markdownDir.resolve("00_intro.md"), "# Book Intro\n");
     Path ch = Files.createDirectories(markdownDir.resolve("01_chapter-basics"));
     Files.writeString(ch.resolve("00_intro.md"), "# Chapter 1\n");
@@ -277,16 +284,20 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String introHtml = Files.readString(htmlOutputDir.resolve("00_intro.html"));
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
     assertTrue(
-        introHtml.contains("<details class=\"nav-tree\""),
-        "Chapter groups should use <details> for collapsible tree");
+        shellHtml.contains("class=\"nav-chapter\""),
+        "Shell nav should use .nav-chapter divs for OS-style flyout chapter groups");
     assertTrue(
-        introHtml.contains("<summary>"), "Chapter groups should have a <summary> toggle label");
+        shellHtml.contains("class=\"chapter-stories\""),
+        "Shell nav should use .chapter-stories as hidden data holder inside each chapter group");
+    assertTrue(
+        shellHtml.contains("id=\"nav-flyout\""),
+        "Shell should include a global #nav-flyout panel element outside the sidebar");
   }
 
   @Test
-  void generate_shouldCollapseChapterGroupsByDefault() throws IOException {
+  void generate_shouldNotUseCollapsibleDetailsForChapterGroups() throws IOException {
     Files.writeString(markdownDir.resolve("00_intro.md"), "# Book Intro\n");
     Path ch1 = Files.createDirectories(markdownDir.resolve("01_chapter"));
     Files.writeString(ch1.resolve("01_story.md"), "# Story 1\n");
@@ -296,15 +307,15 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    // When viewing the intro (root), no chapter groups should be open
-    String introHtml = Files.readString(htmlOutputDir.resolve("00_intro.html"));
+    // Flyout menus use divs, not <details> elements
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
     assertFalse(
-        introHtml.contains("<details class=\"nav-tree\" open"),
-        "Chapter groups should be collapsed by default when not active");
+        shellHtml.contains("<details"),
+        "Chapter groups should use flyout divs, not <details> elements");
   }
 
   @Test
-  void generate_shouldUseCssDepthPrefixForNestedPages() throws IOException {
+  void generate_shellShouldUseRootLevelAssetPaths() throws IOException {
     Files.writeString(markdownDir.resolve("00_intro.md"), "# Book Intro\n");
     Path ch = Files.createDirectories(markdownDir.resolve("01_chapter"));
     Files.writeString(ch.resolve("01_story.md"), "# Story\n");
@@ -312,13 +323,14 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String storyHtml = Files.readString(htmlOutputDir.resolve("01_chapter/01_story.html"));
+    // The SPA shell always lives at the output root, so no depth prefix is needed
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
     assertTrue(
-        storyHtml.contains("href=\"../truedoctales.css\""),
-        "Nested pages should use relative path to CSS");
+        shellHtml.contains("href=\"truedoctales.css\""),
+        "SPA shell should reference CSS at root level");
     assertTrue(
-        storyHtml.contains("src=\"../small_icon_full.png\""),
-        "Nested pages should use relative path to icon");
+        shellHtml.contains("src=\"small_icon_full.png\""),
+        "SPA shell should reference icon at root level");
   }
 
   @Test
@@ -375,11 +387,12 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    // When viewing a story in chapter 1, that chapter group should be expanded
-    String storyHtml = Files.readString(htmlOutputDir.resolve("01_chapter/01_story.html"));
+    // With flyout menus, chapter groups show their stories in a fixed-positioned panel on hover;
+    // the active page is highlighted via the .active class on its link
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
     assertTrue(
-        storyHtml.contains("<details class=\"nav-tree\" open"),
-        "Chapter group containing active page should be expanded");
+        shellHtml.contains("flyout-visible"),
+        "Shell JS should use .flyout-visible to show the chapter's story list");
   }
 
   @Test
@@ -389,14 +402,14 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String html = Files.readString(htmlOutputDir.resolve("intro.html"));
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
     assertTrue(
-        html.contains("<link rel=\"icon\" type=\"image/png\" href=\"small_icon_full.png\">"),
-        "Should include favicon link");
+        shellHtml.contains("<link rel=\"icon\" type=\"image/png\" href=\"small_icon_full.png\">"),
+        "Shell should include favicon link");
   }
 
   @Test
-  void generate_shouldIncludeFaviconWithDepthPrefix() throws IOException {
+  void generate_shellFaviconAtRootLevel() throws IOException {
     Files.writeString(markdownDir.resolve("00_intro.md"), "# Book Intro\n");
     Path ch = Files.createDirectories(markdownDir.resolve("01_chapter"));
     Files.writeString(ch.resolve("01_story.md"), "# Story\n");
@@ -404,10 +417,11 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String storyHtml = Files.readString(htmlOutputDir.resolve("01_chapter/01_story.html"));
+    // The SPA shell is always at the root; no depth prefix required for the favicon
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
     assertTrue(
-        storyHtml.contains("href=\"../small_icon_full.png\""),
-        "Nested pages should use relative path to favicon");
+        shellHtml.contains("href=\"small_icon_full.png\""),
+        "SPA shell should reference favicon at root level without depth prefix");
   }
 
   @Test
@@ -417,20 +431,22 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String html = Files.readString(htmlOutputDir.resolve("intro.html"));
-    assertTrue(html.contains("class=\"report-footer\""), "Should include branded footer");
-    assertTrue(html.contains("truedoctales-4j"), "Footer should link to project repository");
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    assertTrue(
+        shellHtml.contains("class=\"report-footer\""), "Shell should include branded footer");
+    assertTrue(shellHtml.contains("truedoctales-4j"), "Footer should link to project repository");
   }
 
   @Test
-  void generate_shouldIncludePicoCssFramework() throws IOException {
+  void generate_shouldIncludeBootstrapCssFramework() throws IOException {
     Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
 
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String html = Files.readString(htmlOutputDir.resolve("intro.html"));
-    assertTrue(html.contains("picocss/pico"), "Should include Pico CSS framework from CDN");
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    assertTrue(
+        shellHtml.contains("bootstrap"), "Shell should include Bootstrap framework from CDN");
   }
 
   @Test
@@ -451,10 +467,11 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String html = Files.readString(htmlOutputDir.resolve("intro.html"));
-    assertTrue(html.contains("class=\"top-header\""), "Should include a top header bar");
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    assertTrue(shellHtml.contains("class=\"top-header\""), "Shell should include a top header bar");
     assertTrue(
-        html.contains("class=\"top-header-brand\""), "Should include brand link in top header");
+        shellHtml.contains("class=\"top-header-brand\""),
+        "Shell should include brand link in top header");
   }
 
   @Test
@@ -464,9 +481,12 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String html = Files.readString(htmlOutputDir.resolve("intro.html"));
-    assertTrue(html.contains("id=\"theme-toggle\""), "Should include a theme toggle button");
-    assertTrue(html.contains("data-theme"), "Should use Pico data-theme attribute for theming");
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    assertTrue(
+        shellHtml.contains("id=\"theme-toggle\""), "Shell should include a theme toggle button");
+    assertTrue(
+        shellHtml.contains("data-bs-theme"),
+        "Shell should use Bootstrap data-bs-theme attribute for theming");
   }
 
   @Test
@@ -480,24 +500,138 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String storyHtml = Files.readString(htmlOutputDir.resolve("01_chapter/01_story.html"));
-    assertTrue(
-        storyHtml.contains("Meta Chapter Title"),
-        "Should use title from meta.json instead of parsing markdown heading");
+    // Navigation content is now in report-nav.json, not baked into the shell HTML
+    String navJson = Files.readString(htmlOutputDir.resolve("report-nav.json"));
+    assertTrue(navJson.contains("Meta Chapter Title"), "Nav JSON should use title from meta.json");
   }
 
   @Test
-  void generate_shouldFallBackToMarkdownTitleWhenNoMetaJson() throws IOException {
-    Files.writeString(markdownDir.resolve("00_intro.md"), "# Markdown Title\n");
-    Path ch = Files.createDirectories(markdownDir.resolve("01_chapter"));
-    Files.writeString(ch.resolve("01_story.md"), "# Markdown Story Title\n");
+  void generate_shouldPreserveMermaidSourceForRetheming() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
 
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String storyHtml = Files.readString(htmlOutputDir.resolve("01_chapter/01_story.html"));
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
     assertTrue(
-        storyHtml.contains("Markdown Story Title"),
-        "Should fall back to markdown heading when no meta.json exists");
+        shellHtml.contains("mermaidSource"),
+        "Shell JS should save mermaid source text before first render");
+    assertTrue(
+        shellHtml.contains("removeAttribute('data-processed')"),
+        "Shell JS should remove data-processed so mermaid can re-render on theme change");
+  }
+
+  @Test
+  void generate_shouldIncludeSidebarHandleWithIcon() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    assertTrue(
+        shellHtml.contains("class=\"sidebar-handle\""),
+        "Sidebar should include a handle button with the brand icon");
+  }
+
+  @Test
+  void generate_shouldIncludeSidebarPullTabInCss() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String css = Files.readString(htmlOutputDir.resolve("truedoctales.css"));
+    assertTrue(
+        css.contains(".sidebar-handle"),
+        "CSS should include styles for the icon-based sidebar handle");
+  }
+
+  @Test
+  void generate_shouldIncludeVimStyleKeyboardNavigationShortcuts() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    assertTrue(
+        shellHtml.contains("e.key === ':'"),
+        "Shell JS should support ':' keyboard shortcut to open navigation (vim-style)");
+    assertTrue(
+        shellHtml.contains("ArrowDown"),
+        "Shell JS should support ArrowDown key to navigate sidebar items");
+    assertTrue(
+        shellHtml.contains("ArrowRight"),
+        "Shell JS should support ArrowRight key to enter a chapter flyout");
+  }
+
+  @Test
+  void generate_shouldDisplayChapterNumberInNavigation() throws IOException {
+    Files.writeString(markdownDir.resolve("00_intro.md"), "# Book Intro\n");
+    Path ch = Files.createDirectories(markdownDir.resolve("02_brave-tailor"));
+    Files.writeString(ch.resolve("01_story.md"), "# A Story\n");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    // Chapter numbers come from dirName — the JS numberBadge() emits nav-number spans client-side
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    assertTrue(
+        shellHtml.contains("nav-number"),
+        "Shell JS should contain numberBadge helper that emits .nav-number spans");
+    // The chapter dirName "02_brave-tailor" is stored in report-nav.json for the JS to parse
+    String navJson = Files.readString(htmlOutputDir.resolve("report-nav.json"));
+    assertTrue(
+        navJson.contains("02_brave-tailor"),
+        "Nav JSON should contain dirName '02_brave-tailor' so client JS can extract chapter number 2");
+  }
+
+  @Test
+  void generate_shouldDisplayStoryNumberInNavigation() throws IOException {
+    Files.writeString(markdownDir.resolve("00_intro.md"), "# Book Intro\n");
+    Path ch = Files.createDirectories(markdownDir.resolve("01_chapter"));
+    Files.writeString(ch.resolve("03_my-story.md"), "# My Story\n");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    // Story numbers are rendered client-side as sequential index+1 badges
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    assertTrue(
+        shellHtml.contains("nav-number"),
+        "Shell JS should contain numberBadge helper that emits .nav-number spans");
+    String navJson = Files.readString(htmlOutputDir.resolve("report-nav.json"));
+    assertTrue(
+        navJson.contains("01_chapter/03_my-story.html"),
+        "Nav JSON should contain the story HTML path");
+  }
+
+  @Test
+  void generate_shouldNotDisplayNumberForEntriesWithoutNumericPrefix() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Book Intro\n");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    // A plain "intro.md" at the root (no NN_ prefix, no chapter dir) gets dirName=""
+    // The client JS only extracts a number badge when parseInt(dirName.split('_')[0]) is a valid
+    // number — an empty dirName parses as NaN, so no badge is emitted.
+    String navJson = Files.readString(htmlOutputDir.resolve("report-nav.json"));
+    // The dirName should be empty (no chapter subdirectory), not a numbered one
+    assertFalse(
+        navJson.matches("(?s).*\"dirName\":\\s*\"\\d+_[^\"]+\".*"),
+        "Entries without numeric prefix should not have a numbered dirName that triggers a badge");
+  }
+
+  @Test
+  void generate_shouldIncludeNavNumberCssClass() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String css = Files.readString(htmlOutputDir.resolve("truedoctales.css"));
+    assertTrue(css.contains(".nav-number"), "CSS should include .nav-number styles");
   }
 }

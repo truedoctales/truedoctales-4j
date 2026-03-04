@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /**
@@ -52,6 +53,7 @@ public final class StoryBookParserImpl implements StoryBookParser {
   private static final Logger LOGGER = Logger.getLogger(StoryBookParserImpl.class.getName());
   private static final String PREQUEL_PREFIX = "00_";
   private static final String INTRO_FILE = "00_intro.md";
+  private static final Pattern CHAPTER_NUMBER_PATTERN = Pattern.compile("^(\\d+)_.*");
 
   private final Path bookPath;
   private final MarkdownStoryParser storyParser;
@@ -118,7 +120,12 @@ public final class StoryBookParserImpl implements StoryBookParser {
 
   private List<ChapterModel> parseAllChapters() throws IOException {
     try (Stream<Path> dirStream = Files.list(bookPath)) {
-      return dirStream.filter(Files::isDirectory).sorted().map(this::parseChapter).toList();
+      return dirStream
+          .filter(Files::isDirectory)
+          .sorted()
+          .filter(path -> CHAPTER_NUMBER_PATTERN.matcher(path.getFileName().toString()).matches())
+          .map(this::parseChapter)
+          .toList();
     }
   }
 
@@ -148,6 +155,7 @@ public final class StoryBookParserImpl implements StoryBookParser {
     var stories = parseStories(chapterPath);
 
     return new ChapterModel(
+        deriveNumber(relativePath),
         relativePath.getFileName(),
         chapterIntro.map(IntroMarkdownParser.IntroContent::title).orElse(chapterName),
         stories);
@@ -191,5 +199,16 @@ public final class StoryBookParserImpl implements StoryBookParser {
       LOGGER.log(Level.WARNING, "Failed to parse story: " + storyFile, e);
       throw new UncheckedIOException(e);
     }
+  }
+
+  private static Integer deriveNumber(Path storyPath) {
+    Path filename = storyPath.getFileName();
+    var matcher = CHAPTER_NUMBER_PATTERN.matcher(filename.toString());
+    if (matcher.matches()) {
+      return Integer.parseInt(matcher.group(1));
+    }
+    throw new IllegalArgumentException(
+        "Filename must start with a number followed by an underscore (e.g., '01_story.md'): "
+            + filename);
   }
 }

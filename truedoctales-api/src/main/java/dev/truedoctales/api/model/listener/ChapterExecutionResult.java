@@ -7,8 +7,18 @@ import java.util.List;
 /// Contains the chapter model and the results of all stories within the chapter. The status is
 /// computed based on the story results.
 public class ChapterExecutionResult implements HasExecutionStatus {
+  private Integer number;
   private String path;
   private String title;
+
+  public Integer getNumber() {
+    return number;
+  }
+
+  public void setNumber(Integer number) {
+    this.number = number;
+  }
+
   private List<StoryExecutionResult> stories;
 
   public String getPath() {

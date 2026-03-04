@@ -27,6 +27,7 @@ public class JupiterStoryTestExecutor implements JuniperStoryTestBuilder {
 
   private final StoryExecutionListener executionListener;
   private final StepExecutor stepExecutor;
+  private final PlotRegistry plotRegistry;
 
   /// Creates a new JUnit executor with the given registry and listener.
   ///
@@ -36,10 +37,12 @@ public class JupiterStoryTestExecutor implements JuniperStoryTestBuilder {
       PlotRegistry plotRegistry, StoryExecutionListener executionListener) {
     this.executionListener = executionListener;
     this.stepExecutor = new StepExecutor(plotRegistry, executionListener);
+    this.plotRegistry = plotRegistry;
   }
 
   @Override
   public Stream<DynamicNode> buildDynamicTests(StoryBookExecution book, Path storyPath) {
+    executionListener.onPlotBindings(plotRegistry.getBindings());
 
     StoryExecution story = book.loadStory(storyPath);
     ChapterExecution chapter = book.findChapterForStory(story).orElseThrow();
@@ -51,10 +54,13 @@ public class JupiterStoryTestExecutor implements JuniperStoryTestBuilder {
                 c ->
                     DynamicTest.dynamicTest(
                         "start Chapter: " + chapter.title(),
-                        () -> {
-                          executionListener.startChapter(
-                              new ChapterModel(chapter.path(), chapter.title(), List.of()));
-                        }));
+                        () ->
+                            executionListener.startChapter(
+                                new ChapterModel(
+                                    chapter.number(),
+                                    chapter.path(),
+                                    chapter.title(),
+                                    List.of()))));
 
     Optional<DynamicTest> closeChapter =
         Optional.of(chapter)
@@ -66,7 +72,11 @@ public class JupiterStoryTestExecutor implements JuniperStoryTestBuilder {
                         "End Chapter: " + chapter.title(),
                         () ->
                             executionListener.endChapter(
-                                new ChapterModel(chapter.path(), chapter.title(), List.of()))));
+                                new ChapterModel(
+                                    chapter.number(),
+                                    chapter.path(),
+                                    chapter.title(),
+                                    List.of()))));
 
     List<DynamicNode> nodes = new ArrayList<>();
     startChapter.ifPresent(nodes::add);

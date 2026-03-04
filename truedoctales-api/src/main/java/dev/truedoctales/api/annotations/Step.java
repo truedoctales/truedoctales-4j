@@ -1,5 +1,6 @@
 package dev.truedoctales.api.annotations;
 
+import dev.truedoctales.api.model.execution.InputType;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -26,4 +27,17 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface Step {
   String value();
+
+  /// Optional markdown description of what this step does.
+  ///
+  /// The description is included in the final generated report, rendered as a blockquote line
+  /// directly below the step annotation. Supports standard markdown formatting.
+  String description() default "";
+
+  /// The input type for this step. Defaults to {@link InputType#AUTO}, which auto-detects the
+  /// type from the method's parameter types (BATCH when a {@link java.util.Collection} parameter
+  /// is present, SEQUENCE otherwise).
+  ///
+  /// Set this explicitly to override the auto-detected type.
+  InputType type() default InputType.AUTO;
 }
