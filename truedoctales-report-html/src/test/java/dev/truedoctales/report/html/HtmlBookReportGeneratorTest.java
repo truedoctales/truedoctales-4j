@@ -621,4 +621,61 @@ class HtmlBookReportGeneratorTest {
     String css = Files.readString(htmlOutputDir.resolve("truedoctales.css"));
     assertTrue(css.contains(".nav-number"), "CSS should include .nav-number styles");
   }
+
+  @Test
+  void generate_shouldPlacePrequelChapterAfterRegularChapters() throws IOException {
+    Files.writeString(markdownDir.resolve("00_intro.md"), "# Book Intro\n");
+    Path prequels = Files.createDirectories(markdownDir.resolve("00_prequels"));
+    Files.writeString(prequels.resolve("01_setup.md"), "# Setup\n");
+    Path ch1 = Files.createDirectories(markdownDir.resolve("01_chapter"));
+    Files.writeString(ch1.resolve("01_story.md"), "# Story\n");
+    Path ch2 = Files.createDirectories(markdownDir.resolve("02_chapter"));
+    Files.writeString(ch2.resolve("01_story.md"), "# Story 2\n");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String navJson = Files.readString(htmlOutputDir.resolve("report-nav.json"));
+    int ch1Index = navJson.indexOf("01_chapter");
+    int ch2Index = navJson.indexOf("02_chapter");
+    int prequelIndex = navJson.indexOf("00_prequels");
+    assertTrue(ch1Index < prequelIndex, "Regular chapter 01 should appear before prequels");
+    assertTrue(ch2Index < prequelIndex, "Regular chapter 02 should appear before prequels");
+  }
+
+  @Test
+  void generate_shouldPlacePrequelChapterAfterRegularChaptersWithJsonReport() throws IOException {
+    Path jsonReportDir = Files.createDirectories(tempDir.resolve("json-report"));
+    Files.writeString(
+        jsonReportDir.resolve("meta.json"), "{\"title\": \"Book\", \"hasIntro\": true}");
+
+    Files.writeString(markdownDir.resolve("00_intro.md"), "# Book Intro\n");
+
+    Path prequelJsonDir = Files.createDirectories(jsonReportDir.resolve("00_prequels"));
+    Files.writeString(prequelJsonDir.resolve("meta.json"), "{\"title\": \"Prequels\"}");
+    Files.writeString(
+        prequelJsonDir.resolve("01_setup.json"),
+        "{\"path\": \"00_prequels/01_setup.md\", \"title\": \"Setup\"}");
+    Path prequelMdDir = Files.createDirectories(markdownDir.resolve("00_prequels"));
+    Files.writeString(prequelMdDir.resolve("01_setup.md"), "# Setup\n");
+
+    Path ch1JsonDir = Files.createDirectories(jsonReportDir.resolve("01_chapter"));
+    Files.writeString(ch1JsonDir.resolve("meta.json"), "{\"title\": \"Chapter One\"}");
+    Files.writeString(
+        ch1JsonDir.resolve("01_story.json"),
+        "{\"path\": \"01_chapter/01_story.md\", \"title\": \"Story\"}");
+    Path ch1MdDir = Files.createDirectories(markdownDir.resolve("01_chapter"));
+    Files.writeString(ch1MdDir.resolve("00_intro.md"), "# Ch1 Intro\n");
+    Files.writeString(ch1MdDir.resolve("01_story.md"), "# Story\n");
+
+    HtmlBookReportGenerator generator =
+        new HtmlBookReportGenerator(markdownDir, jsonReportDir, htmlOutputDir);
+    generator.generate();
+
+    String navJson = Files.readString(htmlOutputDir.resolve("report-nav.json"));
+    int ch1Index = navJson.indexOf("01_chapter");
+    int prequelIndex = navJson.indexOf("00_prequels");
+    assertTrue(
+        ch1Index < prequelIndex, "Regular chapter should appear before prequels in JSON nav");
+  }
 }

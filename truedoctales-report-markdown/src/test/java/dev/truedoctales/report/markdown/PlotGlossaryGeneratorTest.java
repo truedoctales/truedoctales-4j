@@ -193,4 +193,125 @@ class PlotGlossaryGeneratorTest {
     assertTrue(Files.exists(outputDir.resolve("plots/Hero.md")));
     assertTrue(Files.readString(outputDir.resolve("plots/Hero.md")).contains("## Create hero"));
   }
+
+  @Test
+  void generate_shouldIncludeDescriptionWhenPresent() throws IOException {
+    Files.writeString(
+        executionDir.resolve("plot-registry.json"),
+        """
+        {
+          "plots": [
+            {
+              "plotId": "Hero",
+              "steps": [
+                {
+                  "plot": "Hero",
+                  "pattern": "Create hero",
+                  "inputType": "SEQUENCE",
+                  "description": "Creates a new hero with the given attributes."
+                }
+              ]
+            }
+          ]
+        }
+        """);
+
+    new PlotGlossaryGenerator(executionDir, outputDir).generate();
+
+    String content = Files.readString(outputDir.resolve("plots/Hero.md"));
+    assertTrue(
+        content.contains("Creates a new hero with the given attributes."),
+        "Should include step description");
+  }
+
+  @Test
+  void generate_shouldShowHeadersSectionWhenNoVariablesInPattern() throws IOException {
+    Files.writeString(
+        executionDir.resolve("plot-registry.json"),
+        """
+        {
+          "plots": [
+            {
+              "plotId": "Hero",
+              "steps": [
+                {
+                  "plot": "Hero",
+                  "pattern": "Create hero",
+                  "inputType": "SEQUENCE",
+                  "headers": ["id", "name", "species", "age"]
+                }
+              ]
+            }
+          ]
+        }
+        """);
+
+    new PlotGlossaryGenerator(executionDir, outputDir).generate();
+
+    String content = Files.readString(outputDir.resolve("plots/Hero.md"));
+    assertTrue(content.contains("### Headers"), "Should have Headers section");
+    assertTrue(content.contains("`id`"), "Should list header id");
+    assertTrue(content.contains("`name`"), "Should list header name");
+    assertTrue(content.contains("`species`"), "Should list header species");
+    assertTrue(content.contains("`age`"), "Should list header age");
+    assertTrue(
+        content.contains("| id | name | species | age |"),
+        "Usage example should show table with headers");
+  }
+
+  @Test
+  void generate_shouldShowInputTypeForEachStep() throws IOException {
+    Files.writeString(
+        executionDir.resolve("plot-registry.json"),
+        """
+        {
+          "plots": [
+            {
+              "plotId": "Greeting",
+              "steps": [
+                { "plot": "Greeting", "pattern": "Say Hello", "inputType": "SEQUENCE" },
+                { "plot": "Greeting", "pattern": "Batch greet", "inputType": "BATCH" }
+              ]
+            }
+          ]
+        }
+        """);
+
+    new PlotGlossaryGenerator(executionDir, outputDir).generate();
+
+    String content = Files.readString(outputDir.resolve("plots/Greeting.md"));
+    assertTrue(content.contains("**Input type:** SEQUENCE"), "Should show SEQUENCE input type");
+    assertTrue(content.contains("**Input type:** BATCH"), "Should show BATCH input type");
+  }
+
+  @Test
+  void generate_shouldPreferVariablesOverHeaders() throws IOException {
+    Files.writeString(
+        executionDir.resolve("plot-registry.json"),
+        """
+        {
+          "plots": [
+            {
+              "plotId": "Hero",
+              "steps": [
+                {
+                  "plot": "Hero",
+                  "pattern": "Greet ${name}",
+                  "inputType": "SEQUENCE",
+                  "headers": ["name", "extra"]
+                }
+              ]
+            }
+          ]
+        }
+        """);
+
+    new PlotGlossaryGenerator(executionDir, outputDir).generate();
+
+    String content = Files.readString(outputDir.resolve("plots/Hero.md"));
+    assertTrue(content.contains("### Variables"), "Should show Variables not Headers");
+    assertFalse(content.contains("### Headers"), "Should not show Headers when variables exist");
+    assertTrue(content.contains("`name`"), "Should list variable name");
+    assertFalse(content.contains("`extra`"), "Should not show headers when variables present");
+  }
 }
