@@ -247,7 +247,7 @@ public class HtmlBookReportGenerator {
                 "Plot Glossary",
                 true,
                 "plots",
-                "Reference"));
+                "Plots"));
       }
       Path plotsDir = markdownDirectory.resolve("plots");
       if (Files.isDirectory(plotsDir)) {
@@ -267,7 +267,7 @@ public class HtmlBookReportGenerator {
                             plotId,
                             false,
                             "plots",
-                            "Reference"));
+                            "Plots"));
                   });
         }
       }
@@ -627,7 +627,7 @@ public class HtmlBookReportGenerator {
                     sb += '</ul>\\n';
                   } else {
                     var num = ch.dirName ? parseInt(ch.dirName.split('_')[0], 10) : null;
-                    var badge = isNaN(num) ? '' : numberBadge(num);
+                    var badge = isNaN(num) || num === 0 ? '' : numberBadge(num);
                     sb += '<div class="nav-chapter">\\n';
                     sb += '  <div class="nav-chapter-row">';
                     if (ch.introPage) {

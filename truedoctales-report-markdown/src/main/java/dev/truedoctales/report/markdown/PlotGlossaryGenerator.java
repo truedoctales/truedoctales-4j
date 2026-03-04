@@ -156,12 +156,10 @@ public class PlotGlossaryGenerator {
 
     if (!columns.isEmpty()) {
       md.append("\n### ").append(!variables.isEmpty() ? "Variables" : "Headers").append("\n\n");
-      md.append("| ")
-          .append(!variables.isEmpty() ? "Variable" : "Header")
-          .append(" | Description |\n");
-      md.append("|----------|-------------|\n");
+      md.append("| ").append(!variables.isEmpty() ? "Variable" : "Header").append(" |\n");
+      md.append("|----------|\n");
       for (String col : columns) {
-        md.append("| `").append(col).append("` | – |\n");
+        md.append("| `").append(col).append("` |\n");
       }
     }
 
