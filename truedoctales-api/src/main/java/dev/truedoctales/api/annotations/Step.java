@@ -34,6 +34,19 @@ public @interface Step {
   /// directly below the step annotation. Supports standard markdown formatting.
   String description() default "";
 
+  /// Optional column headers for steps that accept tabular input data.
+  ///
+  /// When a step pattern does not contain {@code ${variable}} placeholders, the generated
+  /// documentation cannot infer the column names from the pattern alone. Specifying headers
+  /// explicitly allows the report to produce a complete usage example with named columns.
+  ///
+  /// Example:
+  /// ```java
+  /// @Step(value = "Create hero", headers = {"id", "name", "species", "age"})
+  /// void createHero(Long id, String name, String species, Integer age) { … }
+  /// ```
+  String[] headers() default {};
+
   /// The input type for this step. Defaults to {@link InputType#AUTO}, which auto-detects the
   /// type from the method's parameter types (BATCH when a {@link java.util.Collection} parameter
   /// is present, SEQUENCE otherwise).

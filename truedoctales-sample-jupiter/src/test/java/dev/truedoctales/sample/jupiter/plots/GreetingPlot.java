@@ -10,17 +10,20 @@ import org.junit.jupiter.api.Assertions;
 @Plot("Greeting")
 public class GreetingPlot {
 
-  @Step("Say Hello")
+  @Step(value = "Say Hello", description = "Prints a simple greeting to the console.")
   public void greet() {
     System.out.println("Hello, True Doc Tales!");
   }
 
-  @Step("Greet ${name}")
+  @Step(value = "Greet ${name}", description = "Greets the person identified by name.")
   public void greetSomeone(String name) {
     System.out.println("Hello, " + name + "!");
   }
 
-  @Step("Greet ${name} ${count} times")
+  @Step(
+      value = "Greet ${name} ${count} times",
+      description = "Greets the person the given number of times and verifies the output.",
+      headers = {"expected"})
   public void greetSomeoneMultipleTimes(
       String name, Integer count, List<Map<String, String>> expected) {
     List<String> list =

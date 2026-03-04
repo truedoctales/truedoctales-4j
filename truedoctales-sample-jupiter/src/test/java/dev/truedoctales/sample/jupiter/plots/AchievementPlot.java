@@ -14,7 +14,10 @@ public class AchievementPlot {
 
   private final Set<String> achievements = new HashSet<>();
 
-  @Step("Unlocked")
+  @Step(
+      value = "Unlocked",
+      description = "Records that the hero has unlocked an achievement.",
+      headers = {"hero", "achievement"})
   public void unlocked(String hero, String achievement) {
     achievements.add(hero + ":" + achievement);
   }

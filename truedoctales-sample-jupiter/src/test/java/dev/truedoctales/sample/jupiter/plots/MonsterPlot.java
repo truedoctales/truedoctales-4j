@@ -19,22 +19,34 @@ public class MonsterPlot {
     this.monsterService = monsterService;
   }
 
-  @Step("Create monster")
+  @Step(
+      value = "Create monster",
+      description = "Creates a new monster with the given id, name, threat level and weakness.",
+      headers = {"id", "name", "threat", "weakness"})
   public void createMonster(Long id, String name, String threat, String weakness) {
     monsterService.createMonster(id, name, threat, weakness);
   }
 
-  @Step("Monster exists")
+  @Step(
+      value = "Monster exists",
+      description = "Asserts that a monster with the given name exists.",
+      headers = {"name"})
   public void monsterExists(String name) {
     Assertions.assertTrue(monsterService.exists(name), "Monster '" + name + "' should exist");
   }
 
-  @Step("Monster is alive")
+  @Step(
+      value = "Monster is alive",
+      description = "Asserts that the monster is still alive.",
+      headers = {"name"})
   public void monsterIsAlive(String name) {
     Assertions.assertTrue(monsterService.isAlive(name), "Monster '" + name + "' should be alive");
   }
 
-  @Step("Monster is dead")
+  @Step(
+      value = "Monster is dead",
+      description = "Asserts that the monster has been defeated.",
+      headers = {"name"})
   public void monsterIsDead(String name) {
     Assertions.assertFalse(monsterService.isAlive(name), "Monster '" + name + "' should be dead");
   }

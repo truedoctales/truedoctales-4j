@@ -133,40 +133,64 @@ public class PlotGlossaryGenerator {
     return md.toString();
   }
 
-  /// Appends a single step section (H2 + variables + usage example) to the builder.
+  /// Appends a single step section (H2 + description + variables/headers + usage example) to the
+  /// builder.
   private void appendStepSection(StringBuilder md, String plotId, JsonNode step) {
     String pattern = step.path("pattern").asText("");
     String inputType = step.path("inputType").asText("SEQUENCE");
+    String description = step.path("description").asText("");
     List<String> variables = extractVariables(pattern);
+    List<String> headers = extractHeaders(step);
 
     md.append("\n## ").append(pattern).append("\n\n");
-    md.append("Pattern: `").append(pattern).append("`\n");
 
-    if (!variables.isEmpty()) {
-      md.append("\n### Variables\n\n");
-      md.append("| Variable | Description |\n");
+    if (!description.isBlank()) {
+      md.append(description).append("\n\n");
+    }
+
+    md.append("- **Pattern:** `").append(pattern).append("`\n");
+    md.append("- **Input type:** ").append(inputType).append("\n");
+
+    // Determine effective columns: prefer variables from the pattern, fall back to headers
+    List<String> columns = !variables.isEmpty() ? variables : headers;
+
+    if (!columns.isEmpty()) {
+      md.append("\n### ").append(!variables.isEmpty() ? "Variables" : "Headers").append("\n\n");
+      md.append("| ")
+          .append(!variables.isEmpty() ? "Variable" : "Header")
+          .append(" | Description |\n");
       md.append("|----------|-------------|\n");
-      for (String var : variables) {
-        md.append("| `").append(var).append("` | – |\n");
+      for (String col : columns) {
+        md.append("| `").append(col).append("` | – |\n");
       }
     }
 
     md.append("\n### Usage Example\n\n");
-    if (variables.isEmpty()) {
+    if (columns.isEmpty()) {
       md.append("```\n> **").append(plotId).append("** ").append(pattern).append("\n```\n");
     } else {
       // Show table invocation format (same for SEQUENCE and BATCH)
       md.append("```\n> **").append(plotId).append("** ").append(pattern).append("\n");
       md.append("> |");
-      variables.forEach(v -> md.append(" ").append(v).append(" |"));
+      columns.forEach(v -> md.append(" ").append(v).append(" |"));
       md.append("\n> |");
-      variables.forEach(v -> md.append(" ---- |"));
+      columns.forEach(v -> md.append(" ---- |"));
       md.append("\n> |");
-      variables.forEach(v -> md.append(" value |"));
+      columns.forEach(v -> md.append(" value |"));
       md.append("\n```\n");
     }
 
     md.append("\n---\n");
+  }
+
+  /// Extracts header names from the step JSON node's {@code headers} array.
+  static List<String> extractHeaders(JsonNode step) {
+    List<String> hdrs = new ArrayList<>();
+    JsonNode headersNode = step.get("headers");
+    if (headersNode != null && headersNode.isArray()) {
+      headersNode.forEach(h -> hdrs.add(h.asText()));
+    }
+    return hdrs;
   }
 
   /// Extracts variable names from a step pattern, e.g. {@code ${name}} → {@code name}.

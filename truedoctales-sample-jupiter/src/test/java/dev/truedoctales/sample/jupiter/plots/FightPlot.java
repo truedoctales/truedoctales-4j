@@ -20,14 +20,20 @@ public class FightPlot {
     this.fightService = fightService;
   }
 
-  @Step("Attack fails")
+  @Step(
+      value = "Attack fails",
+      description = "Performs an attack that is expected to fail.",
+      headers = {"attacker", "defender", "weapon", "result"})
   public void attackFails(String attacker, String defender, String weapon, String result) {
     AttackResult attackResult = fightService.attack(attacker, defender, weapon);
     Assertions.assertFalse(attackResult.success(), "Attack should fail");
     Assertions.assertEquals("FAILED", result, "Attack should fail");
   }
 
-  @Step("Defeat with skill")
+  @Step(
+      value = "Defeat with skill",
+      description = "The hero defeats the monster using a specific skill.",
+      headers = {"hero", "monster", "skill", "outcome"})
   public void defeatWithSkill(String hero, String monster, String skill, String outcome) {
     AttackResult attackResult = fightService.defeatWithSkill(hero, monster, skill);
     Assertions.assertTrue(attackResult.success(), "Hero should defeat monster");
