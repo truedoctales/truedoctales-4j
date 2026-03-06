@@ -1,5 +1,6 @@
 package dev.truedoctales.api.model.execution;
 
+import dev.truedoctales.api.model.plot.StepBinding;
 import dev.truedoctales.api.model.story.StepCall;
 import java.util.List;
 import java.util.Map;

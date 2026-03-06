@@ -3,9 +3,9 @@ package dev.truedoctales.execution.mapping;
 import static dev.truedoctales.api.model.execution.InputType.SEQUENCE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import dev.truedoctales.api.model.execution.PlotBinding;
-import dev.truedoctales.api.model.execution.StepBinding;
 import dev.truedoctales.api.model.execution.StepExecution;
+import dev.truedoctales.api.model.plot.PlotBinding;
+import dev.truedoctales.api.model.plot.StepBinding;
 import dev.truedoctales.api.model.story.StepCall;
 import dev.truedoctales.api.model.story.StepTask;
 import dev.truedoctales.execution.execute.StoryBookExecutionMapperImpl;

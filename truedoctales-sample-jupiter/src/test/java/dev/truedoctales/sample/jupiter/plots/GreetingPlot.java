@@ -2,7 +2,8 @@ package dev.truedoctales.sample.jupiter.plots;
 
 import dev.truedoctales.api.annotations.Plot;
 import dev.truedoctales.api.annotations.Step;
-import dev.truedoctales.api.annotations.Var;
+import dev.truedoctales.api.annotations.Table;
+import dev.truedoctales.api.annotations.Variable;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
@@ -18,7 +19,7 @@ public class GreetingPlot {
 
   @Step(value = "Greet ${name}", description = "Greets the person identified by name.")
   public void greetSomeone(
-      @Var(value = "name", description = "Name of the person to greet") String name) {
+      @Variable(value = "name", description = "Name of the person to greet") String name) {
     System.out.println("Hello, " + name + "!");
   }
 
@@ -26,9 +27,10 @@ public class GreetingPlot {
       value = "Greet ${name} ${count} times",
       description = "Greets the person the given number of times and verifies the output.")
   public void greetSomeoneMultipleTimes(
-      @Var(value = "name", description = "Name of the person to greet") String name,
-      @Var(value = "count", description = "How many times to greet") Integer count,
-      List<Map<String, String>> expected) {
+      @Variable(value = "name", description = "Name of the person to greet") String name,
+      @Variable(value = "count", description = "How many times to greet") Integer count,
+      @Table(headers = {@Variable(value = "expected", description = "Expected greeting output")})
+          List<Map<String, String>> expected) {
     List<String> list =
         IntStream.range(1, count + 1)
             .boxed()

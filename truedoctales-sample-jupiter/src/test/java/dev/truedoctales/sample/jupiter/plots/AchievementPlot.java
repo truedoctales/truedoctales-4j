@@ -2,7 +2,7 @@ package dev.truedoctales.sample.jupiter.plots;
 
 import dev.truedoctales.api.annotations.Plot;
 import dev.truedoctales.api.annotations.Step;
-import dev.truedoctales.api.annotations.Var;
+import dev.truedoctales.api.annotations.Variable;
 import java.util.*;
 
 /**
@@ -17,8 +17,8 @@ public class AchievementPlot {
 
   @Step(value = "Unlocked", description = "Records that the hero has unlocked an achievement.")
   public void unlocked(
-      @Var(value = "hero", description = "Name of the hero") String hero,
-      @Var(value = "achievement", description = "Achievement name") String achievement) {
+      @Variable(value = "hero", description = "Name of the hero") String hero,
+      @Variable(value = "achievement", description = "Achievement name") String achievement) {
     achievements.add(hero + ":" + achievement);
   }
 }

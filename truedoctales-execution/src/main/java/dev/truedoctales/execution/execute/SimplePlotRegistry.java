@@ -2,15 +2,16 @@ package dev.truedoctales.execution.execute;
 
 import dev.truedoctales.api.annotations.Plot;
 import dev.truedoctales.api.annotations.Step;
-import dev.truedoctales.api.annotations.Var;
+import dev.truedoctales.api.annotations.Table;
+import dev.truedoctales.api.annotations.Variable;
 import dev.truedoctales.api.execute.PlotRegistry;
 import dev.truedoctales.api.model.execution.InputType;
-import dev.truedoctales.api.model.execution.PlotBinding;
-import dev.truedoctales.api.model.execution.StepBinding;
 import dev.truedoctales.api.model.execution.StepExecution;
+import dev.truedoctales.api.model.plot.PlotBinding;
+import dev.truedoctales.api.model.plot.StepBinding;
+import dev.truedoctales.api.model.plot.VariableBinding;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -49,21 +50,17 @@ public class SimplePlotRegistry implements PlotRegistry {
                                     e.getKey(),
                                     getInputType(e.getValue().method()),
                                     getStepDescription(e.getValue().method()),
-                                    getStepHeaders(e.getValue().method()),
-                                    getStepVariableDescriptions(e.getValue().method())))
+                                    extractVariables(e.getValue().method()),
+                                    extractHeader(e.getValue().method())))
                         .toList()))
         .collect(Collectors.toSet());
   }
 
   public InputType getInputType(Method method) {
-    Step annotation = method.getAnnotation(Step.class);
-    if (annotation != null && annotation.type() != InputType.AUTO) {
-      return annotation.type();
-    }
-    return Stream.of(method.getParameterTypes())
-        .filter(Collection.class::isAssignableFrom)
+    return Stream.of(method.getParameters())
+        .filter(p -> p.isAnnotationPresent(Table.class))
         .findFirst()
-        .map(x -> InputType.BATCH)
+        .map(p -> InputType.BATCH)
         .orElse(InputType.SEQUENCE);
   }
 
@@ -72,35 +69,27 @@ public class SimplePlotRegistry implements PlotRegistry {
     return annotation != null ? annotation.description() : "";
   }
 
-  private List<String> getStepHeaders(Method method) {
-    VarMetadata varMeta = extractVarMetadata(method);
-    if (!varMeta.names.isEmpty()) {
-      return varMeta.names;
-    }
-    Step annotation = method.getAnnotation(Step.class);
-    return annotation != null && annotation.headers().length > 0
-        ? List.of(annotation.headers())
-        : List.of();
-  }
-
-  private List<String> getStepVariableDescriptions(Method method) {
-    VarMetadata varMeta = extractVarMetadata(method);
-    return varMeta.descriptions;
+  private List<VariableBinding> extractHeader(Method method) {
+    return Stream.of(method.getParameters())
+        .filter(p -> p.isAnnotationPresent(Table.class))
+        .flatMap(p -> Stream.of(p.getAnnotation(Table.class).headers()))
+        .map(p -> new VariableBinding(p.value(), String.class.getSimpleName(), p.description()))
+        .collect(Collectors.toList());
   }
 
   private record VarMetadata(List<String> names, List<String> descriptions) {}
 
-  private VarMetadata extractVarMetadata(Method method) {
-    List<String> names = new ArrayList<>();
-    List<String> descriptions = new ArrayList<>();
-    for (Parameter param : method.getParameters()) {
-      Var var = param.getAnnotation(Var.class);
-      if (var != null) {
-        names.add(var.value());
-        descriptions.add(var.description());
-      }
-    }
-    return new VarMetadata(List.copyOf(names), List.copyOf(descriptions));
+  private List<VariableBinding> extractVariables(Method method) {
+    return Stream.of(method.getParameters())
+        .filter(p -> p.isAnnotationPresent(Variable.class))
+        .map(
+            p ->
+                new VariableBinding(
+                    Optional.ofNullable(p.getAnnotation(Variable.class).value())
+                        .orElse(p.getName()),
+                    p.getType().getSimpleName(),
+                    p.getAnnotation(Variable.class).description()))
+        .collect(Collectors.toList());
   }
 
   @Override

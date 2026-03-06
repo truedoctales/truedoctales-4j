@@ -1,6 +1,6 @@
 # How the binding works
 
-At first you need to create a java class with annotation @Plot annotation.
+At first, you need to create a java class with annotation @Plot annotation.
 
 ```java
 @Plot("Greeting")

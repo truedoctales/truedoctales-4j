@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
 /// {@link Step#headers()} for determining column names.
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
-public @interface Var {
+public @interface Variable {
 
   /// The variable or column header name.
   ///

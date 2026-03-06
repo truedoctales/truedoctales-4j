@@ -13,13 +13,6 @@ package dev.truedoctales.api.model.execution;
 ///       {@link java.util.Collection} parameter.</li>
 /// </ul>
 public enum InputType {
-  /// Auto-detect the input type from the method's parameter types.
-  ///
-  /// When a {@link java.util.Collection} parameter is present, the type resolves to
-  /// {@link #BATCH}; otherwise it resolves to {@link #SEQUENCE}.
-  /// This is the default for {@code @Step.type()}.
-  AUTO,
-
   /// The step accepts no input data.
   NONE,
 

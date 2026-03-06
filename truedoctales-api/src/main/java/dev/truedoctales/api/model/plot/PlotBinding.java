@@ -1,4 +1,4 @@
-package dev.truedoctales.api.model.execution;
+package dev.truedoctales.api.model.plot;
 
 import java.util.List;
 

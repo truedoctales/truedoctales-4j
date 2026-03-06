@@ -1,11 +1,11 @@
 package dev.truedoctales.api.execute;
 
-import dev.truedoctales.api.model.execution.PlotBinding;
 import dev.truedoctales.api.model.execution.SceneExecution;
 import dev.truedoctales.api.model.execution.StepExecution;
 import dev.truedoctales.api.model.execution.StoryExecution;
 import dev.truedoctales.api.model.listener.SceneExecutionResult;
 import dev.truedoctales.api.model.listener.StepExecutionResult;
+import dev.truedoctales.api.model.plot.PlotBinding;
 import dev.truedoctales.api.model.story.ChapterModel;
 import dev.truedoctales.api.model.story.StoryBookModel;
 import java.util.List;

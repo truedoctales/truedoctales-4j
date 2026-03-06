@@ -1,6 +1,5 @@
 package dev.truedoctales.api.annotations;
 
-import dev.truedoctales.api.model.execution.InputType;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -33,24 +32,4 @@ public @interface Step {
   /// The description is included in the final generated report, rendered as a blockquote line
   /// directly below the step annotation. Supports standard markdown formatting.
   String description() default "";
-
-  /// Optional column headers for steps that accept tabular input data.
-  ///
-  /// When a step pattern does not contain {@code ${variable}} placeholders, the generated
-  /// documentation cannot infer the column names from the pattern alone. Specifying headers
-  /// explicitly allows the report to produce a complete usage example with named columns.
-  ///
-  /// Example:
-  /// ```java
-  /// @Step(value = "Create hero", headers = {"id", "name", "species", "age"})
-  /// void createHero(Long id, String name, String species, Integer age) { … }
-  /// ```
-  String[] headers() default {};
-
-  /// The input type for this step. Defaults to {@link InputType#AUTO}, which auto-detects the
-  /// type from the method's parameter types (BATCH when a {@link java.util.Collection} parameter
-  /// is present, SEQUENCE otherwise).
-  ///
-  /// Set this explicitly to override the auto-detected type.
-  InputType type() default InputType.AUTO;
 }

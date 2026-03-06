@@ -1,6 +1,8 @@
 package dev.truedoctales.execution.execute;
 
 import dev.truedoctales.api.model.execution.*;
+import dev.truedoctales.api.model.plot.PlotBinding;
+import dev.truedoctales.api.model.plot.StepBinding;
 import dev.truedoctales.api.model.story.*;
 import java.util.*;
 import java.util.function.Function;
