@@ -151,9 +151,9 @@ class HtmlBookReportGeneratorTest {
     assertTrue(Files.exists(htmlOutputDir.resolve("02_chapter-advanced/00_intro.html")));
     assertTrue(Files.exists(htmlOutputDir.resolve("index.html")));
 
-    // Check that the index.html redirects to first page
-    String index = Files.readString(htmlOutputDir.resolve("index.html"));
-    assertTrue(index.contains("00_intro.html"), "Index should redirect to first page");
+    // Check that the JS references the first page as default
+    String jsContent = Files.readString(htmlOutputDir.resolve("truedoctales.js"));
+    assertTrue(jsContent.contains("00_intro.html"), "JS should reference first page as default");
   }
 
   @Test
@@ -166,10 +166,10 @@ class HtmlBookReportGeneratorTest {
     generator.generate();
 
     // With SPA, active state is managed by the JS router, not baked into the HTML
-    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    String jsContent = Files.readString(htmlOutputDir.resolve("truedoctales.js"));
     assertTrue(
-        shellHtml.contains("toggle('active'"),
-        "Shell JS should manage active navigation state dynamically");
+        jsContent.contains("toggle('active'"),
+        "JS should manage active navigation state dynamically");
   }
 
   @Test
@@ -284,13 +284,15 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
+    String jsContent = Files.readString(htmlOutputDir.resolve("truedoctales.js"));
+    assertTrue(
+        jsContent.contains("class=\"nav-chapter\""),
+        "JS should use .nav-chapter divs for OS-style flyout chapter groups");
+    assertTrue(
+        jsContent.contains("class=\"chapter-stories\""),
+        "JS should use .chapter-stories as hidden data holder inside each chapter group");
+
     String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
-    assertTrue(
-        shellHtml.contains("class=\"nav-chapter\""),
-        "Shell nav should use .nav-chapter divs for OS-style flyout chapter groups");
-    assertTrue(
-        shellHtml.contains("class=\"chapter-stories\""),
-        "Shell nav should use .chapter-stories as hidden data holder inside each chapter group");
     assertTrue(
         shellHtml.contains("id=\"nav-flyout\""),
         "Shell should include a global #nav-flyout panel element outside the sidebar");
@@ -389,10 +391,10 @@ class HtmlBookReportGeneratorTest {
 
     // With flyout menus, chapter groups show their stories in a fixed-positioned panel on hover;
     // the active page is highlighted via the .active class on its link
-    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    String jsContent = Files.readString(htmlOutputDir.resolve("truedoctales.js"));
     assertTrue(
-        shellHtml.contains("flyout-visible"),
-        "Shell JS should use .flyout-visible to show the chapter's story list");
+        jsContent.contains("flyout-visible"),
+        "JS should use .flyout-visible to show the chapter's story list");
   }
 
   @Test
@@ -512,13 +514,13 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    String jsContent = Files.readString(htmlOutputDir.resolve("truedoctales.js"));
     assertTrue(
-        shellHtml.contains("mermaidSource"),
-        "Shell JS should save mermaid source text before first render");
+        jsContent.contains("mermaidSource"),
+        "JS should save mermaid source text before first render");
     assertTrue(
-        shellHtml.contains("removeAttribute('data-processed')"),
-        "Shell JS should remove data-processed so mermaid can re-render on theme change");
+        jsContent.contains("removeAttribute('data-processed')"),
+        "JS should remove data-processed so mermaid can re-render on theme change");
   }
 
   @Test
@@ -541,16 +543,16 @@ class HtmlBookReportGeneratorTest {
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
     generator.generate();
 
-    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    String jsContent = Files.readString(htmlOutputDir.resolve("truedoctales.js"));
     assertTrue(
-        shellHtml.contains("e.key === ':'"),
-        "Shell JS should support ':' keyboard shortcut to open navigation (vim-style)");
+        jsContent.contains("e.key === ':'"),
+        "JS should support ':' keyboard shortcut to open navigation (vim-style)");
     assertTrue(
-        shellHtml.contains("ArrowDown"),
-        "Shell JS should support ArrowDown key to navigate sidebar items");
+        jsContent.contains("ArrowDown"),
+        "JS should support ArrowDown key to navigate sidebar items");
     assertTrue(
-        shellHtml.contains("ArrowRight"),
-        "Shell JS should support ArrowRight key to enter a chapter flyout");
+        jsContent.contains("ArrowRight"),
+        "JS should support ArrowRight key to enter a chapter flyout");
   }
 
   @Test
@@ -563,10 +565,10 @@ class HtmlBookReportGeneratorTest {
     generator.generate();
 
     // Chapter numbers come from dirName — the JS numberBadge() emits nav-number spans client-side
-    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    String jsContent = Files.readString(htmlOutputDir.resolve("truedoctales.js"));
     assertTrue(
-        shellHtml.contains("nav-number"),
-        "Shell JS should contain numberBadge helper that emits .nav-number spans");
+        jsContent.contains("nav-number"),
+        "JS should contain numberBadge helper that emits .nav-number spans");
     // The chapter dirName "02_brave-tailor" is stored in report-nav.json for the JS to parse
     String navJson = Files.readString(htmlOutputDir.resolve("report-nav.json"));
     assertTrue(
@@ -584,10 +586,10 @@ class HtmlBookReportGeneratorTest {
     generator.generate();
 
     // Story numbers are rendered client-side as sequential index+1 badges
-    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    String jsContent = Files.readString(htmlOutputDir.resolve("truedoctales.js"));
     assertTrue(
-        shellHtml.contains("nav-number"),
-        "Shell JS should contain numberBadge helper that emits .nav-number spans");
+        jsContent.contains("nav-number"),
+        "JS should contain numberBadge helper that emits .nav-number spans");
     String navJson = Files.readString(htmlOutputDir.resolve("report-nav.json"));
     assertTrue(
         navJson.contains("01_chapter/03_my-story.html"),
