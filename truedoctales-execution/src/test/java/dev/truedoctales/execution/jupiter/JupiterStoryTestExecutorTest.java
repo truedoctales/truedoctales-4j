@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import dev.truedoctales.api.execute.PlotRegistry;
 import dev.truedoctales.api.execute.StoryExecutionListener;
 import dev.truedoctales.api.model.execution.*;
+import dev.truedoctales.api.model.plot.PlotBinding;
+import dev.truedoctales.api.model.plot.StepBinding;
 import dev.truedoctales.api.model.story.StepCall;
 import java.nio.file.Path;
 import java.util.List;

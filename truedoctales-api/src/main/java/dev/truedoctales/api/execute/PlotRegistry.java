@@ -1,7 +1,7 @@
 package dev.truedoctales.api.execute;
 
-import dev.truedoctales.api.model.execution.PlotBinding;
 import dev.truedoctales.api.model.execution.StepExecution;
+import dev.truedoctales.api.model.plot.PlotBinding;
 import java.util.Set;
 
 /// Interface for registering plot instances and invoking bound binding methods.

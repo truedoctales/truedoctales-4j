@@ -162,11 +162,18 @@ public class HtmlBookReportGenerator {
       }
     }
 
-    // 2. Chapter directories (sorted — 00_prequels comes first naturally)
+    // 2. Chapter directories (sorted — prequels (00_) are moved behind all regular chapters)
     List<Path> chapterDirs = new ArrayList<>();
     try (var stream = Files.list(jsonReportDirectory)) {
       stream.filter(Files::isDirectory).sorted().forEach(chapterDirs::add);
     }
+    // Move prequel directories (starting with "00_") to the end of the list
+    List<Path> prequelDirs =
+        chapterDirs.stream().filter(p -> p.getFileName().toString().startsWith("00_")).toList();
+    List<Path> regularDirs =
+        chapterDirs.stream().filter(p -> !p.getFileName().toString().startsWith("00_")).toList();
+    chapterDirs = new ArrayList<>(regularDirs);
+    chapterDirs.addAll(prequelDirs);
 
     for (Path chapterDir : chapterDirs) {
       String chapterTitle = readJsonField(chapterDir.resolve("meta.json"), "title");
@@ -240,7 +247,7 @@ public class HtmlBookReportGenerator {
                 "Plot Glossary",
                 true,
                 "plots",
-                "Reference"));
+                "Plots"));
       }
       Path plotsDir = markdownDirectory.resolve("plots");
       if (Files.isDirectory(plotsDir)) {
@@ -260,7 +267,7 @@ public class HtmlBookReportGenerator {
                             plotId,
                             false,
                             "plots",
-                            "Reference"));
+                            "Plots"));
                   });
         }
       }
@@ -325,7 +332,18 @@ public class HtmlBookReportGenerator {
           }
         });
     entries.sort(Comparator.comparing(NavEntry::relativePath));
-    return entries;
+    // Move prequel entries (in 00_ chapter directories) behind all regular chapters
+    List<NavEntry> prequelEntries =
+        entries.stream()
+            .filter(e -> e.chapterDirName() != null && e.chapterDirName().startsWith("00_"))
+            .toList();
+    List<NavEntry> regularEntries =
+        entries.stream()
+            .filter(e -> e.chapterDirName() == null || !e.chapterDirName().startsWith("00_"))
+            .toList();
+    List<NavEntry> reordered = new ArrayList<>(regularEntries);
+    reordered.addAll(prequelEntries);
+    return reordered;
   }
 
   // -------------------------------------------------------------------------
@@ -609,7 +627,7 @@ public class HtmlBookReportGenerator {
                     sb += '</ul>\\n';
                   } else {
                     var num = ch.dirName ? parseInt(ch.dirName.split('_')[0], 10) : null;
-                    var badge = isNaN(num) ? '' : numberBadge(num);
+                    var badge = isNaN(num) || num === 0 ? '' : numberBadge(num);
                     sb += '<div class="nav-chapter">\\n';
                     sb += '  <div class="nav-chapter-row">';
                     if (ch.introPage) {

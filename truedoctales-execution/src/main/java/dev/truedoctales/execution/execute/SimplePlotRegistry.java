@@ -2,11 +2,14 @@ package dev.truedoctales.execution.execute;
 
 import dev.truedoctales.api.annotations.Plot;
 import dev.truedoctales.api.annotations.Step;
+import dev.truedoctales.api.annotations.Table;
+import dev.truedoctales.api.annotations.Variable;
 import dev.truedoctales.api.execute.PlotRegistry;
 import dev.truedoctales.api.model.execution.InputType;
-import dev.truedoctales.api.model.execution.PlotBinding;
-import dev.truedoctales.api.model.execution.StepBinding;
 import dev.truedoctales.api.model.execution.StepExecution;
+import dev.truedoctales.api.model.plot.PlotBinding;
+import dev.truedoctales.api.model.plot.StepBinding;
+import dev.truedoctales.api.model.plot.VariableBinding;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -46,26 +49,47 @@ public class SimplePlotRegistry implements PlotRegistry {
                                     entry.getKey(),
                                     e.getKey(),
                                     getInputType(e.getValue().method()),
-                                    getStepDescription(e.getValue().method())))
+                                    getStepDescription(e.getValue().method()),
+                                    extractVariables(e.getValue().method()),
+                                    extractHeader(e.getValue().method())))
                         .toList()))
         .collect(Collectors.toSet());
   }
 
   public InputType getInputType(Method method) {
-    Step annotation = method.getAnnotation(Step.class);
-    if (annotation != null && annotation.type() != InputType.AUTO) {
-      return annotation.type();
-    }
-    return Stream.of(method.getParameterTypes())
-        .filter(Collection.class::isAssignableFrom)
+    return Stream.of(method.getParameters())
+        .filter(p -> p.isAnnotationPresent(Table.class))
         .findFirst()
-        .map(x -> InputType.BATCH)
+        .map(p -> InputType.BATCH)
         .orElse(InputType.SEQUENCE);
   }
 
   private String getStepDescription(Method method) {
     Step annotation = method.getAnnotation(Step.class);
     return annotation != null ? annotation.description() : "";
+  }
+
+  private List<VariableBinding> extractHeader(Method method) {
+    return Stream.of(method.getParameters())
+        .filter(p -> p.isAnnotationPresent(Table.class))
+        .flatMap(p -> Stream.of(p.getAnnotation(Table.class).headers()))
+        .map(p -> new VariableBinding(p.value(), String.class.getSimpleName(), p.description()))
+        .collect(Collectors.toList());
+  }
+
+  private record VarMetadata(List<String> names, List<String> descriptions) {}
+
+  private List<VariableBinding> extractVariables(Method method) {
+    return Stream.of(method.getParameters())
+        .filter(p -> p.isAnnotationPresent(Variable.class))
+        .map(
+            p ->
+                new VariableBinding(
+                    Optional.ofNullable(p.getAnnotation(Variable.class).value())
+                        .orElse(p.getName()),
+                    p.getType().getSimpleName(),
+                    p.getAnnotation(Variable.class).description()))
+        .collect(Collectors.toList());
   }
 
   @Override

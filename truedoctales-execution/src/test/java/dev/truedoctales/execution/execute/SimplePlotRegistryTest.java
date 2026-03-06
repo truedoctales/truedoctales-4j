@@ -4,10 +4,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import dev.truedoctales.api.annotations.Plot;
 import dev.truedoctales.api.annotations.Step;
+import dev.truedoctales.api.annotations.Table;
+import dev.truedoctales.api.annotations.Variable;
 import dev.truedoctales.api.model.execution.InputType;
-import dev.truedoctales.api.model.execution.PlotBinding;
-import dev.truedoctales.api.model.execution.StepBinding;
 import dev.truedoctales.api.model.execution.StepExecution;
+import dev.truedoctales.api.model.plot.PlotBinding;
+import dev.truedoctales.api.model.plot.StepBinding;
+import dev.truedoctales.api.model.plot.VariableBinding;
 import dev.truedoctales.api.model.story.StepCall;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +66,8 @@ class SimplePlotRegistryTest {
     TestPlot plot = new TestPlot();
     registry.register(plot);
 
-    StepBinding step = new StepBinding("TestPlot", "Simple binding", InputType.SEQUENCE);
+    StepBinding step =
+        new StepBinding("TestPlot", "Simple binding", InputType.SEQUENCE, "description");
     var call = new StepCall("TestPlot", "Simple binding");
     StepExecution execution = new StepExecution(step, call, List.of(), 0);
 
@@ -80,7 +84,7 @@ class SimplePlotRegistryTest {
     TestPlot plot = new TestPlot();
     registry.register(plot);
 
-    StepBinding binding = new StepBinding("TestPlot", "Step with ${param}", InputType.SEQUENCE);
+    StepBinding binding = new StepBinding("TestPlot", "Step with ${param}", InputType.SEQUENCE, "");
     var call = new StepCall("TestPlot", "Step with test-value");
     List<Map<String, String>> data = List.of(Map.of("param", "test-value"));
     StepExecution execution = new StepExecution(binding, call, data, 0);
@@ -95,7 +99,7 @@ class SimplePlotRegistryTest {
   @Test
   void invoke_shouldThrowWhenPlotNotFound() {
     // Arrange
-    StepBinding step = new StepBinding("NonExistentPlot", "Some binding", InputType.SEQUENCE);
+    StepBinding step = new StepBinding("NonExistentPlot", "Some binding", InputType.SEQUENCE, "");
     var call = new StepCall("NonExistentPlot", "Some binding");
     StepExecution execution = new StepExecution(step, call, List.of(), 0);
 
@@ -109,7 +113,7 @@ class SimplePlotRegistryTest {
   void invoke_shouldThrowWhenStepNotFound() {
     // Arrange
     registry.register(new TestPlot());
-    StepBinding step = new StepBinding("TestPlot", "Non-existent binding", InputType.SEQUENCE);
+    StepBinding step = new StepBinding("TestPlot", "Non-existent binding", InputType.SEQUENCE, "");
     var call = new StepCall("TestPlot", "Non-existent binding");
     StepExecution execution = new StepExecution(step, call, List.of(), 0);
 
@@ -127,11 +131,11 @@ class SimplePlotRegistryTest {
     registry.register(plot1).register(plot2);
 
     // Act
-    StepBinding step1 = new StepBinding("TestPlot", "Simple binding", InputType.SEQUENCE);
+    StepBinding step1 = new StepBinding("TestPlot", "Simple binding", InputType.SEQUENCE, "");
     var call1 = new StepCall("TestPlot", "Simple binding");
     registry.invoke(new StepExecution(step1, call1, List.of(), 0));
 
-    StepBinding step2 = new StepBinding("AnotherPlot", "Another binding", InputType.SEQUENCE);
+    StepBinding step2 = new StepBinding("AnotherPlot", "Another binding", InputType.SEQUENCE, "");
     var call2 = new StepCall("AnotherPlot", "Another binding");
     registry.invoke(new StepExecution(step2, call2, List.of(), 0));
 
@@ -178,39 +182,81 @@ class SimplePlotRegistryTest {
   }
 
   @Test
-  void getBindings_shouldUseAutoDetectionWhenTypeIsAuto() {
-    // Arrange - register a plot with a Collection param (should auto-detect BATCH)
-    registry.register(new AnnotatedTypePlot());
+  void getBindings_shouldExtractHeadersAndDescriptionsFromVarAnnotation() {
+    // Arrange
+    registry.register(new VarAnnotatedPlot());
 
     // Act
     Set<PlotBinding> bindings = registry.getBindings();
 
-    // Assert: step with Collection param and no explicit type should still auto-detect as BATCH
-    StepBinding autoStep =
+    // Assert
+    StepBinding step =
         bindings.stream()
             .flatMap(b -> b.steps().stream())
-            .filter(s -> s.pattern().equals("Auto batch step"))
+            .filter(s -> s.pattern().equals("Create item"))
             .findFirst()
             .orElseThrow();
     assertEquals(
-        InputType.BATCH, autoStep.inputType(), "Collection param should auto-detect as BATCH");
+        List.of(
+            new VariableBinding("id", "Long", "Unique identifier"),
+            new VariableBinding("name", "String", "Item name")),
+        step.variables(),
+        "@Var should provide header names");
+  }
+
+  @Test
+  void getBindings_shouldPreferVarAnnotationOverStepHeaders() {
+    // Arrange
+    registry.register(new VarAnnotatedPlot());
+
+    // Act
+    Set<PlotBinding> bindings = registry.getBindings();
+
+    // Assert - the step has @Step headers AND @Var; @Var should win
+    StepBinding step =
+        bindings.stream()
+            .flatMap(b -> b.steps().stream())
+            .filter(s -> s.pattern().equals("Step with fallback"))
+            .findFirst()
+            .orElseThrow();
+    assertEquals(
+        List.of(new VariableBinding("paramA", "String", "Description from @Var")),
+        step.variables(),
+        "@Var should take precedence over @Step.headers()");
+  }
+
+  @Test
+  void getBindings_shouldFallBackToStepHeadersWhenNoVarAnnotation() {
+    // Arrange
+    registry.register(new VarAnnotatedPlot());
+
+    // Act
+    Set<PlotBinding> bindings = registry.getBindings();
+
+    // Assert - the step has @Step headers but no @Var
+    StepBinding step =
+        bindings.stream()
+            .flatMap(b -> b.steps().stream())
+            .filter(s -> s.pattern().equals("Legacy step"))
+            .findFirst()
+            .orElseThrow();
+    assertEquals(
+        List.of(
+            new VariableBinding("col1", "String", ""), new VariableBinding("col1", "String", "")),
+        step.variables(),
+        "Should fall back to @Step.headers() when no @Var present");
   }
 
   @Plot("AnnotatedTypePlot")
   public static class AnnotatedTypePlot {
 
-    @Step(value = "Batch step", type = InputType.BATCH)
-    public void batchStep(String param) {
+    @Step(value = "Batch step")
+    public void batchStep(@Table List<Map<String, String>> rows) {
       // explicit BATCH override even though no Collection param
     }
 
     @Step(value = "Described step", description = "A helpful description.")
     public void describedStep() {}
-
-    @Step("Auto batch step")
-    public void autoBatchStep(List<Map<String, String>> rows) {
-      // no explicit type — should auto-detect BATCH from List param
-    }
   }
 
   @Plot("TestPlot")
@@ -237,5 +283,21 @@ class SimplePlotRegistryTest {
     public void anotherStep() {
       anotherCalled = true;
     }
+  }
+
+  @Plot("VarAnnotatedPlot")
+  public static class VarAnnotatedPlot {
+
+    @Step("Create item")
+    public void createItem(
+        @Variable(value = "id", description = "Unique identifier") Long id,
+        @Variable(value = "name", description = "Item name") String name) {}
+
+    @Step(value = "Step with fallback")
+    public void stepWithFallback(
+        @Variable(value = "paramA", description = "Description from @Var") String paramA) {}
+
+    @Step(value = "Legacy step")
+    public void legacyStep(@Variable("col1") String col1, @Variable("col1") String col2) {}
   }
 }
