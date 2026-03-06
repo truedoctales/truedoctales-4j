@@ -44,8 +44,10 @@ class PlotGlossaryGeneratorTest {
             {
               "plotId": "Hero",
               "steps": [
-                { "plot": "Hero", "pattern": "Create hero", "inputType": "SEQUENCE" },
-                { "plot": "Hero", "pattern": "Hero exists", "inputType": "SEQUENCE" }
+                { "plot": "Hero", "pattern": "Create hero", "inputType": "SEQUENCE",
+                  "variables": [], "headers": [] },
+                { "plot": "Hero", "pattern": "Hero exists", "inputType": "SEQUENCE",
+                  "variables": [], "headers": [] }
               ]
             }
           ]
@@ -70,7 +72,7 @@ class PlotGlossaryGeneratorTest {
   }
 
   @Test
-  void generate_perPlotPage_shouldShowVariablesSection() throws IOException {
+  void generate_perPlotPage_shouldShowVariablesSectionWithTypeAndDescription() throws IOException {
     Files.writeString(
         executionDir.resolve("plot-registry.json"),
         """
@@ -79,7 +81,16 @@ class PlotGlossaryGeneratorTest {
             {
               "plotId": "Hero",
               "steps": [
-                { "plot": "Hero", "pattern": "Create hero ${id} ${name}", "inputType": "SEQUENCE" }
+                {
+                  "plot": "Hero",
+                  "pattern": "Create hero",
+                  "inputType": "SEQUENCE",
+                  "variables": [
+                    { "name": "id", "type": "Long", "description": "Unique identifier" },
+                    { "name": "name", "type": "String", "description": "Hero name" }
+                  ],
+                  "headers": []
+                }
               ]
             }
           ]
@@ -90,8 +101,9 @@ class PlotGlossaryGeneratorTest {
 
     String content = Files.readString(outputDir.resolve("plots/Hero.md"));
     assertTrue(content.contains("### Variables"), "Should have Variables section");
-    assertTrue(content.contains("`id`"), "Should list variable id");
-    assertTrue(content.contains("`name`"), "Should list variable name");
+    assertTrue(content.contains("| Variable | Type | Description |"), "Should have Type column");
+    assertTrue(content.contains("| `id` | `Long` | Unique identifier |"), "Should list id var");
+    assertTrue(content.contains("| `name` | `String` | Hero name |"), "Should list name var");
     assertTrue(content.contains("### Usage Example"), "Should have Usage Example section");
   }
 
@@ -105,7 +117,8 @@ class PlotGlossaryGeneratorTest {
             {
               "plotId": "Greeting",
               "steps": [
-                { "plot": "Greeting", "pattern": "Say Hello", "inputType": "SEQUENCE" }
+                { "plot": "Greeting", "pattern": "Say Hello", "inputType": "SEQUENCE",
+                  "variables": [], "headers": [] }
               ]
             }
           ]
@@ -120,7 +133,7 @@ class PlotGlossaryGeneratorTest {
     assertTrue(
         content.contains("```\n> **Greeting** Say Hello\n```"),
         "Usage should be wrapped in code block");
-    assertFalse(content.contains("### Variables"), "No variables section when pattern has none");
+    assertFalse(content.contains("### Variables"), "No variables section when none present");
   }
 
   @Test
@@ -130,8 +143,8 @@ class PlotGlossaryGeneratorTest {
         """
         {
           "plots": [
-            { "plotId": "Zorro",  "steps": [{ "plot": "Zorro",  "pattern": "z step", "inputType": "SEQUENCE" }] },
-            { "plotId": "Alpha",  "steps": [{ "plot": "Alpha",  "pattern": "a step", "inputType": "SEQUENCE" }] }
+            { "plotId": "Zorro",  "steps": [{ "plot": "Zorro",  "pattern": "z step", "inputType": "SEQUENCE", "variables": [], "headers": [] }] },
+            { "plotId": "Alpha",  "steps": [{ "plot": "Alpha",  "pattern": "a step", "inputType": "SEQUENCE", "variables": [], "headers": [] }] }
           ]
         }
         """);
@@ -181,7 +194,8 @@ class PlotGlossaryGeneratorTest {
           "plots": [
             {
               "plotId": "Hero",
-              "steps": [{ "plot": "Hero", "pattern": "Create hero", "inputType": "SEQUENCE" }]
+              "steps": [{ "plot": "Hero", "pattern": "Create hero", "inputType": "SEQUENCE",
+                          "variables": [], "headers": [] }]
             }
           ]
         }
@@ -208,7 +222,8 @@ class PlotGlossaryGeneratorTest {
                   "plot": "Hero",
                   "pattern": "Create hero",
                   "inputType": "SEQUENCE",
-                  "description": "Creates a new hero with the given attributes."
+                  "description": "Creates a new hero with the given attributes.",
+                  "variables": [], "headers": []
                 }
               ]
             }
@@ -225,7 +240,7 @@ class PlotGlossaryGeneratorTest {
   }
 
   @Test
-  void generate_shouldShowHeadersSectionWhenNoVariablesInPattern() throws IOException {
+  void generate_shouldShowHeadersSectionWithTypeAndDescription() throws IOException {
     Files.writeString(
         executionDir.resolve("plot-registry.json"),
         """
@@ -238,7 +253,13 @@ class PlotGlossaryGeneratorTest {
                   "plot": "Hero",
                   "pattern": "Create hero",
                   "inputType": "SEQUENCE",
-                  "headers": ["id", "name", "species", "age"]
+                  "variables": [],
+                  "headers": [
+                    { "name": "id", "type": "Long", "description": "Unique identifier" },
+                    { "name": "name", "type": "String", "description": "Hero name" },
+                    { "name": "species", "type": "String", "description": "Species" },
+                    { "name": "age", "type": "Integer", "description": "Age in years" }
+                  ]
                 }
               ]
             }
@@ -250,10 +271,11 @@ class PlotGlossaryGeneratorTest {
 
     String content = Files.readString(outputDir.resolve("plots/Hero.md"));
     assertTrue(content.contains("### Headers"), "Should have Headers section");
-    assertTrue(content.contains("`id`"), "Should list header id");
-    assertTrue(content.contains("`name`"), "Should list header name");
-    assertTrue(content.contains("`species`"), "Should list header species");
-    assertTrue(content.contains("`age`"), "Should list header age");
+    assertTrue(content.contains("| Header | Type | Description |"), "Should have Type column");
+    assertTrue(content.contains("| `id` | `Long` | Unique identifier |"), "Should list header id");
+    assertTrue(content.contains("| `name` | `String` | Hero name |"), "Should list header name");
+    assertTrue(content.contains("| `species` | `String` | Species |"), "Should list species");
+    assertTrue(content.contains("| `age` | `Integer` | Age in years |"), "Should list header age");
     assertTrue(
         content.contains("| id | name | species | age |"),
         "Usage example should show table with headers");
@@ -269,8 +291,10 @@ class PlotGlossaryGeneratorTest {
             {
               "plotId": "Greeting",
               "steps": [
-                { "plot": "Greeting", "pattern": "Say Hello", "inputType": "SEQUENCE" },
-                { "plot": "Greeting", "pattern": "Batch greet", "inputType": "BATCH" }
+                { "plot": "Greeting", "pattern": "Say Hello", "inputType": "SEQUENCE",
+                  "variables": [], "headers": [] },
+                { "plot": "Greeting", "pattern": "Batch greet", "inputType": "BATCH",
+                  "variables": [], "headers": [] }
               ]
             }
           ]
@@ -285,7 +309,53 @@ class PlotGlossaryGeneratorTest {
   }
 
   @Test
-  void generate_shouldPreferVariablesOverHeaders() throws IOException {
+  void generate_shouldShowBothVariablesAndHeadersSections() throws IOException {
+    Files.writeString(
+        executionDir.resolve("plot-registry.json"),
+        """
+        {
+          "plots": [
+            {
+              "plotId": "Greeting",
+              "steps": [
+                {
+                  "plot": "Greeting",
+                  "pattern": "Greet ${name} ${count} times",
+                  "inputType": "BATCH",
+                  "variables": [
+                    { "name": "name", "type": "String", "description": "Name of the person" },
+                    { "name": "count", "type": "Integer", "description": "How many times" }
+                  ],
+                  "headers": [
+                    { "name": "expected", "type": "String", "description": "Expected output" }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+        """);
+
+    new PlotGlossaryGenerator(executionDir, outputDir).generate();
+
+    String content = Files.readString(outputDir.resolve("plots/Greeting.md"));
+    assertTrue(content.contains("### Variables"), "Should have Variables section");
+    assertTrue(content.contains("### Headers"), "Should have Headers section");
+    assertTrue(
+        content.contains("| `name` | `String` | Name of the person |"),
+        "Should list variable name");
+    assertTrue(
+        content.contains("| `expected` | `String` | Expected output |"),
+        "Should list header expected");
+    // Usage example includes all columns: variables + headers
+    assertTrue(
+        content.contains("| name | count | expected |"),
+        "Usage example should include both variables and headers");
+  }
+
+  @Test
+  void generate_shouldHandleLegacyFlatHeadersFormat() throws IOException {
+    // Backward compatibility: plain string arrays should still work
     Files.writeString(
         executionDir.resolve("plot-registry.json"),
         """
@@ -296,9 +366,9 @@ class PlotGlossaryGeneratorTest {
               "steps": [
                 {
                   "plot": "Hero",
-                  "pattern": "Greet ${name}",
+                  "pattern": "Create hero",
                   "inputType": "SEQUENCE",
-                  "headers": ["name", "extra"]
+                  "headers": ["id", "name"]
                 }
               ]
             }
@@ -309,9 +379,8 @@ class PlotGlossaryGeneratorTest {
     new PlotGlossaryGenerator(executionDir, outputDir).generate();
 
     String content = Files.readString(outputDir.resolve("plots/Hero.md"));
-    assertTrue(content.contains("### Variables"), "Should show Variables not Headers");
-    assertFalse(content.contains("### Headers"), "Should not show Headers when variables exist");
-    assertTrue(content.contains("`name`"), "Should list variable name");
-    assertFalse(content.contains("`extra`"), "Should not show headers when variables present");
+    assertTrue(content.contains("### Headers"), "Should have Headers section");
+    assertTrue(content.contains("`id`"), "Should list header id from flat format");
+    assertTrue(content.contains("`name`"), "Should list header name from flat format");
   }
 }

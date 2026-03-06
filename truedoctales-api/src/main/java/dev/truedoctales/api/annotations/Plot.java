@@ -7,37 +7,40 @@ import java.lang.annotation.Target;
 
 /// ## Plot Annotation
 ///
-/// Marks a class as a plot containing methods that can be bound and reused in story-based testing.
+/// Marks a class as a plot — a reusable collection of {@link Step}-annotated methods that
+/// can be bound to markdown story files.
 ///
-/// This annotation is used to define a set of methods that represent a plot - a reusable collection
-/// of test steps or actions. Plots can be linked to Java test classes to provide method bindings
-/// for test steps, promoting code reuse and modularity in story-based testing.
+/// Plots group related step bindings together and provide them to the story executor
+/// via the {@link dev.truedoctales.api.execute.PlotRegistry PlotRegistry}. The plot's
+/// {@link #value()} is used as its identifier in the generated {@code plot-registry.json}
+/// and in the plot glossary.
 ///
 /// ### Usage
 /// ```java
-/// @Plot("User Authentication")
-/// public class AuthenticationPlot {
-///     @Step("a user with username ${username} and password ${password}")
-///     void createUser(String username, String password) {
+/// @Plot("Hero")
+/// public class HeroPlot {
+///
+///     @Step(value = "Create hero",
+///           description = "Creates a new hero with the given attributes.")
+///     void createHero(
+///         @Variable(value = "id", description = "Unique identifier") Long id,
+///         @Variable(value = "name", description = "Hero name") String name) {
 ///         // setup logic
 ///     }
 ///
-///     @Step("the user attempts to log in")
-///     void userLogsIn() {
-///         // action logic
-///     }
-///
-///     @Step("the user is successfully authenticated")
-///     void verifyAuthentication() {
+///     @Step("Hero exists")
+///     void heroExists(
+///         @Variable(value = "name", description = "Hero name to look up") String name) {
 ///         // validation logic
 ///     }
 /// }
 /// ```
 ///
 /// Apply this annotation to classes that define reusable method bindings for your test stories.
-/// Plots can be imported and used across multiple test classes.
 ///
 /// @see Step
+/// @see Variable
+/// @see Table
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Plot {

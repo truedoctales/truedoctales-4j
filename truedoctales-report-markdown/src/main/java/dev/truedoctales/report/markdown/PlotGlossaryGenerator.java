@@ -133,15 +133,17 @@ public class PlotGlossaryGenerator {
     return md.toString();
   }
 
+  /// A single variable/header entry extracted from JSON.
+  record VarEntry(String name, String type, String description) {}
+
   /// Appends a single step section (H2 + description + variables/headers + usage example) to the
   /// builder.
   private void appendStepSection(StringBuilder md, String plotId, JsonNode step) {
     String pattern = step.path("pattern").asText("");
     String inputType = step.path("inputType").asText("SEQUENCE");
     String description = step.path("description").asText("");
-    List<String> variables = extractVariables(pattern);
-    List<String> headers = extractHeaders(step);
-    List<String> varDescs = extractVariableDescriptions(step);
+    List<VarEntry> variables = extractVariableBindings(step);
+    List<VarEntry> headers = extractHeaderBindings(step);
 
     md.append("\n## ").append(pattern).append("\n\n");
 
@@ -152,21 +154,32 @@ public class PlotGlossaryGenerator {
     md.append("- **Pattern:** `").append(pattern).append("`\n");
     md.append("- **Input type:** ").append(inputType).append("\n");
 
-    // Determine effective columns: prefer variables from the pattern, fall back to headers
-    List<String> columns = !variables.isEmpty() ? variables : headers;
-
-    if (!columns.isEmpty()) {
-      md.append("\n### ").append(!variables.isEmpty() ? "Variables" : "Headers").append("\n\n");
-      md.append("| ")
-          .append(!variables.isEmpty() ? "Variable" : "Header")
-          .append(" | Description |\n");
-      md.append("|----------|-------------|\n");
-      for (int i = 0; i < columns.size(); i++) {
-        String col = columns.get(i);
-        String desc = i < varDescs.size() ? varDescs.get(i) : "–";
-        md.append("| `").append(col).append("` | ").append(desc).append(" |\n");
+    // Variables section
+    if (!variables.isEmpty()) {
+      md.append("\n### Variables\n\n");
+      md.append("| Variable | Type | Description |\n");
+      md.append("|----------|------|-------------|\n");
+      for (VarEntry v : variables) {
+        md.append("| `").append(v.name()).append("` | `").append(v.type()).append("` | ");
+        md.append(v.description().isEmpty() ? "–" : v.description()).append(" |\n");
       }
     }
+
+    // Headers section (table columns for @Table parameters)
+    if (!headers.isEmpty()) {
+      md.append("\n### Headers\n\n");
+      md.append("| Header | Type | Description |\n");
+      md.append("|--------|------|-------------|\n");
+      for (VarEntry h : headers) {
+        md.append("| `").append(h.name()).append("` | `").append(h.type()).append("` | ");
+        md.append(h.description().isEmpty() ? "–" : h.description()).append(" |\n");
+      }
+    }
+
+    // Determine effective columns for usage example
+    List<String> columns = new ArrayList<>();
+    variables.forEach(v -> columns.add(v.name()));
+    headers.forEach(h -> columns.add(h.name()));
 
     md.append("\n### Usage Example\n\n");
     if (columns.isEmpty()) {
@@ -186,24 +199,41 @@ public class PlotGlossaryGenerator {
     md.append("\n---\n");
   }
 
-  /// Extracts header names from the step JSON node's {@code headers} array.
-  static List<String> extractHeaders(JsonNode step) {
-    List<String> headers = new ArrayList<>();
-    JsonNode headersNode = step.get("headers");
-    if (headersNode != null && headersNode.isArray()) {
-      headersNode.forEach(h -> headers.add(h.asText()));
-    }
-    return headers;
+  /// Extracts variable bindings from the step JSON node's {@code variables} array.
+  ///
+  /// Supports both the new object format ({@code {"name", "type", "description"}}) and the
+  /// legacy flat string format for backward compatibility.
+  static List<VarEntry> extractVariableBindings(JsonNode step) {
+    return extractBindingArray(step, "variables");
   }
 
-  /// Extracts variable descriptions from the step JSON node's {@code variableDescriptions} array.
-  static List<String> extractVariableDescriptions(JsonNode step) {
-    List<String> descs = new ArrayList<>();
-    JsonNode descsNode = step.get("variableDescriptions");
-    if (descsNode != null && descsNode.isArray()) {
-      descsNode.forEach(d -> descs.add(d.asText()));
+  /// Extracts header bindings from the step JSON node's {@code headers} array.
+  ///
+  /// Supports both the new object format ({@code {"name", "type", "description"}}) and the
+  /// legacy flat string format for backward compatibility.
+  static List<VarEntry> extractHeaderBindings(JsonNode step) {
+    return extractBindingArray(step, "headers");
+  }
+
+  private static List<VarEntry> extractBindingArray(JsonNode step, String fieldName) {
+    List<VarEntry> entries = new ArrayList<>();
+    JsonNode node = step.get(fieldName);
+    if (node != null && node.isArray()) {
+      node.forEach(
+          item -> {
+            if (item.isObject()) {
+              entries.add(
+                  new VarEntry(
+                      item.path("name").asText(""),
+                      item.path("type").asText("String"),
+                      item.path("description").asText("")));
+            } else {
+              // Legacy flat string format
+              entries.add(new VarEntry(item.asText(), "String", ""));
+            }
+          });
     }
-    return descs;
+    return entries;
   }
 
   /// Extracts variable names from a step pattern, e.g. {@code ${name}} → {@code name}.
