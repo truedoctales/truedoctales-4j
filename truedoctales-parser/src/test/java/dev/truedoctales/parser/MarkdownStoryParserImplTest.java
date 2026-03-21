@@ -24,7 +24,54 @@ class MarkdownStoryParserImplTest {
   }
 
   @Test
-  void parse_shouldParseSimpleStory() throws IOException {
+  void parse_withoutScene() throws IOException {
+    // Arrange
+    String content =
+        """
+            # Simple Story
+
+            Here is some **markdown**
+
+            """;
+    createTempFile(STORY_MD, content);
+
+    // Act
+    StoryModel story = parser.parse(tempDir, Path.of(STORY_MD));
+
+    // Assert
+    assertNotNull(story);
+    assertEquals(Path.of(STORY_MD), story.path());
+    assertEquals("Simple Story", story.title());
+    assertTrue(story.scenes().isEmpty());
+  }
+
+  @Test
+  void parse_withSceneWithoutStep() throws IOException {
+    // Arrange
+    String content =
+        """
+            # Simple Story
+
+            ## First Scene
+
+            Here is some **markdown**
+
+            """;
+    createTempFile(STORY_MD, content);
+
+    // Act
+    StoryModel story = parser.parse(tempDir, Path.of(STORY_MD));
+
+    // Assert
+    assertNotNull(story);
+    assertEquals(Path.of(STORY_MD), story.path());
+    assertEquals("Simple Story", story.title());
+    assertEquals(1, story.scenes().size());
+    assertTrue(story.scenes().getFirst().steps().isEmpty());
+  }
+
+  @Test
+  void parse_withSceneAndWithStep() throws IOException {
     // Arrange
     String content =
         """
