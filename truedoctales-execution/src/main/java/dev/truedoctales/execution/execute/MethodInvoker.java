@@ -29,7 +29,7 @@ public class MethodInvoker {
   ///
   /// @param instance  the object instance
   /// @param method    the method to invoke
-  /// @param inputType
+  /// @param inputType  sequence or batch mode
   /// @param maps      the table data rows
   /// @param variables extracted inplaceVariables from pattern matching
   /// @return the method result
@@ -64,7 +64,7 @@ public class MethodInvoker {
       mergedData.putAll(map);
       results.add(invokeWithDataRow(instance, method, mergedData));
     }
-    // If there are no table rows but we have inplaceVariables, invoke once with just the
+    // If there are no table rows, but we have inplaceVariables, invoke once with just the
     // inplaceVariables
     if (maps.isEmpty() && !variables.isEmpty()) {
       results.add(invokeWithDataRow(instance, method, variables));
@@ -87,7 +87,7 @@ public class MethodInvoker {
   Object invokeWithDataRow(Object instance, Method method, Map<String, String> methodCall)
       throws Exception {
     method.setAccessible(true);
-    Object[] args = prepareArgumentsFromDataRow(method, methodCall);
+    Object[] args = prepareArgumentsFromDataRow(methodCall, method.getParameters());
     return method.invoke(instance, args);
   }
 
@@ -115,8 +115,8 @@ public class MethodInvoker {
     return args;
   }
 
-  private Object[] prepareArgumentsFromDataRow(Method method, Map<String, String> methodCall) {
-    Parameter[] parameters = method.getParameters();
+  private Object[] prepareArgumentsFromDataRow(
+      Map<String, String> methodCall, Parameter[] parameters) {
     Object[] args = new Object[parameters.length];
 
     for (int i = 0; i < parameters.length; i++) {
@@ -294,14 +294,7 @@ public class MethodInvoker {
   private Object createObjectFromMap(Constructor<?> constructor, Map<String, String> dataRow)
       throws Exception {
     Parameter[] parameters = constructor.getParameters();
-    Object[] args = new Object[parameters.length];
-
-    for (int i = 0; i < parameters.length; i++) {
-      Parameter param = parameters[i];
-      String value = findParameterValue(param, dataRow);
-      args[i] = convertValue(value, param.getType(), param.getName());
-    }
-
+    Object[] args = prepareArgumentsFromDataRow(dataRow, parameters);
     constructor.setAccessible(true);
     return constructor.newInstance(args);
   }

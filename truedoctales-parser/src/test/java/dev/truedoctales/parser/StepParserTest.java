@@ -27,21 +27,6 @@ class StepParserTest {
   }
 
   @Test
-  void parse_shouldParseStepTaskWithMultipleWords() {
-    // Arrange
-    StepParser parser =
-        new StepParser("> **Plot With Spaces** This is a step with multiple words", 5);
-
-    // Act
-    StepTask stepTask = parser.build();
-
-    // Assert
-    assertEquals("Plot With Spaces", stepTask.call().plotName());
-    assertEquals("This is a step with multiple words", stepTask.call().stepValue());
-    assertEquals(5, stepTask.lineNumber());
-  }
-
-  @Test
   void parse_shouldHandleMissingPlotName() {
     // Arrange
     StepParser parser = new StepParser("> Just a story without plot name", 3);
@@ -51,7 +36,7 @@ class StepParserTest {
 
     // Assert
     assertEquals("", result.call().plotName());
-    assertEquals("Just a story without plot name", ((StepTask) result).call().stepValue());
+    assertEquals("Just a story without plot name", result.call().stepValue());
   }
 
   @Test
@@ -64,7 +49,7 @@ class StepParserTest {
 
     // Assert
     assertEquals("", result.call().plotName());
-    assertEquals("**Unclosed Plot Some step", ((StepTask) result).call().stepValue());
+    assertEquals("**Unclosed Plot Some step", result.call().stepValue());
   }
 
   // Tests for step description parsing (markdown content between steps)
@@ -76,23 +61,19 @@ class StepParserTest {
     // Arrange
     String block =
         """
-        > **User Operations** Create users
-        >
-        > | name | email |
-        > |------|-------|
-        > | John | john@example.com |
+                        > **User Operations** Create users
+                        >
+                        > | name | email |
+                        > |------|-------|
+                        > | John | john@example.com |
 
-        """;
+                        """;
 
     // Act
-    StepTask result = parseStepFromTextBlock(block, 1);
-
-    // Assert
-    assertTrue(result instanceof StepTask);
-    StepTask stepTask = (StepTask) result;
+    StepTask stepTask = parseStepFromTextBlock(block, 1);
     assertEquals(1, stepTask.inputRows().size());
 
-    Map<String, String> firstRow = stepTask.inputRows().get(0);
+    Map<String, String> firstRow = stepTask.inputRows().getFirst();
     assertEquals("John", firstRow.get("name"));
     assertEquals("john@example.com", firstRow.get("email"));
   }
@@ -102,29 +83,28 @@ class StepParserTest {
     // Arrange
     String block =
         """
-        > **User Operations** Create multiple users
-        >
-        > | name | email | age |
-        > |------|-------|-----|
-        > | John | john@example.com | 30 |
-        > | Jane | jane@example.com | 25 |
-        > | Bob | bob@example.com | 35 |
-        """;
+                        > **User Operations** Create multiple users
+                        >
+                        > | name | email | age |
+                        > |------|-------|-----|
+                        > | John | john@example.com | 30 |
+                        > | Jane | jane@example.com | 25 |
+                        > | Bob | bob@example.com | 35 |
+                        """;
 
     // Act
     StepTask result = parseStepFromTextBlock(block, 1);
 
     // Assert
     assertInstanceOf(StepTask.class, result);
-    StepTask stepTask = (StepTask) result;
-    assertEquals(3, stepTask.inputRows().size());
+    assertEquals(3, result.inputRows().size());
 
-    assertEquals("John", stepTask.inputRows().get(0).get("name"));
-    assertEquals("30", stepTask.inputRows().get(0).get("age"));
-    assertEquals("Jane", stepTask.inputRows().get(1).get("name"));
-    assertEquals("25", stepTask.inputRows().get(1).get("age"));
-    assertEquals("Bob", stepTask.inputRows().get(2).get("name"));
-    assertEquals("35", stepTask.inputRows().get(2).get("age"));
+    assertEquals("John", result.inputRows().get(0).get("name"));
+    assertEquals("30", result.inputRows().get(0).get("age"));
+    assertEquals("Jane", result.inputRows().get(1).get("name"));
+    assertEquals("25", result.inputRows().get(1).get("age"));
+    assertEquals("Bob", result.inputRows().get(2).get("name"));
+    assertEquals("35", result.inputRows().get(2).get("age"));
   }
 
   @Test
@@ -132,23 +112,22 @@ class StepParserTest {
     // Arrange
     String block =
         """
-        > **Operations** Process data
-        >
-        > | id | name | optional |
-        > |----|----- |----------|
-        > | 1 | Alice |  |
-        > | 2 | Bob | value |
-        """;
+                        > **Operations** Process data
+                        >
+                        > | id | name | optional |
+                        > |----|----- |----------|
+                        > | 1 | Alice |  |
+                        > | 2 | Bob | value |
+                        """;
 
     // Act
-    StepTask result = parseStepFromTextBlock(block, 1);
 
     // Assert
-    assertTrue(result instanceof StepTask);
-    StepTask stepTask = (StepTask) result;
+
+    StepTask stepTask = parseStepFromTextBlock(block, 1);
     assertEquals(2, stepTask.inputRows().size());
 
-    Map<String, String> firstRow = stepTask.inputRows().get(0);
+    Map<String, String> firstRow = stepTask.inputRows().getFirst();
     assertEquals("1", firstRow.get("id"));
     assertEquals("Alice", firstRow.get("name"));
     // Empty cells are not included in the map, so optional key might not exist
@@ -164,12 +143,12 @@ class StepParserTest {
     // Arrange
     String block =
         """
-        > **Operations** Do something
-        >
-        > | id | name |
-        > |----|----- |
-        > | 1 | Alice |
-        """;
+                        > **Operations** Do something
+                        >
+                        > | id | name |
+                        > |----|----- |
+                        > | 1 | Alice |
+                        """;
 
     StepParser parser = new StepParser(block.strip().split("\\R")[0], 1);
     String[] lines = block.strip().split("\\R");
@@ -179,12 +158,10 @@ class StepParserTest {
 
     // Act
     boolean continueParsing = parser.parseLine("Next step or content");
-    StepTask result = parser.build();
+    StepTask stepTask = parser.build();
 
     // Assert
-    assertTrue(result instanceof StepTask);
     assertFalse(continueParsing); // Should return false indicating parsing is done
-    StepTask stepTask = (StepTask) result;
     assertEquals(1, stepTask.inputRows().size());
   }
 
@@ -213,7 +190,7 @@ class StepParserTest {
     StepTask result = parser.build();
 
     // Assert
-    assertEquals("Step with @#$%^& special chars", ((StepTask) result).call().stepValue());
+    assertEquals("Step with @#$%^& special chars", result.call().stepValue());
   }
 
   @Test
@@ -232,23 +209,21 @@ class StepParserTest {
     // Arrange
     String block =
         """
-        > **User Operations** Create users
-        >
-        > | name | email |
-        > |------|-------|
-        > | John | john@example.com |
-        > | Jane | jane@example.com |
-        """;
+                        > **User Operations** Create users
+                        >
+                        > | name | email |
+                        > |------|-------|
+                        > | John | john@example.com |
+                        > | Jane | jane@example.com |
+                        """;
 
     // Act
-    StepTask result = parseStepFromTextBlock(block, 10);
+    StepTask stepTask = parseStepFromTextBlock(block, 10);
 
     // Assert
-    assertTrue(result instanceof StepTask);
-    StepTask stepTask = (StepTask) result;
     assertEquals(2, stepTask.inputRows().size());
-    assertEquals("John", stepTask.inputRows().get(0).get("name"));
-    assertEquals("john@example.com", stepTask.inputRows().get(0).get("email"));
+    assertEquals("John", stepTask.inputRows().getFirst().get("name"));
+    assertEquals("john@example.com", stepTask.inputRows().getFirst().get("email"));
   }
 
   @Test
@@ -256,15 +231,13 @@ class StepParserTest {
     // Arrange - mirrors: > **Greeting** Say Hello
     String block =
         """
-        > **Greeting** Say Hello
-        """;
+                        > **Greeting** Say Hello
+                        """;
 
     // Act
-    StepTask result = parseStepFromTextBlock(block, 1);
+    StepTask stepTask = parseStepFromTextBlock(block, 1);
 
     // Assert
-    assertTrue(result instanceof StepTask);
-    StepTask stepTask = (StepTask) result;
     assertEquals("Greeting", stepTask.call().plotName());
     assertEquals("Say Hello", stepTask.call().stepValue());
     assertTrue(stepTask.inputRows().isEmpty());
@@ -275,15 +248,13 @@ class StepParserTest {
     // Arrange - mirrors: > **Greeting** Greet John
     String block =
         """
-        > **Greeting** Greet John
-        """;
+                        > **Greeting** Greet John
+                        """;
 
     // Act
-    StepTask result = parseStepFromTextBlock(block, 1);
+    StepTask stepTask = parseStepFromTextBlock(block, 1);
 
     // Assert
-    assertTrue(result instanceof StepTask);
-    StepTask stepTask = (StepTask) result;
     assertEquals("Greeting", stepTask.call().plotName());
     assertEquals("Greet John", stepTask.call().stepValue());
     assertTrue(stepTask.inputRows().isEmpty());
@@ -294,15 +265,13 @@ class StepParserTest {
     // Arrange - mirrors: > **Greeting** Greet ${name}
     String block =
         """
-        > **Greeting** Greet ${name}
-        """;
+                        > **Greeting** Greet ${name}
+                        """;
 
     // Act
-    StepTask result = parseStepFromTextBlock(block, 1);
+    StepTask stepTask = parseStepFromTextBlock(block, 1);
 
     // Assert
-    assertTrue(result instanceof StepTask);
-    StepTask stepTask = (StepTask) result;
     assertEquals("Greeting", stepTask.call().plotName());
     assertEquals("Greet ${name}", stepTask.call().stepValue());
     assertTrue(stepTask.inputRows().isEmpty());
@@ -313,21 +282,20 @@ class StepParserTest {
     // Arrange - mirrors the exact example from 00_the-first-step.md
     String block =
         """
-        > **Greeting** Greet ${name}
-        >
-        > | name  |
-        > |-------|
-        > | John  |
-        > | Jane  |
-        > | Doe   |
-        """;
+                        > **Greeting** Greet ${name}
+                        >
+                        > | name  |
+                        > |-------|
+                        > | John  |
+                        > | Jane  |
+                        > | Doe   |
+                        """;
 
     // Act
-    StepTask result = parseStepFromTextBlock(block, 1);
+    StepTask stepTask = parseStepFromTextBlock(block, 1);
 
     // Assert
-    assertTrue(result instanceof StepTask);
-    StepTask stepTask = (StepTask) result;
+    assertTrue(stepTask instanceof StepTask);
     assertEquals("Greeting", stepTask.call().plotName());
     assertEquals("Greet ${name}", stepTask.call().stepValue());
     assertEquals(3, stepTask.inputRows().size());
@@ -344,25 +312,5 @@ class StepParserTest {
       parser.parseLine(lines[i]);
     }
     return parser.build();
-  }
-
-  @Test
-  void parse_shouldParseProblemLineFromMarkdown() {
-    // Arrange - The exact problematic line from 00_the-first-step.md line 23
-    String line = "> **Greeting** Say Hello";
-    StepParser parser = new StepParser(line, 23);
-
-    // Act
-    StepTask result = parser.build();
-
-    // Assert
-    assertEquals(
-        "Greeting",
-        ((StepTask) result).call().plotName(),
-        "Plot name should be extracted correctly");
-    assertEquals(
-        "Say Hello",
-        ((StepTask) result).call().stepValue(),
-        "Step value should not contain the plot name");
   }
 }

@@ -44,30 +44,6 @@ public class StoryBookExecutionMapperImpl implements Function<StoryBookModel, St
     return storyBookExecution;
   }
 
-  /// Maps a chapter model to execution model.
-  ///
-  /// @param chapterModel the chapter model
-  /// @return the chapter execution
-  public ChapterExecution mapChapter(ChapterModel chapterModel) {
-    return chapterExecutionMapper.apply(chapterModel);
-  }
-
-  /// Maps a story model to execution model.
-  ///
-  /// @param storyModel the story model
-  /// @return the story execution
-  public StoryExecution mapStory(StoryModel storyModel) {
-    return storyExecutionMapper.apply(storyModel);
-  }
-
-  /// Maps a scene model to execution model.
-  ///
-  /// @param sceneModel the scene model
-  /// @return the scene execution
-  public SceneExecution mapScene(SceneModel sceneModel) {
-    return sceneExecutionMapper.apply(sceneModel);
-  }
-
   /// Maps a binding model to execution model.
   ///
   /// @param stepModel the binding task model
@@ -147,10 +123,6 @@ public class StoryBookExecutionMapperImpl implements Function<StoryBookModel, St
         .flatMap(p -> p.steps().stream())
         .filter(p -> variableExtractor.matches(p.pattern(), stepCall.stepValue()))
         .toList();
-  }
-
-  private void throwMultipleBindingsError(StepCall stepCall) {
-    throw new IllegalStateException("Multiple binding bindings found for binding key: " + stepCall);
   }
 
   private IllegalStateException throwNoBindingFoundError(StepCall stepCall) {

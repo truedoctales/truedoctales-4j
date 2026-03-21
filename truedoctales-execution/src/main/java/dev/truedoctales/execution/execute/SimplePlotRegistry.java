@@ -60,7 +60,7 @@ public class SimplePlotRegistry implements PlotRegistry {
     return Stream.of(method.getParameters())
         .filter(p -> p.isAnnotationPresent(Table.class))
         .findFirst()
-        .map(p -> InputType.BATCH)
+        .map(_ -> InputType.BATCH)
         .orElse(InputType.SEQUENCE);
   }
 
@@ -76,8 +76,6 @@ public class SimplePlotRegistry implements PlotRegistry {
         .map(p -> new VariableBinding(p.value(), String.class.getSimpleName(), p.description()))
         .collect(Collectors.toList());
   }
-
-  private record VarMetadata(List<String> names, List<String> descriptions) {}
 
   private List<VariableBinding> extractVariables(Method method) {
     return Stream.of(method.getParameters())
@@ -161,6 +159,6 @@ public class SimplePlotRegistry implements PlotRegistry {
             + stepValue
             + " mapped to method: "
             + method);
-    stepRegistry.computeIfAbsent(plotName, key -> new HashMap<>()).put(stepValue, call);
+    stepRegistry.computeIfAbsent(plotName, _ -> new HashMap<>()).put(stepValue, call);
   }
 }

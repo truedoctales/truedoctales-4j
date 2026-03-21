@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
 ///     @Variable(value = "count", description = "How many times to greet") Integer count,
 ///     @Table(tableVariables = { @Variable(value = "expected", description = "Expected greeting
 // output")
-// })
+/// })
 ///         List<Map<String, String>> expected) {
 ///     // step logic
 /// }

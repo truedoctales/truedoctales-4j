@@ -12,8 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.extension.ClassTemplateInvocationContext;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.ParameterContext;
 
 /// JUnit Jupiter extension provider for story-based testing.
 ///
@@ -23,13 +25,13 @@ public class StoryTestProvider
     implements org.junit.jupiter.api.extension.ClassTemplateInvocationContextProvider {
 
   @Override
-  public boolean supportsClassTemplate(org.junit.jupiter.api.extension.ExtensionContext context) {
+  public boolean supportsClassTemplate(@NonNull ExtensionContext context) {
     return true;
   }
 
   @Override
   public Stream<ClassTemplateInvocationContext> provideClassTemplateInvocationContexts(
-      org.junit.jupiter.api.extension.ExtensionContext context) {
+      @NonNull ExtensionContext context) {
 
     try {
       List<ClassTemplateInvocationContext> contexts = new ArrayList<>();
@@ -53,26 +55,26 @@ public class StoryTestProvider
       StoryExecutionListener storyExecutionListener, StoryBookModel book, StoryModel story) {
     return new org.junit.jupiter.api.extension.ClassTemplateInvocationContext() {
       @Override
-      public String getDisplayName(int invocationIndex) {
+      public @NonNull String getDisplayName(int invocationIndex) {
         return "Story: " + story.title();
       }
 
       @Override
-      public List<org.junit.jupiter.api.extension.Extension> getAdditionalExtensions() {
+      public @NonNull List<org.junit.jupiter.api.extension.Extension> getAdditionalExtensions() {
         return List.of(
             new org.junit.jupiter.api.extension.ParameterResolver() {
               @Override
               public boolean supportsParameter(
-                  org.junit.jupiter.api.extension.ParameterContext parameterContext,
-                  org.junit.jupiter.api.extension.ExtensionContext extensionContext) {
+                  @NonNull ParameterContext parameterContext,
+                  @NonNull ExtensionContext extensionContext) {
                 return List.of(StoryExecutionListener.class, StoryBookModel.class, Path.class)
                     .contains(parameterContext.getParameter().getType());
               }
 
               @Override
               public Object resolveParameter(
-                  org.junit.jupiter.api.extension.ParameterContext parameterContext,
-                  org.junit.jupiter.api.extension.ExtensionContext extensionContext) {
+                  @NonNull ParameterContext parameterContext,
+                  @NonNull ExtensionContext extensionContext) {
                 if (parameterContext.getParameter().getType().equals(StoryBookModel.class)) {
                   return book;
                 } else if (parameterContext.getParameter().getType().equals(Path.class)) {
