@@ -12,6 +12,31 @@ Mirror Mike calls Pinky Princess. Pinky Princess calls Checklist Charlie. Checkl
 
 ---
 
+## Scene: The four people in this story
+
+These four people work at FinTrack Solutions. This story takes four hours of their working day.
+
+> **Team Member** Create team member
+>
+> | id | name              | role          |
+> |----|-------------------|---------------|
+> | 10 | Pinky Princess    | Product Owner |
+> | 11 | Checklist Charlie | Developer     |
+> | 13 | Mirror Mike       | CFO           |
+> | 14 | Blueprint Ben     | Tech Lead     |
+
+Three business risks are alive in every sprint at FinTrack. They have never been named, assigned, or mitigated. This story will show exactly how two of them combine.
+
+> **Risk** Create risk
+>
+> | id | name                    | severity | mitigation                |
+> |----|-------------------------|----------|---------------------------|
+> | 10 | Documentation Drift     | HIGH     | Executable Specifications |
+> | 11 | Missing Acceptance Test | HIGH     | Automated Verification    |
+> | 12 | Blame Culture           | EXTREME  | Shared Accountability     |
+
+---
+
 ## Scene: Mirror Mike fires off the requirement
 
 It is 8:23 PM on a Thursday. Mirror Mike is in Dubai at a fintech conference, presenting FinTrack's roadmap to potential partners. His phone buzzes — the quarterly compliance report has arrived in his inbox. There is a finding.
@@ -20,7 +45,7 @@ Last quarter, a high-value transfer was processed without any secondary authoris
 
 He opens Slack and types a message to Pinky Princess.
 
-> *"Hey PP — we had an audit finding last quarter. Payments above certain thresholds need manager approval before processing. Can we get this into the next sprint?"*
+*"Hey PP — we had an audit finding last quarter. Payments above certain thresholds need manager approval before processing. Can we get this into the next sprint?"*
 
 He sends it. He puts his phone away. He goes back to his presentation.
 

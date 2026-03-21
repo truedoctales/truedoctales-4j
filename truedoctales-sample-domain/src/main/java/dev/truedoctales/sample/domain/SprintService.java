@@ -129,9 +129,8 @@ public class SprintService {
   public Sprint closeSprint(String sprintName) {
     Sprint sprint = byName.get(sprintName);
     if (sprint == null) return null;
-    SprintStatus status = verifiedTasks.containsAll(doneTasks)
-        ? SprintStatus.COMPLETED
-        : SprintStatus.FAILED;
+    SprintStatus status =
+        verifiedTasks.containsAll(doneTasks) ? SprintStatus.COMPLETED : SprintStatus.FAILED;
     var updated = sprint.withStatus(status);
     byName.put(sprintName, updated);
     sprints.put(updated.id(), updated);
@@ -160,10 +159,11 @@ public class SprintService {
   private void updateSprintReported(String sprintName) {
     Sprint sprint = byName.get(sprintName);
     if (sprint == null) return;
-    int total = doneTasks.stream()
-        .filter(t -> sprintName.equals(taskToSprint.get(t)))
-        .mapToInt(t -> taskPoints.getOrDefault(t, 0))
-        .sum();
+    int total =
+        doneTasks.stream()
+            .filter(t -> sprintName.equals(taskToSprint.get(t)))
+            .mapToInt(t -> taskPoints.getOrDefault(t, 0))
+            .sum();
     var updated = sprint.withReported(total);
     byName.put(sprintName, updated);
     sprints.put(updated.id(), updated);
@@ -172,10 +172,11 @@ public class SprintService {
   private void updateSprintVerified(String sprintName) {
     Sprint sprint = byName.get(sprintName);
     if (sprint == null) return;
-    int total = verifiedTasks.stream()
-        .filter(t -> sprintName.equals(taskToSprint.get(t)))
-        .mapToInt(t -> taskPoints.getOrDefault(t, 0))
-        .sum();
+    int total =
+        verifiedTasks.stream()
+            .filter(t -> sprintName.equals(taskToSprint.get(t)))
+            .mapToInt(t -> taskPoints.getOrDefault(t, 0))
+            .sum();
     var updated = sprint.withVerified(total);
     byName.put(sprintName, updated);
     sprints.put(updated.id(), updated);

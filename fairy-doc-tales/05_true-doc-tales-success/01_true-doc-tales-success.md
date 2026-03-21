@@ -14,6 +14,46 @@ The difference between those two calls is not a different team, a new process, o
 
 ---
 
+## Scene: The same team — six months later
+
+Six months after the InnoConnect penalty. Same six people. Same six risks. One new rule.
+
+> **Team Member** Create team member
+>
+> | id | name              | role             |
+> |----|-------------------|------------------|
+> | 10 | Pinky Princess    | Product Owner    |
+> | 11 | Checklist Charlie | Developer        |
+> | 12 | Bugfinder Betty   | QA Engineer      |
+> | 13 | Mirror Mike       | CFO              |
+> | 14 | Blueprint Ben     | Tech Lead        |
+
+Every risk that caused the three incidents is still active. They were acknowledged in the post-mortem. They were never resolved.
+
+> **Risk** Create risk
+>
+> | id | name                    | severity | mitigation                      |
+> |----|-------------------------|----------|---------------------------------|
+> | 10 | Documentation Drift     | HIGH     | Executable Specifications       |
+> | 11 | Missing Acceptance Test | HIGH     | Automated Verification          |
+> | 12 | Blame Culture           | EXTREME  | Shared Accountability           |
+> | 13 | Unimplemented Feature   | EXTREME  | Living Documentation            |
+> | 14 | Audit Failure           | EXTREME  | Verified Documentation          |
+> | 15 | Partial Implementation  | HIGH     | Complete Specification Coverage |
+
+> **Risk** Risk is active
+>
+> | name                    |
+> |-------------------------|
+> | Documentation Drift     |
+> | Missing Acceptance Test |
+> | Blame Culture           |
+> | Unimplemented Feature   |
+> | Audit Failure           |
+> | Partial Implementation  |
+
+---
+
 ## Scene: The retrospective nobody wanted to have
 
 The retrospective after the InnoConnect penalty was scheduled for a Tuesday afternoon. Attendance was mandatory. The room had six people and the atmosphere of a courtroom.

@@ -14,6 +14,21 @@ She pauses. She nods. She moves on to the next feature.
 
 ---
 
+## Scene: The risks embedded in the FinTrack catalogue
+
+Four business risks have been accumulating at FinTrack Solutions for four years. They are not on any register. They have never been assigned an owner.
+
+> **Risk** Create risk
+>
+> | id | name                  | severity | mitigation                |
+> |----|-----------------------|----------|---------------------------|
+> | 10 | Documentation Drift   | HIGH     | Executable Specifications |
+> | 12 | Blame Culture         | EXTREME  | Shared Accountability     |
+> | 13 | Unimplemented Feature | EXTREME  | Living Documentation      |
+> | 14 | Audit Failure         | EXTREME  | Verified Documentation    |
+
+---
+
 ## Scene: The FinTrack product catalogue — four years in the making
 
 Pinky Princess has been Product Owner at FinTrack Solutions for four years. In those four years, she has written 847 Confluence pages. She has documented every feature request, every stakeholder conversation, every roadmap item, every idea that came up in a sprint retrospective.

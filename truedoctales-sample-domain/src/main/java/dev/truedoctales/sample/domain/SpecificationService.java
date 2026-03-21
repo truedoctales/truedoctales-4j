@@ -5,8 +5,8 @@ import java.util.*;
 /**
  * Service for tracking feature specifications and their concrete examples.
  *
- * <p>A feature without examples cannot be proven to exist. This service makes that
- * gap visible — and executable.
+ * <p>A feature without examples cannot be proven to exist. This service makes that gap visible —
+ * and executable.
  */
 public class SpecificationService {
 
@@ -23,7 +23,8 @@ public class SpecificationService {
    * @param expected the expected outcome
    */
   public void addExample(String feature, String given, String expected) {
-    examples.computeIfAbsent(feature, _ -> new ArrayList<>())
+    examples
+        .computeIfAbsent(feature, _ -> new ArrayList<>())
         .add(new Example(feature, given, expected));
   }
 

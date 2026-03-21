@@ -5,8 +5,8 @@ import java.util.*;
 /**
  * Service for managing software projects at the business level.
  *
- * <p>A project tracks its team and the features it claims to support.
- * Features without verified examples are not live — they are aspirations.
+ * <p>A project tracks its team and the features it claims to support. Features without verified
+ * examples are not live — they are aspirations.
  */
 public class ProjectService {
 

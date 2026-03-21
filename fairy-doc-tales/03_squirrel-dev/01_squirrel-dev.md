@@ -12,6 +12,20 @@ Bugfinder Betty has been sick all week. She comes back on Thursday.
 
 ---
 
+## Scene: The risks hiding in Sprint 14
+
+Before the sprint begins, three business risks are already active at FinTrack. They have no owner, no mitigation, and no place on any risk register.
+
+> **Risk** Create risk
+>
+> | id | name                    | severity | mitigation                      |
+> |----|-------------------------|----------|---------------------------------|
+> | 11 | Missing Acceptance Test | HIGH     | Automated Verification          |
+> | 12 | Blame Culture           | EXTREME  | Shared Accountability           |
+> | 15 | Partial Implementation  | HIGH     | Complete Specification Coverage |
+
+---
+
 ## Scene: Sprint 14 — the most important sprint in FinTrack history
 
 InnoConnect is FinTrack's largest enterprise prospect. After three months of evaluation and two product demos, they have agreed to a pilot. The condition: User Registration must be live and fully working by end of sprint — this Friday.

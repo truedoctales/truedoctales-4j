@@ -28,11 +28,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * Story-based test execution for the True Doc Tales framework.
  *
  * <p>This class demonstrates best practices for: - Shared service management across plots -
- * Constructor dependency injection - Clean plot registration - Story execution with HTML and
- * Markdown reporting
+ * Constructor dependency injection - Clean plot registration - Story execution with JSON reporting
  *
  * <p><strong>Pattern:</strong> Create shared service instances and inject them into plots to ensure
- * state consistency across test scenarios.
+ * state consistency across test scenarios. Each story execution receives a fresh set of services —
+ * stories must be self-contained and set up their own preconditions.
  */
 @ClassTemplate
 @ExtendWith({StoryTestProvider.class})
@@ -52,7 +52,7 @@ public class StoryBookTest {
 
   @TestFactory
   public Stream<DynamicNode> runStory() {
-    // Shared domain services — state is consistent across all plots in a story
+    // Each story gets its own fresh service instances — state does not leak between stories
     var heroService = new HeroService();
     var monsterService = new MonsterService();
     var questService = new QuestService();
@@ -63,7 +63,7 @@ public class StoryBookTest {
 
     SimplePlotRegistry plotRegistry = new SimplePlotRegistry();
 
-    // Business-domain plots (primary — used in all business stories)
+    // Business-domain plots — used in the four FinTrack business chapters
     plotRegistry.register(new TeamMemberPlot(heroService));
     plotRegistry.register(new RiskPlot(monsterService));
     plotRegistry.register(new TicketPlot(questService, heroService));
@@ -71,16 +71,10 @@ public class StoryBookTest {
     plotRegistry.register(new AttemptPlot(fightService));
     plotRegistry.register(new SprintPlot(sprintService));
     plotRegistry.register(new ProjectPlot(projectService, specificationService));
-
-    // Framework-demo plots (used in 01_framework-basics)
-    plotRegistry.register(new GreetingPlot());
-
-    // Legacy plots kept for backward compatibility
-    plotRegistry.register(new HeroPlot(heroService));
-    plotRegistry.register(new MonsterPlot(monsterService));
-    plotRegistry.register(new QuestPlot(questService, heroService));
-    plotRegistry.register(new FightPlot(fightService));
     plotRegistry.register(new AchievementPlot());
+
+    // Framework-demo plot — used in 01_framework-basics
+    plotRegistry.register(new GreetingPlot());
 
     StoryBookExecutionMapperImpl executionMapper =
         new StoryBookExecutionMapperImpl(plotRegistry.getBindings());

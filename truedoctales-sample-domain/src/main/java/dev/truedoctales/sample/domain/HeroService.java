@@ -59,7 +59,8 @@ public class HeroService {
     Objects.requireNonNull(id, "id cannot be null");
     Objects.requireNonNull(name, "name cannot be null");
 
-    var hero = new Hero(id, name, species, age, new HashSet<>(), new HashSet<>(), 1, new HashSet<>());
+    var hero =
+        new Hero(id, name, species, age, new HashSet<>(), new HashSet<>(), 1, new HashSet<>());
     heroes.put(id, hero);
     heroByName.put(name, hero);
     return hero;

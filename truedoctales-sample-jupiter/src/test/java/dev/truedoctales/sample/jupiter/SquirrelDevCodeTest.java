@@ -58,7 +58,8 @@ public class SquirrelDevCodeTest {
 
   @Scene(
       title = "Sprint 14 is planned — five tasks, 43 points, one go-live",
-      description = """
+      description =
+          """
           The sprint plan looks solid on paper.
           Five tasks. 43 story points. InnoConnect's go-live depends on User Registration.
 
@@ -70,8 +71,8 @@ public class SquirrelDevCodeTest {
     heroService.createHero(11L, "Checklist Charlie", "Developer", 0);
     heroService.createHero(12L, "Bugfinder Betty", "QA Engineer", 0);
 
-    sprintService.createSprint(1L, "Sprint 14", 43,
-        "User Registration ready for InnoConnect go-live");
+    sprintService.createSprint(
+        1L, "Sprint 14", 43, "User Registration ready for InnoConnect go-live");
     sprintService.addTask("Sprint 14", "User Registration", 13);
     sprintService.addTask("Sprint 14", "Email Validation", 5);
     sprintService.addTask("Sprint 14", "Confirmation Email", 5);
@@ -80,9 +81,11 @@ public class SquirrelDevCodeTest {
     sprintService.addTask("Sprint 14", "Password Reset Flow", 7);
 
     // No specification examples for any task — the root cause of everything that follows
-    assertFalse(specificationService.hasExamples("User Registration"),
+    assertFalse(
+        specificationService.hasExamples("User Registration"),
         "User Registration has no specification examples");
-    assertFalse(specificationService.hasExamples("GDPR Audit Log"),
+    assertFalse(
+        specificationService.hasExamples("GDPR Audit Log"),
         "GDPR Audit Log has no specification examples — and it is a legal requirement");
 
     Sprint sprint = sprintService.findByName("Sprint 14").orElseThrow();
@@ -92,7 +95,8 @@ public class SquirrelDevCodeTest {
 
   @Scene(
       title = "Checklist Charlie reads the first criterion and marks everything done",
-      description = """
+      description =
+          """
           Monday morning. Checklist Charlie picks up User Registration.
           He reads criterion 1: "A new user can register with email and password."
           He builds it. He marks it done. He picks up the next ticket.
@@ -121,15 +125,18 @@ public class SquirrelDevCodeTest {
     sprintService.markTaskDone("Password Reset Flow");
 
     Sprint sprint = sprintService.findByName("Sprint 14").orElseThrow();
-    assertEquals(43, sprint.reportedPoints(),
+    assertEquals(
+        43,
+        sprint.reportedPoints(),
         "Reported velocity is 43 — exactly as planned. The chart looks great.");
-    assertEquals(0, sprint.verifiedPoints(),
-        "Verified velocity is 0 — nothing has been QA-confirmed yet.");
+    assertEquals(
+        0, sprint.verifiedPoints(), "Verified velocity is 0 — nothing has been QA-confirmed yet.");
   }
 
   @Scene(
       title = "Bugfinder Betty comes back — and cannot verify a single task",
-      description = """
+      description =
+          """
           Thursday. Bugfinder Betty returns from sick leave.
           She opens the sprint board. Six green tickets. 43 points.
           She opens User Registration. She reads all five acceptance criteria.
@@ -175,7 +182,8 @@ public class SquirrelDevCodeTest {
 
   @Scene(
       title = "Sprint 14 closes as FAILED — the burndown chart was fiction",
-      description = """
+      description =
+          """
           Friday sprint review. The burndown chart shows a perfect sprint.
           Thomas has a call with InnoConnect at 4 PM.
 
@@ -219,11 +227,11 @@ public class SquirrelDevCodeTest {
     assertNotNull(closed);
 
     // The verdict
-    assertEquals(SprintService.SprintStatus.FAILED, closed.status(),
+    assertEquals(
+        SprintService.SprintStatus.FAILED,
+        closed.status(),
         "Sprint FAILED: 43 points reported, 0 verified");
-    assertEquals(43, closed.reportedPoints(),
-        "The burndown chart showed 43 delivered points");
-    assertEquals(0, closed.verifiedPoints(),
-        "Zero points were actually verified by QA");
+    assertEquals(43, closed.reportedPoints(), "The burndown chart showed 43 delivered points");
+    assertEquals(0, closed.verifiedPoints(), "Zero points were actually verified by QA");
   }
 }
