@@ -682,7 +682,7 @@ class HtmlBookReportGeneratorTest {
   }
 
   @Test
-  void generate_cssShoulContainStepBlockquoteStyles() throws IOException {
+  void generate_cssShouldContainStepBlockquoteStyles() throws IOException {
     Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
 
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
@@ -731,7 +731,7 @@ class HtmlBookReportGeneratorTest {
   }
 
   @Test
-  void generate_cssShoulContainNavErrorBadgeStyles() throws IOException {
+  void generate_cssShouldContainNavErrorBadgeStyles() throws IOException {
     Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
 
     HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);

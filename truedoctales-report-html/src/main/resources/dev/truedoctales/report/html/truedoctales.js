@@ -27,9 +27,9 @@
         sb += '<div class="nav-group-label">' + escHtml(ch.label) + '</div>\n';
         sb += '<ul>\n';
         stories.forEach(function (s) {
-          var failedClass = s.status === 'FAILURE' || s.status === 'ERROR' ? ' nav-failed' : '';
+          var failedClass = s.status === 'FAILURE' || s.status === 'ERROR' ? 'nav-failed' : '';
           var badge = s.errorCount > 0 ? '<span class="nav-error-badge">' + s.errorCount + '</span>' : '';
-          sb += '<li><a href="#' + escHtml(s.htmlPath) + '" class="' + failedClass.trim() + '">' + escHtml(s.title) + badge + '</a></li>\n';
+          sb += '<li><a href="#' + escHtml(s.htmlPath) + '" class="' + failedClass + '">' + escHtml(s.title) + badge + '</a></li>\n';
         });
         sb += '</ul>\n';
       } else {
@@ -54,9 +54,9 @@
         sb += '  <ul class="chapter-stories">\n';
         stories.forEach(function (s, idx) {
           var storyNum = idx + 1;
-          var failedClass = s.status === 'FAILURE' || s.status === 'ERROR' ? ' nav-failed' : '';
+          var failedClass = s.status === 'FAILURE' || s.status === 'ERROR' ? 'nav-failed' : '';
           var storyBadge = s.errorCount > 0 ? '<span class="nav-error-badge">' + s.errorCount + '</span>' : '';
-          sb += '    <li><a href="#' + escHtml(s.htmlPath) + '" class="' + failedClass.trim() + '">' + numberBadge(storyNum) + escHtml(s.title) + storyBadge + '</a></li>\n';
+          sb += '    <li><a href="#' + escHtml(s.htmlPath) + '" class="' + failedClass + '">' + numberBadge(storyNum) + escHtml(s.title) + storyBadge + '</a></li>\n';
         });
         sb += '  </ul>\n';
         sb += '</div>\n';
