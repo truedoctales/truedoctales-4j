@@ -1,10 +1,12 @@
 package dev.truedoctales.report.json;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import dev.truedoctales.api.execute.PersistStoryListener;
 import dev.truedoctales.api.model.listener.ChapterExecutionResult;
+import dev.truedoctales.api.model.listener.StepExecutionResult;
 import dev.truedoctales.api.model.listener.StoryBookExecutionResult;
 import dev.truedoctales.api.model.listener.StoryExecutionResult;
 import dev.truedoctales.api.model.plot.PlotBinding;
@@ -62,7 +64,16 @@ public class JsonStoryListener extends PersistStoryListener {
             .withGetterVisibility(com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY)
             .withIsGetterVisibility(
                 com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY));
+    // Throwable fields cannot be serialized due to Java module access restrictions.
+    // The errorMessage field already contains the relevant error text.
+    mapper.addMixIn(StepExecutionResult.class, StepExecutionResultMixin.class);
     return mapper;
+  }
+
+  /// Mixin to exclude the {@code throwable} field from JSON serialization.
+  abstract static class StepExecutionResultMixin {
+    @JsonIgnore
+    abstract Throwable throwable();
   }
 
   @Override
