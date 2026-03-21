@@ -174,11 +174,11 @@ class StepParserTest {
     StepParser parser = new StepParser(block.strip().split("\\R")[0], 1);
     String[] lines = block.strip().split("\\R");
     for (int i = 1; i < lines.length; i++) {
-      parser.parseLine(lines[i], 1 + i);
+      parser.parseLine(lines[i]);
     }
 
     // Act
-    boolean continueParsing = parser.parseLine("Next step or content", 10);
+    boolean continueParsing = parser.parseLine("Next step or content");
     StepTask result = parser.build();
 
     // Assert
@@ -222,7 +222,7 @@ class StepParserTest {
     StepParser parser = new StepParser("> **Plot** Step", 1);
 
     // Act & Assert
-    assertFalse(parser.parseLine("Next section begins", 2));
+    assertFalse(parser.parseLine("Next section begins"));
   }
 
   // Tests for table header changes
@@ -341,7 +341,7 @@ class StepParserTest {
     String[] lines = trimmed.split("\\R");
     StepParser parser = new StepParser(lines[0], startLine);
     for (int i = 1; i < lines.length; i++) {
-      parser.parseLine(lines[i], startLine + i);
+      parser.parseLine(lines[i]);
     }
     return parser.build();
   }

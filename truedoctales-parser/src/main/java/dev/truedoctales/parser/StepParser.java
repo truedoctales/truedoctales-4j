@@ -42,10 +42,9 @@ final class StepParser {
    * Parses the next line for this step.
    *
    * @param line the line to parse
-   * @param lineNumber current line number (unused but kept for API compatibility)
    * @return `true` if line consumed, `false` if step parsing complete
    */
-  boolean parseLine(String line, int lineNumber) {
+  boolean parseLine(String line) {
     String trimmed = line.trim();
 
     return switch (state) {
@@ -61,10 +60,7 @@ final class StepParser {
   StepTask build() {
 
     return new StepTask(
-        startLineNumber,
-        new StepCall(state.plot, state.stepValue),
-        List.copyOf(state.rows),
-        List.of());
+        startLineNumber, new StepCall(state.plot, state.stepValue), List.copyOf(state.rows));
   }
 
   private TaskState parseStepTaskFormat(String content) {

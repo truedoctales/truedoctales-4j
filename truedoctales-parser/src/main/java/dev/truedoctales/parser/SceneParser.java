@@ -68,7 +68,7 @@ final class SceneParser {
 
     // Delegate to current step parser if active
     if (context.currentStepParser != null) {
-      if (!context.currentStepParser.parseLine(line, context.lineNumber)) {
+      if (!context.currentStepParser.parseLine(line)) {
         // Step parser finished
         finishCurrentStep();
         // Continue processing this line
