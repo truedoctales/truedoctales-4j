@@ -248,7 +248,7 @@ class BookReportGeneratorTest {
               "stepData" : [ ],
               "status" : "SUCCESS",
               "errorMessage" : null,
-              "throwable" : null
+              "errorType" : null
             } ],
             "status" : "SUCCESS"
           } ]

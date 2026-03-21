@@ -1,6 +1,5 @@
 package dev.truedoctales.execution.extension;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -102,16 +101,7 @@ public class StoryExtension
             .withSetterVisibility(com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE)
             .withCreatorVisibility(
                 com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE));
-    // Throwable fields cannot be serialized due to Java module access restrictions.
-    // The errorMessage field already contains the relevant error text.
-    mapper.addMixIn(StepExecutionResult.class, StepExecutionResultMixin.class);
     return mapper;
-  }
-
-  /// Mixin to exclude the {@code throwable} field from JSON serialization.
-  abstract static class StepExecutionResultMixin {
-    @JsonIgnore
-    abstract Throwable throwable();
   }
 
   @Override

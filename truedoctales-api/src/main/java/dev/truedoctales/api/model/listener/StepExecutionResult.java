@@ -10,7 +10,7 @@ import org.jspecify.annotations.Nullable;
 ///
 /// @param status the execution status (SUCCESS, FAILURE, ERROR)
 /// @param errorMessage optional error message if the binding failed
-/// @param throwable optional exception if the binding encountered an error
+/// @param errorType optional class name of the exception that caused the error
 /// @param description optional markdown description from the {@code @Step} annotation
 /// @param rowStatuses per-row execution statuses for SEQUENCE steps with table data
 public record StepExecutionResult(
@@ -22,7 +22,7 @@ public record StepExecutionResult(
     List<Map<String, String>> stepData,
     ExecutionStatus status,
     @Nullable String errorMessage,
-    @Nullable Throwable throwable,
+    @Nullable String errorType,
     String description,
     List<ExecutionStatus> rowStatuses)
     implements HasExecutionStatus {
@@ -57,7 +57,7 @@ public record StepExecutionResult(
         step.tableData(),
         ExecutionStatus.ERROR,
         throwable.getMessage(),
-        throwable,
+        throwable.getClass().getName(),
         step.binding().description(),
         List.of());
   }
@@ -77,7 +77,7 @@ public record StepExecutionResult(
         step.tableData(),
         overallStatus,
         throwable != null ? throwable.getMessage() : null,
-        throwable,
+        throwable != null ? throwable.getClass().getName() : null,
         step.binding().description(),
         rowStatuses);
   }
@@ -92,7 +92,7 @@ public record StepExecutionResult(
       List<Map<String, String>> stepData,
       ExecutionStatus status,
       @Nullable String errorMessage,
-      @Nullable Throwable throwable) {
+      @Nullable String errorType) {
     this(
         lineNumber,
         plot,
@@ -102,7 +102,7 @@ public record StepExecutionResult(
         stepData,
         status,
         errorMessage,
-        throwable,
+        errorType,
         "",
         List.of());
   }
@@ -117,7 +117,7 @@ public record StepExecutionResult(
       List<Map<String, String>> stepData,
       ExecutionStatus status,
       @Nullable String errorMessage,
-      @Nullable Throwable throwable,
+      @Nullable String errorType,
       String description) {
     this(
         lineNumber,
@@ -128,7 +128,7 @@ public record StepExecutionResult(
         stepData,
         status,
         errorMessage,
-        throwable,
+        errorType,
         description,
         List.of());
   }

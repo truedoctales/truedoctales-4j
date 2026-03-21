@@ -60,7 +60,7 @@ class ScenarioExecutorTest {
     assertTrue(listener.failureRecorded);
     assertTrue(listener.endStepCalled);
     assertEquals(ExecutionStatus.ERROR, result.status());
-    assertNotNull(result.throwable());
+    assertNotNull(result.errorType());
     assertTrue(result.errorMessage().contains("Test failure"));
   }
 
@@ -77,7 +77,7 @@ class ScenarioExecutorTest {
 
     // Assert
     assertEquals(ExecutionStatus.ERROR, result.status());
-    assertNotNull(result.throwable());
+    assertNotNull(result.errorType());
   }
 
   @Test
@@ -93,7 +93,7 @@ class ScenarioExecutorTest {
 
     // Assert - when line number is 0, error result still created but no line info
     assertEquals(ExecutionStatus.ERROR, result.status());
-    assertNotNull(result.throwable());
+    assertNotNull(result.errorType());
   }
 
   static class TestPlotRegistry implements PlotRegistry {
