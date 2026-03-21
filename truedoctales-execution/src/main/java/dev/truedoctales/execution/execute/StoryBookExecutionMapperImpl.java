@@ -132,9 +132,7 @@ public class StoryBookExecutionMapperImpl implements Function<StoryBookModel, St
             .filter(p -> p.plotId().equals(stepCall.plotName()))
             .flatMap(p -> p.steps().stream())
             .anyMatch(
-                p ->
-                    variableExtractor.matchesWithoutItalicMarkers(
-                        p.pattern(), stepCall.stepValue()));
+                p -> variableExtractor.matchesLegacyFormat(p.pattern(), stepCall.stepValue()));
     if (wouldMatchLegacyFormat) {
       return new IllegalStateException(
           "Step '"
@@ -142,7 +140,7 @@ public class StoryBookExecutionMapperImpl implements Function<StoryBookModel, St
               + "' has variable values that are not wrapped in italic markers (*...*). "
               + "Use *{variable}* for table-backed variables or *value* for inline values.");
     }
-    return new IllegalStateException("No binding binding found for binding key: " + stepCall);
+    return new IllegalStateException("No binding found for binding key: " + stepCall);
   }
 
   class StepExecutionMapper implements Function<StepTask, StepExecution> {

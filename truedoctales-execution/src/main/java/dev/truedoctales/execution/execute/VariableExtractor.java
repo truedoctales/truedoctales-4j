@@ -49,14 +49,14 @@ public class VariableExtractor {
     }
   }
 
-  /// Checks if a scenario value would match a pattern if italic markers were not required.
-  ///
-  /// Used to produce clear error messages when variables are not wrapped in {@code *...*}.
+  /// Checks if a scenario value would match a pattern using the legacy format
+  /// (without italic markers). Used to produce clear error messages when variables
+  /// are not wrapped in {@code *...*}.
   ///
   /// @param scenarioPattern the pattern with optional ${variable} placeholders
   /// @param scenarioValue the actual scenario value (without italic markers)
   /// @return true if the pattern would match without requiring italic markers
-  public boolean matchesWithoutItalicMarkers(String scenarioPattern, String scenarioValue) {
+  public boolean matchesLegacyFormat(String scenarioPattern, String scenarioValue) {
     List<String> variableNames = findVariableNames(scenarioPattern);
     if (variableNames.isEmpty()) {
       return false;

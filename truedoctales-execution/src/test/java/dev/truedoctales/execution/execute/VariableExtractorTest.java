@@ -154,21 +154,21 @@ class VariableExtractorTest {
   }
 
   @Test
-  void matchesWithoutItalicMarkers_shouldDetectLegacyFormat() {
+  void matchesLegacyFormat_shouldDetectLegacyFormat() {
     String pattern = "Count is ${count}";
     String scenarioName = "Count is 5";
 
     assertTrue(
-        extractor.matchesWithoutItalicMarkers(pattern, scenarioName),
+        extractor.matchesLegacyFormat(pattern, scenarioName),
         "Legacy format should be detected for error messages");
   }
 
   @Test
-  void matchesWithoutItalicMarkers_shouldReturnFalseForNonVariablePatterns() {
+  void matchesLegacyFormat_shouldReturnFalseForNonVariablePatterns() {
     String pattern = "Simple pattern";
     String scenarioName = "Different text";
 
-    assertFalse(extractor.matchesWithoutItalicMarkers(pattern, scenarioName));
+    assertFalse(extractor.matchesLegacyFormat(pattern, scenarioName));
   }
 
   @Test
