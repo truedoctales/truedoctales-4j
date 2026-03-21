@@ -12,6 +12,7 @@ import org.jspecify.annotations.Nullable;
 /// @param errorMessage optional error message if the binding failed
 /// @param throwable optional exception if the binding encountered an error
 /// @param description optional markdown description from the {@code @Step} annotation
+/// @param rowStatuses per-row execution statuses for SEQUENCE steps with table data
 public record StepExecutionResult(
     int lineNumber,
     String plot,
@@ -22,7 +23,8 @@ public record StepExecutionResult(
     ExecutionStatus status,
     @Nullable String errorMessage,
     @Nullable Throwable throwable,
-    String description)
+    String description,
+    List<ExecutionStatus> rowStatuses)
     implements HasExecutionStatus {
 
   /// Creates a successful binding execution result.
@@ -40,7 +42,8 @@ public record StepExecutionResult(
         ExecutionStatus.SUCCESS,
         null,
         null,
-        step.binding().description());
+        step.binding().description(),
+        buildAllSuccessRowStatuses(step.tableData()));
   }
 
   public StepExecutionResult(StepExecution step, Throwable throwable) {
@@ -55,10 +58,31 @@ public record StepExecutionResult(
         ExecutionStatus.ERROR,
         throwable.getMessage(),
         throwable,
-        step.binding().description());
+        step.binding().description(),
+        List.of());
   }
 
-  /// Backward-compatible constructor without description (description defaults to {@code ""}).
+  /// Constructor with per-row statuses for SEQUENCE steps.
+  public StepExecutionResult(
+      StepExecution step,
+      Throwable throwable,
+      ExecutionStatus overallStatus,
+      List<ExecutionStatus> rowStatuses) {
+    this(
+        step.lineNumber(),
+        step.binding().plot(),
+        step.binding().pattern(),
+        step.binding().inputType(),
+        step.inplaceVariables(),
+        step.tableData(),
+        overallStatus,
+        throwable != null ? throwable.getMessage() : null,
+        throwable,
+        step.binding().description(),
+        rowStatuses);
+  }
+
+  /// Backward-compatible constructor without description and rowStatuses.
   public StepExecutionResult(
       int lineNumber,
       String plot,
@@ -79,6 +103,41 @@ public record StepExecutionResult(
         status,
         errorMessage,
         throwable,
-        "");
+        "",
+        List.of());
+  }
+
+  /// Backward-compatible constructor without rowStatuses.
+  public StepExecutionResult(
+      int lineNumber,
+      String plot,
+      String pattern,
+      InputType inputType,
+      Map<String, String> variables,
+      List<Map<String, String>> stepData,
+      ExecutionStatus status,
+      @Nullable String errorMessage,
+      @Nullable Throwable throwable,
+      String description) {
+    this(
+        lineNumber,
+        plot,
+        pattern,
+        inputType,
+        variables,
+        stepData,
+        status,
+        errorMessage,
+        throwable,
+        description,
+        List.of());
+  }
+
+  private static List<ExecutionStatus> buildAllSuccessRowStatuses(
+      List<Map<String, String>> tableData) {
+    if (tableData == null || tableData.isEmpty()) {
+      return List.of();
+    }
+    return tableData.stream().map(_ -> ExecutionStatus.SUCCESS).toList();
   }
 }

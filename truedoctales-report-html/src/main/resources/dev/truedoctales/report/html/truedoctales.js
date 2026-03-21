@@ -27,25 +27,36 @@
         sb += '<div class="nav-group-label">' + escHtml(ch.label) + '</div>\n';
         sb += '<ul>\n';
         stories.forEach(function (s) {
-          sb += '<li><a href="#' + escHtml(s.htmlPath) + '">' + escHtml(s.title) + '</a></li>\n';
+          var failedClass = s.status === 'FAILURE' || s.status === 'ERROR' ? ' nav-failed' : '';
+          var badge = s.errorCount > 0 ? '<span class="nav-error-badge">' + s.errorCount + '</span>' : '';
+          sb += '<li><a href="#' + escHtml(s.htmlPath) + '" class="' + failedClass.trim() + '">' + escHtml(s.title) + badge + '</a></li>\n';
         });
         sb += '</ul>\n';
       } else {
         var num = ch.dirName ? parseInt(ch.dirName.split('_')[0], 10) : null;
         var badge = isNaN(num) || num === 0 ? '' : numberBadge(num);
+        var chapterErrorCount = 0;
+        stories.forEach(function (s) {
+          if (s.errorCount > 0) chapterErrorCount += s.errorCount;
+        });
+        var chapterFailedClass = chapterErrorCount > 0 ? ' nav-failed' : '';
+        var chapterBadge = chapterErrorCount > 0 ? '<span class="nav-error-badge">' + chapterErrorCount + '</span>' : '';
         sb += '<div class="nav-chapter">\n';
         sb += '  <div class="nav-chapter-row">';
         if (ch.introPage) {
-          sb += '<a href="#' + escHtml(ch.introPage) + '" class="chapter-link">' + badge + escHtml(ch.label) + '</a>';
+          sb += '<a href="#' + escHtml(ch.introPage) + '" class="chapter-link' + chapterFailedClass + '">' + badge + escHtml(ch.label) + '</a>';
         } else {
-          sb += badge + escHtml(ch.label);
+          sb += '<span class="chapter-link' + chapterFailedClass + '">' + badge + escHtml(ch.label) + '</span>';
         }
+        sb += chapterBadge;
         sb += '<span class="flyout-arrow" aria-hidden="true">&#x203A;</span>';
         sb += '</div>\n';
         sb += '  <ul class="chapter-stories">\n';
         stories.forEach(function (s, idx) {
           var storyNum = idx + 1;
-          sb += '    <li><a href="#' + escHtml(s.htmlPath) + '">' + numberBadge(storyNum) + escHtml(s.title) + '</a></li>\n';
+          var failedClass = s.status === 'FAILURE' || s.status === 'ERROR' ? ' nav-failed' : '';
+          var storyBadge = s.errorCount > 0 ? '<span class="nav-error-badge">' + s.errorCount + '</span>' : '';
+          sb += '    <li><a href="#' + escHtml(s.htmlPath) + '" class="' + failedClass.trim() + '">' + numberBadge(storyNum) + escHtml(s.title) + storyBadge + '</a></li>\n';
         });
         sb += '  </ul>\n';
         sb += '</div>\n';
@@ -102,6 +113,19 @@
   }
 
   // ---------------------------------------------------------------
+  // Step status classification — adds CSS classes to step blockquotes
+  // ---------------------------------------------------------------
+  function classifyStepBlocks(container) {
+    container.querySelectorAll('blockquote').forEach(function (bq) {
+      var text = bq.textContent;
+      if (text.indexOf('✅') !== -1) { bq.classList.add('step', 'step-success'); }
+      else if (text.indexOf('❌') !== -1) { bq.classList.add('step', 'step-failure'); }
+      else if (text.indexOf('⚠️') !== -1) { bq.classList.add('step', 'step-error'); }
+      else if (text.indexOf('⏭️') !== -1) { bq.classList.add('step', 'step-skipped'); }
+    });
+  }
+
+  // ---------------------------------------------------------------
   // Content loader
   // ---------------------------------------------------------------
   var defaultPage = fallbackDefaultPage;
@@ -120,6 +144,7 @@
         var container = document.getElementById('page-content');
         container.innerHTML = html;
         saveMermaidSources(container);
+        classifyStepBlocks(container);
         updateActiveNav(currentPath);
         if (typeof mermaid !== 'undefined') {
           mermaid.run({ querySelector: '#page-content .mermaid' });

@@ -680,4 +680,94 @@ class HtmlBookReportGeneratorTest {
     assertTrue(
         ch1Index < prequelIndex, "Regular chapter should appear before prequels in JSON nav");
   }
+
+  @Test
+  void generate_cssShoulContainStepBlockquoteStyles() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String css = Files.readString(htmlOutputDir.resolve("truedoctales.css"));
+    assertTrue(
+        css.contains("article blockquote"),
+        "CSS should include article blockquote styles for step boxes");
+    assertTrue(css.contains(".step-success"), "CSS should include success step styling");
+    assertTrue(css.contains(".step-failure"), "CSS should include failure step styling");
+    assertTrue(css.contains(".step-error"), "CSS should include error step styling");
+    assertTrue(css.contains(".step-skipped"), "CSS should include skipped step styling");
+  }
+
+  @Test
+  void generate_jsShouldClassifyStepBlocks() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String jsContent = Files.readString(htmlOutputDir.resolve("truedoctales.js"));
+    assertTrue(
+        jsContent.contains("classifyStepBlocks"),
+        "JS should contain classifyStepBlocks function for step status classification");
+    assertTrue(
+        jsContent.contains("step-success"), "JS should classify blockquotes with success status");
+    assertTrue(
+        jsContent.contains("step-failure"), "JS should classify blockquotes with failure status");
+  }
+
+  @Test
+  void generate_jsShouldSupportNavErrorBadges() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String jsContent = Files.readString(htmlOutputDir.resolve("truedoctales.js"));
+    assertTrue(
+        jsContent.contains("nav-error-badge"),
+        "JS should support error badge rendering in navigation");
+    assertTrue(
+        jsContent.contains("nav-failed"), "JS should support failed story styling in navigation");
+  }
+
+  @Test
+  void generate_cssShoulContainNavErrorBadgeStyles() throws IOException {
+    Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String css = Files.readString(htmlOutputDir.resolve("truedoctales.css"));
+    assertTrue(
+        css.contains(".nav-error-badge"), "CSS should include navigation error badge styles");
+    assertTrue(css.contains(".nav-failed"), "CSS should include failed story navigation styles");
+  }
+
+  @Test
+  void generate_navJsonShouldIncludeStatusForStories() throws IOException {
+    Path jsonReportDir = Files.createDirectories(tempDir.resolve("json-report"));
+    Files.writeString(
+        jsonReportDir.resolve("meta.json"), "{\"title\": \"Book\", \"hasIntro\": true}");
+
+    Files.writeString(markdownDir.resolve("00_intro.md"), "# Book Intro\n");
+
+    Path ch1JsonDir = Files.createDirectories(jsonReportDir.resolve("01_chapter"));
+    Files.writeString(ch1JsonDir.resolve("meta.json"), "{\"title\": \"Chapter One\"}");
+    Files.writeString(
+        ch1JsonDir.resolve("01_story.json"),
+        "{\"path\": \"01_chapter/01_story.md\", \"title\": \"Story\","
+            + " \"sceneResults\": [{\"stepResults\": [{\"status\": \"FAILURE\"}]}]}");
+    Path ch1MdDir = Files.createDirectories(markdownDir.resolve("01_chapter"));
+    Files.writeString(ch1MdDir.resolve("00_intro.md"), "# Ch1 Intro\n");
+    Files.writeString(ch1MdDir.resolve("01_story.md"), "# Story\n");
+
+    HtmlBookReportGenerator generator =
+        new HtmlBookReportGenerator(markdownDir, jsonReportDir, htmlOutputDir);
+    generator.generate();
+
+    String navJson = Files.readString(htmlOutputDir.resolve("report-nav.json"));
+    assertTrue(navJson.contains("\"status\""), "Nav JSON should contain status field for stories");
+    assertTrue(
+        navJson.contains("\"errorCount\""), "Nav JSON should contain errorCount field for stories");
+  }
 }

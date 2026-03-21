@@ -1,6 +1,7 @@
 package dev.truedoctales.execution.execute;
 
 import dev.truedoctales.api.model.execution.InputType;
+import dev.truedoctales.api.model.listener.ExecutionStatus;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -58,16 +59,29 @@ public class MethodInvoker {
       Object instance, Method method, List<Map<String, String>> maps, Map<String, String> variables)
       throws Exception {
     var results = new ArrayList<>();
+    List<ExecutionStatus> rowStatuses = new ArrayList<>();
+    Throwable firstError = null;
     for (Map<String, String> map : maps) {
       // Merge inplaceVariables with each row
       Map<String, String> mergedData = new HashMap<>(variables);
       mergedData.putAll(map);
-      results.add(invokeWithDataRow(instance, method, mergedData));
+      try {
+        results.add(invokeWithDataRow(instance, method, mergedData));
+        rowStatuses.add(ExecutionStatus.SUCCESS);
+      } catch (Exception e) {
+        rowStatuses.add(ExecutionStatus.FAILURE);
+        if (firstError == null) {
+          firstError = e;
+        }
+      }
     }
     // If there are no table rows, but we have inplaceVariables, invoke once with just the
     // inplaceVariables
     if (maps.isEmpty() && !variables.isEmpty()) {
       results.add(invokeWithDataRow(instance, method, variables));
+    }
+    if (firstError != null) {
+      throw new SequenceRowFailureException(rowStatuses, firstError);
     }
     return results;
   }

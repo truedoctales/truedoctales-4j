@@ -236,7 +236,7 @@ class StoryReportMergerTest {
     StoryExecutionResult result = buildStoryResult(List.of(step));
     String merged = merger.merge(markdown, result);
 
-    assertTrue(merged.contains("> **Greeting** Greet Alice ✅"), "Variable should be expanded");
+    assertTrue(merged.contains("> **Greeting** Greet *Alice* ✅"), "Variable should be expanded");
     assertFalse(merged.contains("${name}"), "Placeholder should be replaced");
   }
 
@@ -261,7 +261,7 @@ class StoryReportMergerTest {
     StoryExecutionResult result = buildStoryResult(List.of(step));
     String merged = merger.merge(markdown, result);
 
-    assertTrue(merged.contains("> **Greeting** Greet John 3 times ✅"));
+    assertTrue(merged.contains("> **Greeting** Greet *John* *3* times ✅"));
   }
 
   @Test
@@ -376,6 +376,126 @@ class StoryReportMergerTest {
 
     assertFalse(
         merged.contains("[id, name]"), "SEQUENCE step should not show column bracket annotation");
+  }
+
+  @Test
+  void merge_shouldItalicizeRemainingPlaceholdersForTableInput() {
+    String markdown =
+        """
+        # My Story
+
+        ## Scene: Test
+
+        > **Greeting** Greet ${name}
+        >
+        > | name  |
+        > |-------|
+        > | Alice |
+
+        """;
+
+    StepExecutionResult step =
+        new StepExecutionResult(
+            1,
+            "Greeting",
+            "Greet ${name}",
+            InputType.SEQUENCE,
+            Map.of(),
+            List.of(Map.of("name", "Alice")),
+            ExecutionStatus.SUCCESS,
+            null,
+            null,
+            "",
+            List.of(ExecutionStatus.SUCCESS));
+    StoryExecutionResult result = buildStoryResult(List.of(step));
+    String merged = merger.merge(markdown, result);
+
+    assertTrue(
+        merged.contains("> **Greeting** Greet *${name}* ✅"),
+        "Table-backed placeholders should be wrapped in italic");
+  }
+
+  @Test
+  void merge_shouldShowPerRowStatusForSequenceTable() {
+    String markdown =
+        """
+        > **Hero** Create hero
+        >
+        > | id | name   |
+        > |----|--------|
+        > | 1  | Tailor |
+        > | 2  | Giant  |
+        """;
+
+    List<Map<String, String>> stepData = new java.util.ArrayList<>();
+    Map<String, String> row1 = new java.util.LinkedHashMap<>();
+    row1.put("id", "1");
+    row1.put("name", "Tailor");
+    Map<String, String> row2 = new java.util.LinkedHashMap<>();
+    row2.put("id", "2");
+    row2.put("name", "Giant");
+    stepData.add(row1);
+    stepData.add(row2);
+
+    StepExecutionResult step =
+        new StepExecutionResult(
+            1,
+            "Hero",
+            "Create hero",
+            InputType.SEQUENCE,
+            Map.of(),
+            stepData,
+            ExecutionStatus.SUCCESS,
+            null,
+            null,
+            "",
+            List.of(ExecutionStatus.SUCCESS, ExecutionStatus.SUCCESS));
+    StoryExecutionResult result = buildStoryResult(List.of(step));
+    String merged = merger.merge(markdown, result);
+
+    assertTrue(merged.contains("✅ |"), "Data rows should include per-row status emoji");
+  }
+
+  @Test
+  void merge_shouldShowMixedPerRowStatusForSequenceTable() {
+    String markdown =
+        """
+        > **Hero** Create hero
+        >
+        > | id | name   |
+        > |----|--------|
+        > | 1  | Tailor |
+        > | 2  | Giant  |
+        """;
+
+    List<Map<String, String>> stepData = new java.util.ArrayList<>();
+    Map<String, String> row1 = new java.util.LinkedHashMap<>();
+    row1.put("id", "1");
+    row1.put("name", "Tailor");
+    Map<String, String> row2 = new java.util.LinkedHashMap<>();
+    row2.put("id", "2");
+    row2.put("name", "Giant");
+    stepData.add(row1);
+    stepData.add(row2);
+
+    StepExecutionResult step =
+        new StepExecutionResult(
+            1,
+            "Hero",
+            "Create hero",
+            InputType.SEQUENCE,
+            Map.of(),
+            stepData,
+            ExecutionStatus.FAILURE,
+            "Giant creation failed",
+            null,
+            "",
+            List.of(ExecutionStatus.SUCCESS, ExecutionStatus.FAILURE));
+    StoryExecutionResult result = buildStoryResult(List.of(step));
+    String merged = merger.merge(markdown, result);
+
+    assertTrue(merged.contains("✅ |"), "First row should be marked SUCCESS");
+    assertTrue(merged.contains("❌ |"), "Second row should be marked FAILURE");
   }
 
   // Helper methods
