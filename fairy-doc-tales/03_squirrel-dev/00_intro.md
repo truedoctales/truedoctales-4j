@@ -1,46 +1,69 @@
 # The Developer Who Was Always Done
 
-## Overview
+## Meet the cast
 
-Alex has the highest velocity on the team. Every sprint, his column fills with green tickets before Wednesday. Stefan calls him a machine. Thomas quotes his throughput in leadership meetings.
+---
 
-There is just one problem. When Maria opens the green tickets, she finds that *done* and *finished* are not the same thing.
+### ✅ Checklist Charlie — Senior Developer
 
-This is the story of a GDPR audit log, a customer registration feature, and a sprint that could not close — because the fastest developer on the team had already moved on to the next ticket before the first one was actually done.
+**His superpower:** Fastest ticket closure rate on the team. Six tickets by Wednesday, every sprint.
+
+**His weakness:** Reads the first acceptance criterion, builds it, marks the ticket DONE. The remaining four criteria — including the ones with legal implications — wait patiently in the ticket description while Charlie picks up the next task.
+
+> *"I built what the ticket said. Criterion one. That's the registration feature."*
+
+---
+
+### 🔍 Bugfinder Betty — QA Engineer
+
+**Her superpower:** Reads every acceptance criterion. Tests every edge case. Finds the gaps every time.
+
+**Her weakness:** She is brought in at the end of the sprint, after the tickets are green and the demo is scheduled. By then, the damage is already done.
+
+> *"Four criteria are missing. One of them is the GDPR audit log. That's not a bug — that's a compliance violation."*
+
+---
+
+### 🏗️ Blueprint Ben — Tech Lead
+
+**His superpower:** Architecture diagrams that could win awards. Code reviews that catch every pattern violation.
+
+**His weakness:** Reviews the implementation against the code quality checklist, not the specification. A partial implementation that compiles cleanly passes Blueprint Ben's review.
+
+> *"The code is clean. The architecture is solid. I didn't check the acceptance criteria."*
+
+---
+
+### 🪞 Mirror Mike — CFO
+
+**His weakness:** Opens the velocity chart on Friday. Sees 43 points. Sends a congratulatory message to the channel. Does not look at the QA report until the InnoConnect call at 4 PM.
+
+> *"The burndown chart shows a perfect sprint. Why is the go-live delayed?"*
+
+---
 
 ## The Problem
 
-A user registration story has five acceptance criteria. Alex reads the first one, implements it in three hours, and marks the ticket done. The other four criteria — including a legally mandatory GDPR audit log — are untouched.
+Sprint 14: 43 story points planned, 43 reported as done — by Wednesday. No specification examples existed for any task. When Bugfinder Betty returned from sick leave on Thursday, she found zero tasks she could verify. The sprint closed as FAILED.
 
-Maria discovers this on the Thursday before sprint review. The sprint cannot close. The feature cannot ship. And because the audit log was a contractual obligation to a new enterprise client, it is now also a legal exposure.
-
-## What Goes Wrong
-
-- ✗ A ticket is marked done after one of five criteria is implemented
-- ✗ The team's velocity report looks excellent — it is fiction
-- ✗ The QA engineer finds the gap 48 hours before the sprint review
-- ✗ A GDPR audit log requirement is missed — a compliance violation, not just a bug
-- ✗ The enterprise client's go-live is delayed by two weeks
-- ✗ Nobody noticed earlier because nobody verified coverage before marking done
+InnoConnect's go-live, scheduled for that Friday, was postponed two weeks.
 
 ## Story Structure
 
 ```mermaid
 graph TD
-    A[Story: 5 acceptance criteria] --> B[Alex reads criterion 1]
-    B --> C[Implements it in 3 hours]
-    C --> D[Marks ticket DONE ✓]
-    D --> E[Picks up next ticket]
-    E --> F[Maria opens ticket on Thursday]
-    F --> G[Criteria 2, 3, 4, 5: not implemented]
-    G --> H[GDPR audit log: missing]
-    H --> I[Sprint cannot close]
-    I --> J[Client go-live delayed 2 weeks]
-    J --> K[Velocity was a lie]
+    A[Sprint 14 — 43 points, 6 tasks] --> B[No specification examples]
+    B --> C[Checklist Charlie marks all done by Wednesday]
+    C --> D[Reported velocity: 43]
+    D --> E[Bugfinder Betty opens tickets on Thursday]
+    E --> F[Zero tasks verifiable]
+    F --> G[Verified velocity: 0]
+    G --> H[Sprint closes as FAILED]
+    H --> I[InnoConnect go-live postponed 2 weeks]
     style D fill:#f66
     style H fill:#f66
-    style K fill:#f66
+    style I fill:#f66
 ```
 
-*"Done!" said Alex, and moved to the next ticket.*
-*Four acceptance criteria watched him leave.*
+*The burndown chart was a work of fiction.*
+*The sprint review was not.*

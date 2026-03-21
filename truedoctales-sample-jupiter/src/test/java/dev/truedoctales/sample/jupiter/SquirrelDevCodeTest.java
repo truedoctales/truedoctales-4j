@@ -7,23 +7,24 @@ import dev.truedoctales.api.annotations.Story;
 import dev.truedoctales.execution.extension.StoryExtension;
 import dev.truedoctales.sample.domain.FightService;
 import dev.truedoctales.sample.domain.HeroService;
-import dev.truedoctales.sample.domain.HeroService.Hero;
 import dev.truedoctales.sample.domain.MonsterService;
-import dev.truedoctales.sample.domain.QuestService;
-import dev.truedoctales.sample.domain.QuestService.Quest;
+import dev.truedoctales.sample.domain.SpecificationService;
+import dev.truedoctales.sample.domain.SprintService;
+import dev.truedoctales.sample.domain.SprintService.Sprint;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-/// Code-based version of "The Developer Who Was Always Done" story.
+/// Code-based story: "The Developer Who Was Always Done"
 ///
 /// This story mirrors the Markdown version in 03_squirrel-dev but is written entirely in Java.
-/// It demonstrates that code-based and markdown-based stories can coexist and
-/// produce the same documentation output.
+/// It demonstrates that code-based and markdown-based stories can coexist.
 ///
-/// Alex — a fast developer who reads the first acceptance criterion and marks tickets done.
-/// Maria — a QA engineer who returns from sick leave to find four missing criteria.
-/// The sprint that could not close because velocity had been mistaken for quality.
+/// The Scrum anti-pattern on display:
+/// - Checklist Charlie marks 6 sprint tasks done (43 reported points) after reading criterion 1
+/// - Bugfinder Betty verifies none of them — they are all incomplete
+/// - Sprint 14 closes as FAILED: reported velocity 43, verified velocity 0
+/// - The GDPR audit log was never built — a compliance violation hiding inside a green ticket
 @Story(
     book = "Book of Stories",
     storyPath = "03_squirrel-dev/01_squirrel-dev.md",
@@ -32,167 +33,197 @@ import org.junit.jupiter.api.extension.ExtendWith;
         """
             # The Developer Who Was Always Done (Code)
 
-            Sprint 14 has the highest velocity in FinTrack history.
-            Alex has closed six tickets. Maria comes back on Thursday.
-            She opens the first ticket. It has five acceptance criteria.
-            One of them is implemented.
+            Sprint 14 at FinTrack Solutions.
+            Reported velocity: 43 points. Verified velocity: 0.
+            The sprint closes as FAILED.
+            Checklist Charlie has moved on to Sprint 15.
             """)
 @ExtendWith(StoryExtension.class)
 public class SquirrelDevCodeTest {
 
   private HeroService heroService;
   private MonsterService monsterService;
-  private QuestService questService;
+  private SprintService sprintService;
+  private SpecificationService specificationService;
   private FightService fightService;
 
   @BeforeEach
   void setUp() {
     heroService = new HeroService();
     monsterService = new MonsterService();
-    questService = new QuestService();
+    sprintService = new SprintService();
+    specificationService = new SpecificationService();
     fightService = new FightService(heroService, monsterService);
   }
 
   @Scene(
-      title = "The user registration story — five criteria, all important",
-      description =
-          """
-          Emma has written the most complete story of her career.
-          Five acceptance criteria. Each one necessary.
-          The enterprise client InnoConnect's go-live depends on it.
+      title = "Sprint 14 is planned — five tasks, 43 points, one go-live",
+      description = """
+          The sprint plan looks solid on paper.
+          Five tasks. 43 story points. InnoConnect's go-live depends on User Registration.
 
-          The story is assigned to Alex on Monday morning.
+          The critical detail: not a single task has a specification example.
+          No concrete examples means no shared understanding of what "done" looks like.
           """)
   @Test
-  void userRegistrationStoryCreatedAndAssigned() {
-    Hero alex = heroService.createHero(11L, "Alex", "Human", 29);
-    assertNotNull(alex);
-    assertTrue(heroService.grantSkill("Alex", "Java"));
-    assertTrue(heroService.grantSkill("Alex", "REST API Design"));
-    assertTrue(heroService.grantSkill("Alex", "Fast Delivery"));
+  void sprintPlannedWithNoExamples() {
+    heroService.createHero(11L, "Checklist Charlie", "Developer", 0);
+    heroService.createHero(12L, "Bugfinder Betty", "QA Engineer", 0);
 
-    Quest quest =
-        questService.createQuest(
-            11L,
-            "Implement User Registration",
-            "Register new users: validation, email confirmation, duplicate check, and GDPR logging",
-            "IN_PROGRESS");
-    assertNotNull(quest);
-    assertEquals("IN_PROGRESS", quest.status());
+    sprintService.createSprint(1L, "Sprint 14", 43,
+        "User Registration ready for InnoConnect go-live");
+    sprintService.addTask("Sprint 14", "User Registration", 13);
+    sprintService.addTask("Sprint 14", "Email Validation", 5);
+    sprintService.addTask("Sprint 14", "Confirmation Email", 5);
+    sprintService.addTask("Sprint 14", "Duplicate Registration Check", 5);
+    sprintService.addTask("Sprint 14", "GDPR Audit Log", 8);
+    sprintService.addTask("Sprint 14", "Password Reset Flow", 7);
 
-    assertTrue(questService.assignToHero("Alex", "Implement User Registration"));
+    // No specification examples for any task — the root cause of everything that follows
+    assertFalse(specificationService.hasExamples("User Registration"),
+        "User Registration has no specification examples");
+    assertFalse(specificationService.hasExamples("GDPR Audit Log"),
+        "GDPR Audit Log has no specification examples — and it is a legal requirement");
 
-    Quest assigned = questService.findByName("Implement User Registration").orElseThrow();
-    assertEquals("IN_PROGRESS", assigned.status());
-    assertEquals("Alex", questService.getHeroQuest("Alex").orElseThrow());
+    Sprint sprint = sprintService.findByName("Sprint 14").orElseThrow();
+    assertEquals("ACTIVE", sprint.status().name());
+    assertEquals(43, sprint.plannedPoints());
   }
 
   @Scene(
-      title = "Alex reads the first line and marks the ticket done",
-      description =
-          """
-          Alex scans the story. His eyes land on criterion 1.
-          He implements it in three hours. He marks the ticket done.
-          He picks up the next ticket.
+      title = "Checklist Charlie reads the first criterion and marks everything done",
+      description = """
+          Monday morning. Checklist Charlie picks up User Registration.
+          He reads criterion 1: "A new user can register with email and password."
+          He builds it. He marks it done. He picks up the next ticket.
 
-          Criteria 2 through 5 — including the GDPR audit log — are untouched.
-          The ticket is green. Four acceptance criteria watch him leave.
+          By Wednesday: six tickets closed, 43 points reported.
+          The burndown chart looks like a masterclass in agile delivery.
           """)
   @Test
-  void alexClosesTicketAfterOneCriterion() {
-    heroService.createHero(11L, "Alex", "Human", 29);
-    questService.createQuest(
-        11L,
-        "Implement User Registration",
-        "Register new users: all 5 criteria",
-        "IN_PROGRESS");
-    questService.assignToHero("Alex", "Implement User Registration");
+  void charlieReportsFullVelocityWithPartialWork() {
+    heroService.createHero(11L, "Checklist Charlie", "Developer", 0);
 
-    // Alex marks done after implementing only criterion 1
-    assertTrue(questService.completeQuest("Implement User Registration"));
+    sprintService.createSprint(1L, "Sprint 14", 43, "User Registration go-live");
+    sprintService.addTask("Sprint 14", "User Registration", 13);
+    sprintService.addTask("Sprint 14", "Email Validation", 5);
+    sprintService.addTask("Sprint 14", "Confirmation Email", 5);
+    sprintService.addTask("Sprint 14", "Duplicate Registration Check", 5);
+    sprintService.addTask("Sprint 14", "GDPR Audit Log", 8);
+    sprintService.addTask("Sprint 14", "Password Reset Flow", 7);
 
-    Quest ticket = questService.findByName("Implement User Registration").orElseThrow();
-    // The ticket says COMPLETED — but only one fifth of it was built
-    assertEquals("COMPLETED", ticket.status());
+    // Charlie marks everything done — criterion 1 per task
+    sprintService.markTaskDone("User Registration");
+    sprintService.markTaskDone("Email Validation");
+    sprintService.markTaskDone("Confirmation Email");
+    sprintService.markTaskDone("Duplicate Registration Check");
+    sprintService.markTaskDone("GDPR Audit Log");
+    sprintService.markTaskDone("Password Reset Flow");
 
-    // The partial implementation and missing tests are now active threats
-    monsterService.createMonster(15L, "Partial Implementation", "HIGH", "Complete Specification Coverage");
-    monsterService.createMonster(11L, "Missing Acceptance Test", "HIGH", "Automated Verification");
-    assertTrue(monsterService.isAlive("Partial Implementation"));
-    assertTrue(monsterService.isAlive("Missing Acceptance Test"));
+    Sprint sprint = sprintService.findByName("Sprint 14").orElseThrow();
+    assertEquals(43, sprint.reportedPoints(),
+        "Reported velocity is 43 — exactly as planned. The chart looks great.");
+    assertEquals(0, sprint.verifiedPoints(),
+        "Verified velocity is 0 — nothing has been QA-confirmed yet.");
   }
 
   @Scene(
-      title = "Maria comes back on Thursday",
-      description =
-          """
-          Maria returns from sick leave. She opens the user registration ticket.
-          She reads all five criteria. She starts checking.
+      title = "Bugfinder Betty comes back — and cannot verify a single task",
+      description = """
+          Thursday. Bugfinder Betty returns from sick leave.
+          She opens the sprint board. Six green tickets. 43 points.
+          She opens User Registration. She reads all five acceptance criteria.
+          She starts checking.
 
-          By 9:30 she has found four gaps.
-          Criterion 5 — the GDPR audit log — is missing.
-          That is not a bug. That is a compliance violation.
+          Email validation: broken. Confirmation email: missing.
+          Duplicate check: not implemented. GDPR audit log: zero entries.
+
+          She cannot verify any task. She reopens all six tickets.
           """)
   @Test
-  void mariaDiscoversTheFourMissingCriteria() {
-    heroService.createHero(11L, "Alex", "Human", 29);
-    heroService.createHero(12L, "Maria", "Human", 33);
-    assertTrue(heroService.grantSkill("Maria", "Test Automation"));
-    assertTrue(heroService.grantSkill("Maria", "Defect Analysis"));
+  void bettyCannotVerifyAnything() {
+    heroService.createHero(11L, "Checklist Charlie", "Developer", 0);
+    heroService.createHero(12L, "Bugfinder Betty", "QA Engineer", 0);
 
-    monsterService.createMonster(15L, "Partial Implementation", "HIGH", "Complete Specification Coverage");
-    monsterService.createMonster(11L, "Missing Acceptance Test", "HIGH", "Automated Verification");
+    sprintService.createSprint(1L, "Sprint 14", 43, "User Registration go-live");
+    sprintService.addTask("Sprint 14", "User Registration", 13);
+    sprintService.addTask("Sprint 14", "Email Validation", 5);
+    sprintService.addTask("Sprint 14", "Confirmation Email", 5);
+    sprintService.addTask("Sprint 14", "Duplicate Registration Check", 5);
+    sprintService.addTask("Sprint 14", "GDPR Audit Log", 8);
+    sprintService.addTask("Sprint 14", "Password Reset Flow", 7);
 
-    // Maria tries to fight the partial implementation with her test report
-    // She cannot defeat it — the gap is already built in
-    var testReport = fightService.attack("Maria", "Partial Implementation", "Test Report");
-    assertFalse(testReport.success(), "A test report cannot fix missing implementation");
+    sprintService.markTaskDone("User Registration");
+    sprintService.markTaskDone("Email Validation");
+    sprintService.markTaskDone("Confirmation Email");
+    sprintService.markTaskDone("Duplicate Registration Check");
+    sprintService.markTaskDone("GDPR Audit Log");
+    sprintService.markTaskDone("Password Reset Flow");
 
-    // Both threats remain alive — Maria has found them, but cannot resolve them alone
-    assertTrue(monsterService.isAlive("Partial Implementation"));
-    assertTrue(monsterService.isAlive("Missing Acceptance Test"));
+    // Betty cannot verify any task — they are all incomplete
+    assertFalse(sprintService.isTaskVerified("User Registration"));
+    assertFalse(sprintService.isTaskVerified("Email Validation"));
+    assertFalse(sprintService.isTaskVerified("Confirmation Email"));
+    assertFalse(sprintService.isTaskVerified("Duplicate Registration Check"));
+    assertFalse(sprintService.isTaskVerified("GDPR Audit Log"));
+    assertFalse(sprintService.isTaskVerified("Password Reset Flow"));
+
+    Sprint sprint = sprintService.findByName("Sprint 14").orElseThrow();
+    assertEquals(43, sprint.reportedPoints(), "Reported: 43");
+    assertEquals(0, sprint.verifiedPoints(), "Verified: 0");
   }
 
   @Scene(
-      title = "The sprint review — forty-three points, nothing to ship",
-      description =
-          """
-          Friday. Sprint review. The burndown chart looks perfect.
+      title = "Sprint 14 closes as FAILED — the burndown chart was fiction",
+      description = """
+          Friday sprint review. The burndown chart shows a perfect sprint.
           Thomas has a call with InnoConnect at 4 PM.
 
-          Maria explains the four missing criteria.
-          She explains the GDPR audit log — a contractual obligation.
+          Bugfinder Betty explains: six tasks marked done. Zero verified.
+          GDPR audit log missing — a contractual and legal requirement.
+          InnoConnect's go-live is postponed two weeks.
 
-          Alex says: "I built the registration. I thought that was the ticket."
-          The sprint cannot close. InnoConnect go-live is postponed two weeks.
-          Thomas cancels the 4 PM call and sends an apology email instead.
+          Thomas cancels the 4 PM call.
+          The sprint closes as FAILED.
+          The velocity was fiction.
           """)
   @Test
-  void sprintReviewCannotClose() {
-    heroService.createHero(11L, "Alex", "Human", 29);
-    heroService.createHero(12L, "Maria", "Human", 33);
-    heroService.createHero(13L, "Thomas", "Human", 52);
-    heroService.createHero(14L, "Stefan", "Human", 41);
+  void sprintClosesAsFailed() {
+    heroService.createHero(11L, "Checklist Charlie", "Developer", 0);
+    heroService.createHero(12L, "Bugfinder Betty", "QA Engineer", 0);
+    heroService.createHero(13L, "Mirror Mike", "CFO", 0);
 
-    monsterService.createMonster(15L, "Partial Implementation", "HIGH", "Complete Specification Coverage");
-    monsterService.createMonster(12L, "Blame Culture", "EXTREME", "Shared Accountability");
+    sprintService.createSprint(1L, "Sprint 14", 43, "User Registration go-live");
+    sprintService.addTask("Sprint 14", "User Registration", 13);
+    sprintService.addTask("Sprint 14", "Email Validation", 5);
+    sprintService.addTask("Sprint 14", "Confirmation Email", 5);
+    sprintService.addTask("Sprint 14", "Duplicate Registration Check", 5);
+    sprintService.addTask("Sprint 14", "GDPR Audit Log", 8);
+    sprintService.addTask("Sprint 14", "Password Reset Flow", 7);
 
-    // Stefan's code review comes too late — the damage is already merged
-    var codeReview = fightService.attack("Stefan", "Partial Implementation", "Code Review");
-    assertFalse(codeReview.success(), "A code review cannot retroactively add missing criteria");
+    // Charlie marks all done
+    sprintService.markTaskDone("User Registration");
+    sprintService.markTaskDone("Email Validation");
+    sprintService.markTaskDone("Confirmation Email");
+    sprintService.markTaskDone("Duplicate Registration Check");
+    sprintService.markTaskDone("GDPR Audit Log");
+    sprintService.markTaskDone("Password Reset Flow");
 
-    // Thomas raises the issue in the sprint review — but feedback alone cannot fix it
-    var sprintFeedback = fightService.attack("Thomas", "Partial Implementation", "Sprint Feedback");
-    assertFalse(sprintFeedback.success(), "Sprint feedback cannot fix missing implementation");
+    // Betty verifies nothing
+    Sprint beforeClose = sprintService.findByName("Sprint 14").orElseThrow();
+    assertEquals(43, beforeClose.reportedPoints());
+    assertEquals(0, beforeClose.verifiedPoints());
 
-    // Blame culture emerges when there is no shared evidence of what was agreed
-    assertTrue(monsterService.isAlive("Blame Culture"));
-    assertTrue(monsterService.isAlive("Partial Implementation"));
+    // Sprint closes
+    Sprint closed = sprintService.closeSprint("Sprint 14");
+    assertNotNull(closed);
 
-    // Both heroes end the sprint at the same level they started — no growth from this failure
-    Hero verifiedAlex = heroService.findByName("Alex").orElseThrow();
-    Hero verifiedStefan = heroService.findByName("Stefan").orElseThrow();
-    assertEquals(1, verifiedAlex.level());
-    assertEquals(1, verifiedStefan.level());
+    // The verdict
+    assertEquals(SprintService.SprintStatus.FAILED, closed.status(),
+        "Sprint FAILED: 43 points reported, 0 verified");
+    assertEquals(43, closed.reportedPoints(),
+        "The burndown chart showed 43 delivered points");
+    assertEquals(0, closed.verifiedPoints(),
+        "Zero points were actually verified by QA");
   }
 }

@@ -1,49 +1,59 @@
 # The Product Owner Who Promised the Stars
 
-## Overview
+## Meet the cast
 
-Emma is exceptional at her job. She has been product owner at FinTrack Solutions for four years. Her Confluence space is the most visited page in the company. New hires are told to read it before their first sprint.
+---
 
-It describes a world-class expense management platform with 1001 documented capabilities.
+### 👑 Pinky Princess — Product Owner
 
-The system has 312 of them.
+**Her superpower:** Can describe a feature so clearly, so completely, and so confidently that you would swear it already exists.
 
-Nobody noticed — until InnoConnect's enterprise IT team arrived for their onboarding.
+**Her weakness:** Documents features as if they are already built. She writes in the present tense. The catalogue says *"the system supports."* The system does not support. The catalogue is beautiful. The system is incomplete.
+
+> *"Of course it's in the documentation. I wrote it myself."*
+
+---
+
+### 🏗️ Blueprint Ben — Tech Lead
+
+**His weakness:** Trusted the product catalogue. Never cross-referenced it against the codebase.
+
+> *"We have a design document from 2022. That's not the same as an implementation."*
+
+---
+
+### 🪞 Mirror Mike — CFO
+
+**His weakness:** Sent the product catalogue to the sales team and called it the feature list.
+
+> *"I need to call InnoConnect. They're going to invoke the penalty clause."*
+
+---
 
 ## The Problem
 
-Emma documents features as she imagines them — clearly, confidently, and ahead of delivery. She intends the development team to build them eventually. She does not mark them as "planned" or "not yet built". She writes them as if they exist, because in her mind they already do.
+Pinky Princess has been product owner for four years. Her Confluence space has 847 pages. New hires are told to read it in their first week.
 
-The sales team uses the documentation to close deals. The customers sign contracts based on it.
+The product catalogue lists 8 features that InnoConnect specifically contracted for.
 
-When InnoConnect arrived with a €200,000 contract and a list of features they had specifically selected, they found that eight of them did not exist.
-
-## What Goes Wrong
-
-- ✗ The product catalogue describes features that were never built
-- ✗ No distinction between "live", "in development", and "planned"  
-- ✗ Sales uses the catalogue as a feature promise — because it reads like one
-- ✗ An enterprise client signs a contract based on described capabilities
-- ✗ Day one of onboarding reveals the gap — publicly, in front of the client's IT team
-- ✗ The penalty clause in the contract applies: €50,000
+None of them were ever built.
 
 ## Story Structure
 
 ```mermaid
 graph TD
-    A[Emma documents 1001 features] --> B[Development builds 312 of them]
-    A --> C[689 features: described but not built]
-    C --> D[Sales uses catalogue to close InnoConnect]
-    D --> E[€200K contract signed]
-    E --> F[InnoConnect onboarding: Day 1]
-    F --> G[8 contracted features not found]
+    A[Pinky Princess documents 8 features] --> B[Written as if already live]
+    B --> C[Mirror Mike gives catalogue to sales]
+    C --> D[InnoConnect signs €200K contract]
+    D --> E[Blueprint Ben checks the codebase]
+    E --> F[8 contracted features not found]
+    F --> G[Project Feature not live — confirmed]
     G --> H[InnoConnect invokes penalty clause]
-    H --> I[€50K penalty]
-    I --> J[Trust destroyed. Contract under review.]
-    style C fill:#f66
+    H --> I[€50K penalty. Trust destroyed.]
+    style F fill:#f66
     style I fill:#f66
-    style J fill:#f66
 ```
 
-*"The catalogue says we have it,"* said Emma.*
-*"The system says we do not,"* said the auditor.
+*"The catalogue says we have it."*
+*"The codebase says we do not."*
+*"The contract says that costs fifty thousand euros."*

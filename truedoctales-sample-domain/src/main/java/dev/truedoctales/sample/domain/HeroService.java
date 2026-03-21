@@ -12,39 +12,46 @@ public class HeroService {
   private final Map<Long, Hero> heroes = new HashMap<>();
   private final Map<String, Hero> heroByName = new HashMap<>();
 
-  /** Hero record representing a mythological hero with skills, level, and trophies. */
+  /** Hero record representing a team member with skills, weaknesses, level, and trophies. */
   public record Hero(
       Long id,
       String name,
       String species,
       int age,
       Set<String> skills,
+      Set<String> weaknesses,
       int level,
       Set<String> trophies) {
 
     public Hero withLevel(int newLevel) {
-      return new Hero(id, name, species, age, skills, newLevel, trophies);
+      return new Hero(id, name, species, age, skills, weaknesses, newLevel, trophies);
     }
 
     public Hero withSkill(String skill) {
       var newSkills = new HashSet<>(skills);
       newSkills.add(skill);
-      return new Hero(id, name, species, age, newSkills, level, trophies);
+      return new Hero(id, name, species, age, newSkills, weaknesses, level, trophies);
+    }
+
+    public Hero withWeakness(String weakness) {
+      var newWeaknesses = new HashSet<>(weaknesses);
+      newWeaknesses.add(weakness);
+      return new Hero(id, name, species, age, skills, newWeaknesses, level, trophies);
     }
 
     public Hero withTrophy(String trophy) {
       var newTrophies = new HashSet<>(trophies);
       newTrophies.add(trophy);
-      return new Hero(id, name, species, age, skills, level, newTrophies);
+      return new Hero(id, name, species, age, skills, weaknesses, level, newTrophies);
     }
   }
 
   /**
-   * Creates a new hero with default level 1 and no skills or trophies.
+   * Creates a new hero with default level 1 and no skills, weaknesses, or trophies.
    *
    * @param id the unique hero identifier
    * @param name the hero's name
-   * @param species the hero's species (e.g., "Demigod", "Human")
+   * @param species the hero's species or role
    * @param age the hero's age
    * @return the created hero
    */
@@ -52,7 +59,7 @@ public class HeroService {
     Objects.requireNonNull(id, "id cannot be null");
     Objects.requireNonNull(name, "name cannot be null");
 
-    var hero = new Hero(id, name, species, age, new HashSet<>(), 1, new HashSet<>());
+    var hero = new Hero(id, name, species, age, new HashSet<>(), new HashSet<>(), 1, new HashSet<>());
     heroes.put(id, hero);
     heroByName.put(name, hero);
     return hero;
@@ -107,6 +114,34 @@ public class HeroService {
   public boolean hasSkill(String heroName, String skill) {
     Hero hero = heroByName.get(heroName);
     return hero != null && hero.skills().contains(skill);
+  }
+
+  /**
+   * Grants a weakness to a team member.
+   *
+   * @param heroName the team member's name
+   * @param weakness the weakness to record
+   * @return true if successful, false if not found
+   */
+  public boolean grantWeakness(String heroName, String weakness) {
+    Hero hero = heroByName.get(heroName);
+    if (hero == null) return false;
+    var updated = hero.withWeakness(weakness);
+    heroes.put(updated.id(), updated);
+    heroByName.put(updated.name(), updated);
+    return true;
+  }
+
+  /**
+   * Checks if a team member has a specific weakness.
+   *
+   * @param heroName the team member's name
+   * @param weakness the weakness to check
+   * @return true if the team member has this weakness
+   */
+  public boolean hasWeakness(String heroName, String weakness) {
+    Hero hero = heroByName.get(heroName);
+    return hero != null && hero.weaknesses().contains(weakness);
   }
 
   /**

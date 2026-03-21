@@ -1,306 +1,389 @@
 # The Day Documentation Became Evidence
 
-Six months ago, Thomas was on a call with InnoConnect's legal team, authorising a €50,000 penalty transfer.
+Six months ago, Mirror Mike was on a call with InnoConnect's legal team authorising a €50,000 penalty.
 
-Today, he is on a call with InnoConnect's CEO. They are discussing expanding the contract.
+Today he is on a call with their CEO. They are discussing expanding the contract.
 
-The difference between those two calls is a single decision the team made five months ago: **every story we write will be a test we can run**.
+The difference between those two calls is a single rule the team adopted five months ago: *every story we write is a test we can run*.
 
 > Prequels
 > - [The Team](../00_prequels/03_create-business-heroes.md)
-> - [The Villains](../00_prequels/04_create-business-villains.md)
+> - [The Risks](../00_prequels/04_create-business-villains.md)
 
-## Scene: The turning point — a retrospective nobody wanted to have
+## Scene: The team adopts True Doc Tales
 
-The meeting after the InnoConnect penalty was the worst in FinTrack history.
+The meeting after the InnoConnect penalty was the hardest in FinTrack history. Three incidents. Three different surface causes. One pattern: every failure happened in the gap between what was written and what was verified.
 
-Thomas had the post-mortem reports printed out. Three incidents. Three different root causes — but one pattern.
+Blueprint Ben proposed True Doc Tales. His argument: *"If the story runs as a test, the gap becomes visible the moment it appears — not six months later at a penalty review."*
 
-*Every failure happened in the gap between what was written and what was verified.*
-
-Emma wrote stories that described features not yet built. Alex marked tickets done before all criteria were implemented. The payment approval story had no concrete example — so it was implemented literally instead of correctly.
-
-Stefan proposed True Doc Tales. His argument was simple: *"If the story runs as a test, we cannot lie to ourselves about whether it is true."*
-
-> **Quest** Create quest
+> **Ticket** Create ticket
 >
-> | id | name                       | description                                                          | status      |
-> |----|----------------------------|----------------------------------------------------------------------|-------------|
-> | 20 | Adopt True Doc Tales       | Integrate executable documentation into the delivery workflow        | IN_PROGRESS |
+> | id | title                  | description                                                   | status      |
+> |----|------------------------|---------------------------------------------------------------|-------------|
+> | 20 | Adopt True Doc Tales   | Integrate executable specifications into the delivery process | IN_PROGRESS |
 
-> **Quest** Assign to hero
+> **Ticket** Assign to developer
 >
-> | hero   | quest                |
-> |--------|----------------------|
-> | Stefan | Adopt True Doc Tales |
+> | developer     | ticket               |
+> |---------------|----------------------|
+> | Blueprint Ben | Adopt True Doc Tales |
 
-The team agreed. Not enthusiastically — change rarely is. But they agreed.
-
-## Scene: Emma learns to write stories that can be proven
-
-The first thing that changed was Emma's writing process.
-
-Before, she wrote stories to communicate intent. Now, she writes stories that can be executed. Every acceptance criterion must have a concrete example. Every claim in the product catalogue must have a passing test behind it.
-
-Her first True Doc Tales story is the multi-currency feature — the one that had been in the documentation for two years and never built.
-
-> **Hero** Grant skill
+> **Sprint** Plan sprint
 >
-> | heroName | skill                        |
-> |----------|------------------------------|
-> | Emma     | Executable Specifications    |
-> | Emma     | Living Documentation         |
+> | id | name      | plannedPoints | goal                         |
+> |----|-----------|---------------|------------------------------|
+> | 5  | Sprint 17 | 34            | True Doc Tales for all stories |
 
-> **Hero** Has skill
+> **Sprint** Add task *Sprint 17*
 >
-> | heroName | skill                     |
-> |----------|---------------------------|
-> | Emma     | Executable Specifications |
+> | task                 | points |
+> |----------------------|--------|
+> | Adopt True Doc Tales | 13     |
+> | Backfill Specs       | 21     |
 
-> **Monster** Monster is dead
+The team agrees. Quietly. Not enthusiastically — change rarely arrives that way. But they agree.
+
+## Scene: Pinky Princess learns to write examples first
+
+The first thing that changed was Pinky Princess's story structure.
+
+Before: *"The system supports multi-currency."* (present tense, no examples, unverifiable)
+After: A concrete example table for every feature claim.
+
+> **Team Member** Grant skill
+>
+> | teamMember     | skill                     |
+> |----------------|---------------------------|
+> | Pinky Princess | Executable Specifications |
+> | Pinky Princess | Living Documentation      |
+
+> **Team Member** Has skill
+>
+> | teamMember     | skill                     |
+> |----------------|---------------------------|
+> | Pinky Princess | Executable Specifications |
+
+She removes every unbuilt feature from the product catalogue. The catalogue shrinks from 1001 entries to 312. It is a painful afternoon. It is the first afternoon in four years where the catalogue is honest.
+
+> **Specification** Add example
+>
+> | feature                         | given               | expected                 |
+> |---------------------------------|---------------------|--------------------------|
+> | Payment Approval Threshold      | payment: €7.50      | approval: not required   |
+> | Payment Approval Threshold      | payment: €500.00    | approval: not required   |
+> | Payment Approval Threshold      | payment: €10,001.00 | approval: required       |
+
+> **Specification** Has examples
+>
+> | feature                    |
+> |----------------------------|
+> | Payment Approval Threshold |
+
+> **Specification** Example count is
+>
+> | feature                    | count |
+> |----------------------------|-------|
+> | Payment Approval Threshold | 3     |
+
+The approval threshold story that caused Tuesday's crisis now has three concrete examples. It is impossible to misinterpret.
+
+> **Attempt** Succeeds with skill
+>
+> | teamMember     | risk                  | skill                 | outcome  |
+> |----------------|-----------------------|-----------------------|----------|
+> | Pinky Princess | Unimplemented Feature | Living Documentation  | RESOLVED |
+
+> **Risk** Risk is mitigated
 >
 > | name                  |
 > |-----------------------|
 > | Unimplemented Feature |
 
-She removes every feature from the catalogue that cannot be backed by a running test. The catalogue shrinks from 1001 entries to 312. It is a painful afternoon. It is also the first afternoon in four years where the catalogue tells the truth.
+> **Achievement** Unlocked
+>
+> | hero           | achievement                     |
+> |----------------|---------------------------------|
+> | Pinky Princess | Curator of Proven Documentation |
 
-*312 features. All of them proven. All of them documented. All of them real.*
+## Scene: Checklist Charlie discovers what done actually means
+
+The second thing that changed was the definition of done.
+
+A story in True Doc Tales is not done when the developer says so. It is done when all the specification examples are green.
+
+> **Team Member** Grant skill
+>
+> | teamMember        | skill                           |
+> |-------------------|---------------------------------|
+> | Checklist Charlie | Complete Specification Coverage |
+
+> **Team Member** Has skill
+>
+> | teamMember        | skill                           |
+> |-------------------|---------------------------------|
+> | Checklist Charlie | Complete Specification Coverage |
+
+The first time Checklist Charlie tries to close a ticket with examples 2 through 5 unimplemented, the story fails at example 2. He sees the failure. He knows exactly what is missing. He implements it. The test passes.
+
+On Wednesday of that sprint, he has fewer green tickets than usual. Every ticket that is green is completely green.
+
+> **Attempt** Succeeds with skill
+>
+> | teamMember        | risk                   | skill                           | outcome  |
+> |-------------------|------------------------|---------------------------------|----------|
+> | Checklist Charlie | Partial Implementation | Complete Specification Coverage | RESOLVED |
+
+> **Risk** Risk is mitigated
+>
+> | name                   |
+> |------------------------|
+> | Partial Implementation |
 
 > **Achievement** Unlocked
 >
-> | hero  | achievement                     |
-> |-------|---------------------------------|
-> | Emma  | Curator of Proven Documentation |
+> | hero              | achievement             |
+> |-------------------|-------------------------|
+> | Checklist Charlie | Complete Implementation |
 
-## Scene: Alex discovers what done actually means
+## Scene: Bugfinder Betty verifies the story, not the debris
 
-The second thing that changed was what it meant to close a ticket.
+The third thing that changed was Bugfinder Betty's role in the sprint.
 
-A story in True Doc Tales is not done when the developer says so. It is done when all the acceptance criteria are green. The test runs on every commit. If criterion 3 is missing, the test fails at criterion 3. Alex cannot move the ticket to done while any criterion is red.
-
-> **Hero** Grant skill
+> **Team Member** Grant skill
 >
-> | heroName | skill                           |
-> |----------|---------------------------------|
-> | Alex     | Complete Specification Coverage |
+> | teamMember      | skill                  |
+> |-----------------|------------------------|
+> | Bugfinder Betty | Automated Verification |
 
-> **Hero** Has skill
+> **Team Member** Has skill
 >
-> | heroName | skill                           |
-> |----------|---------------------------------|
-> | Alex     | Complete Specification Coverage |
+> | teamMember      | skill                  |
+> |-----------------|------------------------|
+> | Bugfinder Betty | Automated Verification |
 
-The first time Alex tries to close a ticket with criteria 2 through 5 unimplemented, the story fails at criterion 2. He sees the failure message. He knows exactly what is missing. He implements it. The test passes. He moves on.
+Before: Betty arrived at the end of the sprint and found what the developers had missed.
+After: The specification examples run on every commit. Betty focuses on the edge cases the stories don't yet cover.
 
-On Wednesday of that sprint, he has fewer green tickets than before. Every ticket that is green is fully green.
+> **Attempt** Succeeds with skill
+>
+> | teamMember      | risk                    | skill                  | outcome  |
+> |-----------------|-------------------------|------------------------|----------|
+> | Bugfinder Betty | Missing Acceptance Test | Automated Verification | RESOLVED |
 
-> **Monster** Monster is dead
+> **Risk** Risk is mitigated
 >
 > | name                    |
 > |-------------------------|
-> | Partial Implementation  |
 > | Missing Acceptance Test |
 
 > **Achievement** Unlocked
 >
-> | hero | achievement             |
-> |------|-------------------------|
-> | Alex | Complete Implementation |
+> | hero            | achievement                |
+> |-----------------|----------------------------|
+> | Bugfinder Betty | Guardian of Verified Quality |
 
-## Scene: Maria verifies the story — not the code
+## Scene: Mirror Mike reads stories instead of slide decks
 
-The third thing that changed was Maria's role.
+The fourth thing that changed was what Mirror Mike looked at on Fridays.
 
-Before, Maria was the last line of defence — the person who found problems after they had already been built and deployed. She was always under pressure, always working with a deadline behind her.
-
-With True Doc Tales, the story is already the verification. When Maria opens a ticket, she does not start from scratch. She reads the story, sees which criteria ran, sees which passed, sees the evidence. She focuses on the edge cases and the business scenarios that the story does not yet cover.
-
-She is no longer cleaning up after the sprint. She is strengthening it.
-
-> **Hero** Grant skill
+> **Team Member** Grant skill
 >
-> | heroName | skill                   |
-> |----------|-------------------------|
-> | Maria    | Automated Verification  |
+> | teamMember  | skill                  |
+> |-------------|------------------------|
+> | Mirror Mike | Verified Documentation |
+> | Mirror Mike | Shared Accountability  |
 
-> **Hero** Has skill
+> **Team Member** Has skill
 >
-> | heroName | skill                   |
-> |----------|-------------------------|
-> | Maria    | Automated Verification  |
+> | teamMember  | skill                  |
+> |-------------|------------------------|
+> | Mirror Mike | Verified Documentation |
 
-> **Monster** Monster is dead
+Before: Mirror Mike read velocity charts.
+After: Mirror Mike runs the stories for the features he cares about. Pass means proven. Fail means honest.
+
+> **Attempt** Succeeds with skill
 >
-> | name                    |
-> |-------------------------|
-> | Documentation Drift     |
-> | Blame Culture           |
+> | teamMember  | risk          | skill                  | outcome  |
+> |-------------|---------------|------------------------|----------|
+> | Mirror Mike | Audit Failure | Verified Documentation | RESOLVED |
+> | Mirror Mike | Blame Culture | Shared Accountability  | RESOLVED |
 
-> **Achievement** Unlocked
->
-> | hero  | achievement                    |
-> |-------|--------------------------------|
-> | Maria | Guardian of Living Proof       |
-
-## Scene: Thomas reads a story — not a slide deck
-
-Thomas used to review sprint results through velocity charts, delivery reports, and executive summaries. He had learned that these numbers meant different things to different people.
-
-Now he reads the stories directly.
-
-A story about the expense approval workflow tells him, in plain language, what the system does — and the test result tells him it is true. He does not have to trust the developer's word or the product owner's summary. He reads the story, sees the green tests, and knows.
-
-> **Hero** Grant skill
->
-> | heroName | skill                   |
-> |----------|-------------------------|
-> | Thomas   | Verified Documentation  |
-
-> **Hero** Has skill
->
-> | heroName | skill                   |
-> |----------|-------------------------|
-> | Thomas   | Verified Documentation  |
-
-> **Achievement** Unlocked
->
-> | hero   | achievement                         |
-> |--------|-------------------------------------|
-> | Thomas | Stakeholder Who Trusts the Evidence |
-
-The team has adopted True Doc Tales. The transformation is complete.
-
-> **Quest** Complete quest
->
-> | hero   | quest                |
-> |--------|----------------------|
-> | Stefan | Adopt True Doc Tales |
-
-> **Quest** Status is
->
-> | quest                | expectedStatus |
-> |----------------------|----------------|
-> | Adopt True Doc Tales | COMPLETED      |
-
-## Scene: InnoConnect's second chance — and the stories that prove it
-
-Three months after adopting True Doc Tales, InnoConnect returns.
-
-They want a new module: multi-currency expense tracking — the exact feature that had been in Emma's documentation for two years without ever being built. This time, they ask for something different before signing.
-
-*"Can you show us the tests that prove the feature works?"*
-
-Emma opens the True Doc Tales story for multi-currency support.
-
-```mermaid
-sequenceDiagram
-    participant IC as InnoConnect IT Team
-    participant E as Emma
-    participant TDT as True Doc Tales
-
-    IC->>E: "Show us the tests that prove multi-currency works"
-    E->>TDT: Runs the multi-currency story
-    TDT->>IC: Story passes ✅ — all 6 currencies validated
-    IC->>E: "What about the audit trail?"
-    E->>TDT: Runs the audit trail story
-    TDT->>IC: Story passes ✅ — all 5 log scenarios verified
-    IC->>IC: Signs contract
-    Note over IC: No penalty clause needed — they saw the proof
-```
-
-> **Quest** Create quest
->
-> | id | name                              | description                                                           | status      |
-> |----|-----------------------------------|-----------------------------------------------------------------------|-------------|
-> | 21 | InnoConnect Multi-Currency Module | Deliver verified multi-currency expense tracking for InnoConnect      | IN_PROGRESS |
-
-> **Quest** Assign to hero
->
-> | hero   | quest                             |
-> |--------|-----------------------------------|
-> | Stefan | InnoConnect Multi-Currency Module |
-
-> **Hero** Grant skill
->
-> | heroName | skill                          |
-> |----------|--------------------------------|
-> | Stefan   | Executable Specifications      |
-
-The stories run. Every scenario passes. InnoConnect's IT team watches the test execution live on screen.
-
-They do not ask for the product catalogue. They do not ask for written guarantees. They run the stories themselves and see that everything claimed is proven.
-
-> **Quest** Complete quest
->
-> | hero   | quest                             |
-> |--------|-----------------------------------|
-> | Stefan | InnoConnect Multi-Currency Module |
-
-> **Quest** Status is
->
-> | quest                             | expectedStatus |
-> |-----------------------------------|----------------|
-> | InnoConnect Multi-Currency Module | COMPLETED      |
-
-> **Monster** Monster is dead
+> **Risk** Risk is mitigated
 >
 > | name          |
 > |---------------|
 > | Audit Failure |
+> | Blame Culture |
 
 > **Achievement** Unlocked
 >
-> | hero   | achievement              |
-> |--------|--------------------------|
-> | Emma   | Trust Rebuilt            |
-> | Alex   | Sprint Integrity Restored |
-> | Maria  | Quality at Every Commit  |
-> | Thomas | Evidence-Based Decisions |
-> | Stefan | Architecture of Truth    |
+> | hero        | achievement                      |
+> |-------------|----------------------------------|
+> | Mirror Mike | Evidence-Based Decision Maker    |
 
-## The Outcome
+## Scene: Blueprint Ben reviews specifications alongside code
 
-The InnoConnect contract is signed. No penalty clause. No remediation plan. No ambiguity about what is included.
+> **Team Member** Grant skill
+>
+> | teamMember    | skill                     |
+> |---------------|---------------------------|
+> | Blueprint Ben | Executable Specifications |
 
-FinTrack's product catalogue now has 312 entries. Every one of them is backed by a running story. When Emma adds a new feature to the catalogue, she writes the story first — and the story must pass before the feature is published.
+> **Team Member** Has skill
+>
+> | teamMember    | skill                     |
+> |---------------|---------------------------|
+> | Blueprint Ben | Executable Specifications |
 
-When Alex marks a ticket done, all criteria are green. When Lucas picks up a ticket, he cannot skip to criterion 5 before criteria 1 through 4 are verified.
+> **Attempt** Succeeds with skill
+>
+> | teamMember    | risk                | skill                     | outcome  |
+> |---------------|---------------------|---------------------------|----------|
+> | Blueprint Ben | Documentation Drift | Executable Specifications | RESOLVED |
 
-When Thomas asks *"can the system do this?"*, the answer is not a product manager's assessment or a developer's estimate. The answer is a test result.
+> **Risk** Risk is mitigated
+>
+> | name                |
+> |---------------------|
+> | Documentation Drift |
 
-| Before | After |
-|--------|-------|
-| 1001 documented features | 312 verified features |
-| "Yes, it's in the documentation" | "Yes, the story passes" |
-| Gaps discovered at customer onboarding | Gaps discovered at commit |
-| Penalty clauses invoked | Contracts fulfilled |
-| Blame in retrospectives | Evidence in reviews |
+> **Achievement** Unlocked
+>
+> | hero          | achievement               |
+> |---------------|---------------------------|
+> | Blueprint Ben | Architect of Trusted Delivery |
+
+## Scene: The adoption sprint closes
+
+> **Sprint** Mark task done
+>
+> | task                 |
+> |----------------------|
+> | Adopt True Doc Tales |
+> | Backfill Specs       |
+
+> **Sprint** Verify task
+>
+> | task                 |
+> |----------------------|
+> | Adopt True Doc Tales |
+> | Backfill Specs       |
+
+> **Ticket** Close ticket
+>
+> | developer     | ticket               |
+> |---------------|----------------------|
+> | Blueprint Ben | Adopt True Doc Tales |
+
+> **Ticket** Ticket status is
+>
+> | ticket               | expectedStatus |
+> |----------------------|----------------|
+> | Adopt True Doc Tales | COMPLETED      |
+
+> **Sprint** Close sprint
+>
+> | sprint    |
+> |-----------|
+> | Sprint 17 |
+
+> **Sprint** Sprint status is
+>
+> | sprint    | expected  |
+> |-----------|-----------|
+> | Sprint 17 | COMPLETED |
+
+> **Sprint** Reported velocity is
+>
+> | sprint    | expected |
+> |-----------|----------|
+> | Sprint 17 | 34       |
+
+> **Sprint** Verified velocity is
+>
+> | sprint    | expected |
+> |-----------|----------|
+> | Sprint 17 | 34       |
+
+Reported velocity: 34. Verified velocity: 34. Sprint: COMPLETED. For the first time in FinTrack history, those three numbers match.
+
+## Scene: InnoConnect returns — and asks to run the stories themselves
+
+Three months later, InnoConnect's IT team is back. They want the multi-currency module — the exact feature that had been in the catalogue for two years without ever being built.
+
+This time they ask: *"Can you show us the tests that prove it works?"*
+
+```mermaid
+sequenceDiagram
+    participant IC as InnoConnect IT Team
+    participant PP as Pinky Princess
+    participant TDT as True Doc Tales
+
+    IC->>PP: "Show us the tests that prove multi-currency works"
+    PP->>TDT: Runs the multi-currency specification
+    TDT->>IC: All 6 currency examples pass ✅
+    IC->>PP: "What about the audit trail?"
+    PP->>TDT: Runs the audit trail specification
+    TDT->>IC: All 5 scenarios pass ✅
+    Note over IC: No penalty clause needed. They saw the proof.
+```
+
+> **Specification** Add example
+>
+> | feature              | given                           | expected                         |
+> |----------------------|---------------------------------|----------------------------------|
+> | Multi-Currency       | GBP account, EUR payment        | converted at current rate        |
+> | Multi-Currency       | USD account, JPY payment        | converted at current rate        |
+> | Multi-Currency       | EUR account, GBP payment        | converted at current rate        |
+
+> **Specification** Has examples
+>
+> | feature        |
+> |----------------|
+> | Multi-Currency |
+
+> **Project** Create project
+>
+> | id | name    | goal                                    |
+> |----|---------|-----------------------------------------|
+> | 1  | FinTrack| Enterprise expense management platform  |
+
+> **Project** Feature is live
+>
+> | project | feature        |
+> |---------|----------------|
+> | FinTrack| Multi-Currency |
+
+InnoConnect signs the renewal contract. No penalty clause. No remediation plan. They ran the stories themselves and saw every example pass.
+
+## Outcome
+
+| Before True Doc Tales                    | After True Doc Tales                           |
+|------------------------------------------|------------------------------------------------|
+| Sprint 14: 43 reported, 0 verified, FAIL | Sprint 17: 34 reported, 34 verified, COMPLETED |
+| 8 unbuilt features, €50K penalty         | Every feature backed by passing examples       |
+| Mirror Mike reads velocity charts        | Mirror Mike runs specification stories         |
+| Blame in post-mortems                    | Evidence in sprint reviews                     |
+
+> **Team Member** Trophy earned
+>
+> | teamMember        | trophy                              |
+> |-------------------|-------------------------------------|
+> | Pinky Princess    | Product Catalogue of Truth          |
+> | Checklist Charlie | Sprint with Zero False Positives    |
+> | Bugfinder Betty   | First-Time Quality Champion         |
+> | Mirror Mike       | Evidence-Based Stakeholder          |
+> | Blueprint Ben     | Architect of Trusted Delivery       |
 
 ## Moral of the Story
 
 **Trust is not built by writing more documentation. It is built by proving what the documentation claims.**
 
-The FinTrack team did not change their process dramatically. They did not hire more people. They did not buy a new tool for the sake of it. They changed one rule:
+The team did not change dramatically. They changed one rule: *a story is not true until it has been run and it has passed.*
 
-*A story is not true until it has been executed and it has passed.*
-
-That single rule changed what it meant to say "done". It changed what it meant to say "this feature exists". It changed what Thomas could confidently tell InnoConnect, what Emma could confidently publish, and what Alex could confidently close.
+That rule changed what "done" meant. It changed what "this feature exists" meant. It changed what Mirror Mike could confidently tell InnoConnect — not because he trusted the team more, but because the team had given him something he could verify himself.
 
 The documentation stopped being a mirror that showed everyone what they wanted to see.
 
-It became evidence.
-
-> **Hero** Trophy earned
->
-> | hero   | trophy                           |
-> |--------|----------------------------------|
-> | Emma   | Product Catalogue of Truth       |
-> | Alex   | Sprint with Zero False Positives |
-> | Maria  | First-Time Quality Champion      |
-> | Thomas | Evidence-Based Stakeholder       |
-> | Stefan | Architect of Trusted Delivery    |
-
-*The team opens the next sprint planning.*
-*Emma starts writing a story.*
-*She writes the example table first.*
+*It became evidence.*

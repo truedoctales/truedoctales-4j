@@ -12,7 +12,10 @@ import dev.truedoctales.report.json.JsonStoryListener;
 import dev.truedoctales.sample.domain.FightService;
 import dev.truedoctales.sample.domain.HeroService;
 import dev.truedoctales.sample.domain.MonsterService;
+import dev.truedoctales.sample.domain.ProjectService;
 import dev.truedoctales.sample.domain.QuestService;
+import dev.truedoctales.sample.domain.SpecificationService;
+import dev.truedoctales.sample.domain.SprintService;
 import dev.truedoctales.sample.jupiter.plots.*;
 import java.nio.file.Path;
 import java.util.stream.Stream;
@@ -49,16 +52,30 @@ public class StoryBookTest {
 
   @TestFactory
   public Stream<DynamicNode> runStory() {
-    // Create shared services for state consistency
+    // Shared domain services — state is consistent across all plots in a story
     var heroService = new HeroService();
     var monsterService = new MonsterService();
     var questService = new QuestService();
     var fightService = new FightService(heroService, monsterService);
+    var specificationService = new SpecificationService();
+    var sprintService = new SprintService();
+    var projectService = new ProjectService();
 
-    // Register plots with injected services
     SimplePlotRegistry plotRegistry = new SimplePlotRegistry();
 
+    // Business-domain plots (primary — used in all business stories)
+    plotRegistry.register(new TeamMemberPlot(heroService));
+    plotRegistry.register(new RiskPlot(monsterService));
+    plotRegistry.register(new TicketPlot(questService, heroService));
+    plotRegistry.register(new SpecificationPlot(specificationService));
+    plotRegistry.register(new AttemptPlot(fightService));
+    plotRegistry.register(new SprintPlot(sprintService));
+    plotRegistry.register(new ProjectPlot(projectService, specificationService));
+
+    // Framework-demo plots (used in 01_framework-basics)
     plotRegistry.register(new GreetingPlot());
+
+    // Legacy plots kept for backward compatibility
     plotRegistry.register(new HeroPlot(heroService));
     plotRegistry.register(new MonsterPlot(monsterService));
     plotRegistry.register(new QuestPlot(questService, heroService));

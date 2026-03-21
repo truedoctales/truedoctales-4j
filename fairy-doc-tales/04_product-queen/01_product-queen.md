@@ -1,184 +1,141 @@
 # The Product Owner Who Promised the Stars
 
-Emma opens Confluence on Monday morning and starts writing. This is her favourite part of the week.
+Pinky Princess opens Confluence on Monday morning. This is her favourite part of the week.
 
-She has a clear vision for the FinTrack platform. In her head, she can see exactly what it will be in two years — the multi-currency support, the advanced permission system, the partner integration API, the configurable audit trail. She writes them down. In detail. With user stories, business rules, and edge cases.
-
-It feels like building the product. In a way, she believes it is.
+In her head, she can see the complete FinTrack platform — the multi-currency module, the advanced permissions system, the partner API. She writes them down. In detail. In the present tense. *"The system supports."*
 
 > Prequels
 > - [The Team](../00_prequels/03_create-business-heroes.md)
-> - [The Villains](../00_prequels/04_create-business-villains.md)
+> - [The Risks](../00_prequels/04_create-business-villains.md)
 
-## Scene: The catalogue grows faster than the codebase
+## Scene: The FinTrack project and its product catalogue
 
-Over four years, Emma has documented everything she has ever envisioned for FinTrack. Her Confluence space has 847 pages. New hires spend their first week reading it.
-
-The sales team calls it *the bible*.
-
-> **Quest** Create quest
+> **Project** Create project
 >
-> | id | name                         | description                                             | status      |
-> |----|------------------------------|---------------------------------------------------------|-------------|
-> | 12 | Publish Feature Catalogue    | Document all product capabilities for sales and clients | IN_PROGRESS |
+> | id | name    | goal                                    |
+> |----|---------|-----------------------------------------|
+> | 1  | FinTrack| Enterprise expense management platform  |
 
-> **Quest** Assign to hero
+> **Project** Project exists
 >
-> | hero  | quest                     |
-> |-------|---------------------------|
-> | Emma  | Publish Feature Catalogue |
+> | name    |
+> |---------|
+> | FinTrack|
 
-Emma documents:
+Pinky Princess has been writing for four years. The catalogue is comprehensive, detailed, and written entirely in the present tense.
 
-| Feature                          | Status in Documentation | Status in System        |
-|----------------------------------|-------------------------|-------------------------|
-| Payment processing               | ✅ Described             | ✅ Built and live        |
-| Expense categorisation           | ✅ Described             | ✅ Built and live        |
-| Basic reporting dashboard        | ✅ Described             | ⚠️ Built — partially    |
-| Multi-currency support           | ✅ Described as live     | ❌ Never started         |
-| Advanced user permission system  | ✅ Described as live     | ❌ Design doc from 2022  |
-| Configurable audit trail export  | ✅ Described as live     | ❌ Ticket never pulled   |
-| Partner integration API          | ✅ Described as live     | ❌ No ticket exists      |
-| Bulk payment import              | ✅ Described as live     | ❌ Prototype abandoned   |
+## Scene: Two features that actually exist
 
-The documentation does not say "planned". It does not say "coming soon". It uses the present tense throughout.
+These two features were built. They have been tested. They have specification examples.
 
-*The FinTrack platform supports multi-currency transactions across 40 countries.*
-
-> **Quest** Complete quest
+> **Specification** Add example
 >
-> | hero  | quest                     |
-> |-------|---------------------------|
-> | Emma  | Publish Feature Catalogue |
+> | feature             | given                       | expected                       |
+> |---------------------|-----------------------------|--------------------------------|
+> | Payment Processing  | payment request submitted   | transaction processed in 2s    |
+> | Expense Categories  | expense item created        | auto-categorised by merchant   |
 
-> **Quest** Status is
+> **Project** Feature is live
 >
-> | quest                     | expectedStatus |
-> |---------------------------|----------------|
-> | Publish Feature Catalogue | COMPLETED      |
+> | project | feature             |
+> |---------|---------------------|
+> | FinTrack| Payment Processing  |
+> | FinTrack| Expense Categories  |
 
-The documentation is excellent. It is also, in large parts, fiction.
+## Scene: Eight features that exist only in the catalogue
 
-> **Monster** Monster is alive
+These features appear in the product documentation. They do not appear in the codebase. They have no specification examples, because they were never built.
+
+> **Project** Feature not live
+>
+> | project | feature                          |
+> |---------|----------------------------------|
+> | FinTrack| Multi-Currency Support           |
+> | FinTrack| Advanced Permission System       |
+> | FinTrack| Partner Integration API          |
+> | FinTrack| Configurable Audit Trail Export  |
+> | FinTrack| Bulk Payment Import              |
+> | FinTrack| Multi-Entity Consolidation       |
+> | FinTrack| SSO Integration                  |
+> | FinTrack| Custom Approval Workflows        |
+
+> **Risk** Risk is active
 >
 > | name                  |
 > |-----------------------|
 > | Unimplemented Feature |
 > | Documentation Drift   |
 
-## Scene: The sales call that sealed the deal
+Eight features. Zero verified examples. All of them in the catalogue. None of them in the system.
 
-Sven, the enterprise sales director, has been working InnoConnect for eight months. They are a logistics company with 12,000 employees across 14 countries. They process expenses in six currencies.
+## Scene: Sales closes the InnoConnect deal
 
-Sven opens Emma's documentation during the final demo. He finds exactly what InnoConnect needs.
-
-*Multi-currency support — yes. Partner integration API — yes. Advanced permissions for regional managers — yes.*
-
-He quotes the documentation directly in the proposal.
+Mirror Mike shares the catalogue with the sales team. Sales uses it in every enterprise pitch.
 
 ```mermaid
 sequenceDiagram
-    participant S as Sven (Sales)
-    participant E as Emma (Product Owner)
-    participant D as Dev Team
+    participant MM as Mirror Mike (CFO)
+    participant PP as Pinky Princess
+    participant BB as Blueprint Ben
     participant IC as InnoConnect
 
-    S->>E: "Does the system support multi-currency?"
-    E->>S: "Yes — it's documented in Section 3.4"
-    S->>IC: "Full multi-currency support — see the product catalogue"
-    IC->>S: Signs €200K annual contract
-    Note over D: Multi-currency was never started
-    IC->>D: "We need to activate multi-currency"
-    D->>IC: "That feature does not exist in the system"
+    MM->>IC: Shares product catalogue
+    IC->>MM: "Does the system support multi-currency?"
+    MM->>PP: "It's in the catalogue, right?"
+    PP->>MM: "Yes — Section 3.4"
+    MM->>IC: "Full multi-currency support — confirmed"
+    IC->>IC: Signs €200K annual contract
+    Note over BB: Multi-currency was never built
 ```
 
-InnoConnect signs a €200,000 annual contract. Thomas celebrates in the all-hands meeting. It is the largest enterprise deal in FinTrack history.
+InnoConnect signs a €200,000 annual contract. Mirror Mike announces it in the all-hands.
 
-> **Quest** Create quest
+## Scene: Blueprint Ben opens the codebase
+
+On day one of InnoConnect onboarding, Blueprint Ben is asked to activate the contracted features.
+
+> **Attempt** Fails
 >
-> | id | name                         | description                                                         | status      |
-> |----|------------------------------|---------------------------------------------------------------------|-------------|
-> | 13 | InnoConnect Onboarding       | Activate all contracted features for InnoConnect enterprise account | IN_PROGRESS |
+> | teamMember    | risk                  | approach    | result |
+> |---------------|-----------------------|-------------|--------|
+> | Blueprint Ben | Unimplemented Feature | Code Search | FAILED |
+> | Blueprint Ben | Documentation Drift   | Code Review | FAILED |
 
-> **Quest** Assign to hero
->
-> | hero   | quest                   |
-> |--------|-------------------------|
-> | Stefan | InnoConnect Onboarding  |
+Blueprint Ben searches the codebase for multi-currency. He finds a branch from 18 months ago with a partial prototype for two currencies. InnoConnect needs six.
 
-## Scene: Day one of onboarding
-
-InnoConnect's IT team arrives for the onboarding call. They have a list. They worked from Emma's documentation to prepare it.
-
-Stefan opens the codebase.
-
-The first feature on InnoConnect's list is multi-currency support.
-
-Stefan searches the codebase. He finds a branch from 18 months ago, never merged, with a partial currency conversion prototype. It covers two currencies. InnoConnect needs six.
-
-> **Fight** Attack fails
->
-> | attacker | defender              | weapon      | result |
-> |----------|-----------------------|-------------|--------|
-> | Stefan   | Unimplemented Feature | Code Search | FAILED |
-> | Stefan   | Documentation Drift   | Code Review | FAILED |
-
-He moves to the next feature: the advanced user permission system. He finds a design document from 2022. No implementation.
-
-Partner integration API. No ticket. No code. No plan.
-
-Configurable audit trail export. One ticket, created fourteen months ago, never assigned to a sprint, never pulled.
-
-> **Quest** Status is
->
-> | quest                   | expectedStatus |
-> |-------------------------|----------------|
-> | InnoConnect Onboarding  | IN_PROGRESS    |
-
-By noon, Stefan has confirmed: eight of the features InnoConnect specifically contracted are not in the system.
+He checks each feature. No implementation for any of them. The design documents exist. The code does not.
 
 ## Scene: The penalty clause
 
-InnoConnect's legal team is not surprised. They had included a delivery clause in the contract.
-
-> **Monster** Monster is alive
+> **Risk** Risk is active
 >
 > | name          |
 > |---------------|
 > | Audit Failure |
 > | Blame Culture |
 
-> **Fight** Attack fails
+> **Attempt** Fails
 >
-> | attacker | defender      | weapon                   | result |
-> |----------|---------------|--------------------------|--------|
-> | Emma     | Audit Failure | Feature Roadmap Promises | FAILED |
-> | Thomas   | Audit Failure | Executive Explanation    | FAILED |
-> | Thomas   | Audit Failure | Sales Proposal Revision  | FAILED |
+> | teamMember     | risk          | approach                 | result |
+> |----------------|---------------|--------------------------|--------|
+> | Pinky Princess | Audit Failure | Feature Roadmap Promises | FAILED |
+> | Mirror Mike    | Audit Failure | Executive Explanation    | FAILED |
 
-InnoConnect invokes the penalty clause. Section 7.3 of the Master Services Agreement: *"Failure to deliver contracted features within 60 days of contract commencement — €50,000 penalty per tier."*
+InnoConnect invokes Section 7.3 of the contract: *€50,000 penalty for failure to deliver contracted features.* FinTrack pays. Mirror Mike cancels two team lunches.
 
-FinTrack pays €50,000. The InnoConnect relationship is placed under a formal remediation plan. Sven's commission is clawed back. Thomas calls an emergency leadership meeting.
+Pinky Princess explains: *"I documented what I planned for the product. I expected the team to build it."*
 
-Emma sits in that meeting and explains that she documented what she *planned* for the product. She genuinely believed the development team would build it.
-
-Nobody told her that the documentation had become a sales instrument. Nobody told the sales team that it described ambitions, not deliverables. Nobody ever verified that the catalogue reflected reality.
+Nobody told her the documentation had become a sales instrument. Nobody connected the catalogue to the codebase. Nobody verified whether what was written matched what was running.
 
 ## Moral of the Story
 
-**Documentation that describes a planned future as a present fact is not product vision. It is an unverified promise — and unverified promises have contract clauses.**
+**A feature without a verified specification example is not a feature. It is a plan that never happened.**
 
-Emma did not deceive anyone deliberately. She was doing what product owners do: thinking ahead, writing it down, sharing the vision. But without a process that links documentation to verified delivery, the catalogue became a liability the moment it was handed to a sales team.
+The product catalogue was not a lie. It was a vision document treated as evidence. The moment it was handed to a sales team and used in a contract, every unbuilt feature became a broken promise.
 
-The sales team did not lie. They quoted the documentation. The documentation looked authoritative — because it was written by the product owner, in the product wiki, with diagrams and business rules and everything that makes a page look true.
+- ✗ Eight features documented as live → zero verified examples → all eight unbuilt
+- ✗ `Feature not live` is not a nice assertion — it is a contract risk
+- ✗ €200K revenue became €50K penalty because nobody ran `Feature is live` before the pitch
 
-Nobody checked whether it was.
-
-- ✗ Present-tense documentation of unbuilt features creates false confidence
-- ✗ A feature catalogue used in sales is a contract — whether it says so or not
-- ✗ €200K of revenue became a €50K penalty because no one verified delivery
-- ✗ Eight missing features cost more than any sprint could recover
-
-*Emma opens Confluence on the following Monday.*
-*She starts writing.*
-*The next feature already exists — on the page.*
+*Pinky Princess opens Confluence the following Monday.*
+*She starts a new page. She writes in the present tense.*

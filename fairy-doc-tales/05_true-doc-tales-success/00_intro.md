@@ -1,46 +1,77 @@
 # The Day Documentation Became Evidence
 
-## Overview
+## The same team. Six months later. Different rules.
 
-Six months after the InnoConnect penalty. Six months after the Tuesday morning payment crisis. Six months after Sprint 14's fictional velocity.
+After the InnoConnect penalty, after Sprint 14's fictional velocity, after the Tuesday morning payment crisis — the team made one decision:
 
-The same team. The same company. Different rules.
+**Every story we write will be a test we can run.**
 
-FinTrack has adopted True Doc Tales. Stories are no longer written and forgotten — they are written and *run*. Every acceptance criterion is a test. Every product claim is verified before it is published. Every ticket can only be closed when the story passes.
+---
 
-InnoConnect has offered FinTrack a second chance: a new module, a new contract, a new start. This time, they want proof — not documentation.
+### 👑 Pinky Princess — now writes examples first
 
-This is the story of how a team that broke trust in three different ways learned to rebuild it in one: by making every story they wrote tell the truth.
+Before True Doc Tales: *"The system supports multi-currency."*
+After True Doc Tales: *"Given a GBP account, when a EUR payment is made, then the amount is converted at the current rate."*
 
-## The Transformation
+She no longer writes features as if they exist. She writes specifications that prove they do.
 
-| Before True Doc Tales              | After True Doc Tales                            |
-|------------------------------------|-------------------------------------------------|
-| Stories describe what might exist  | Stories describe what is verified to exist      |
-| Done means the developer said so   | Done means all criteria are green               |
-| The catalogue is a vision document | The catalogue is a record of proven behaviour   |
-| Stakeholders read documentation    | Stakeholders run documentation                  |
-| Gaps discovered at audit           | Gaps discovered at commit                       |
+---
+
+### ✅ Checklist Charlie — now closes tickets differently
+
+Before True Doc Tales: Criterion 1 done → ticket green.
+After True Doc Tales: All criteria green → ticket green. He cannot close a ticket with failing specification examples. The framework enforces it.
+
+---
+
+### 🔍 Bugfinder Betty — now verifies sprints, not post-mortems
+
+Before True Doc Tales: Found defects after the sprint review.
+After True Doc Tales: The specification examples are verified on every commit. She focuses on edge cases the stories don't yet cover.
+
+---
+
+### 🪞 Mirror Mike — now asks for evidence, not summaries
+
+Before True Doc Tales: Looked at the velocity chart.
+After True Doc Tales: Runs the stories for the features he cares about. Pass means proven.
+
+---
+
+### 🏗️ Blueprint Ben — now reviews specs alongside code
+
+Before True Doc Tales: Reviewed code quality.
+After True Doc Tales: Reviews code AND specification coverage. A clean implementation of the wrong behaviour does not pass his review.
+
+---
+
+## The transformation
+
+| Before                                      | After                                          |
+|---------------------------------------------|------------------------------------------------|
+| Features documented as if they exist        | Features proven by passing specification examples |
+| Done = developer said so                    | Done = all specification examples are green    |
+| Product catalogue is a vision document      | Product catalogue is a verified evidence record |
+| Velocity = story points reported            | Velocity = story points verified               |
+| Gaps discovered at audit or customer call   | Gaps discovered at the next commit             |
 
 ## Story Structure
 
 ```mermaid
 graph TD
-    A[Same team. New approach.] --> B[Emma writes a story]
-    B --> C[Story becomes an executable specification]
-    C --> D[Alex implements the feature]
-    D --> E[Story runs as a test]
-    E --> F{Does it pass?}
-    F -->|No| G[Alex sees exactly which criterion failed]
-    G --> D
-    F -->|Yes| H[Maria verifies — story is the evidence]
-    H --> I[Thomas reads the story — not the code]
-    I --> J[InnoConnect runs the stories before go-live]
-    J --> K[All stories pass]
-    K --> L[Contract fulfilled. Trust restored.]
+    A[Team adopts True Doc Tales] --> B[Pinky Princess writes examples first]
+    B --> C[Checklist Charlie earns Complete Specification Coverage]
+    C --> D[Bugfinder Betty earns Automated Verification]
+    D --> E[Mirror Mike earns Verified Documentation]
+    E --> F[Blueprint Ben earns Executable Specifications]
+    F --> G[All six risks are mitigated]
+    G --> H[InnoConnect returns for a second chance]
+    H --> I[Team runs the stories live in the demo]
+    I --> J[All stories pass]
+    J --> K[Contract renewed. Trust restored.]
+    style G fill:#6f6
     style K fill:#6f6
-    style L fill:#6f6
 ```
 
-*The documentation does not just describe what the system does.*
-*It proves it.*
+*InnoConnect asked: "Can you show us the tests that prove it works?"*
+*This time, the answer was yes.*
