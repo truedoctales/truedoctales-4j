@@ -9,23 +9,22 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 /// Merges story execution results into the original markdown content.
 ///
 /// For each step declaration line in the markdown, this merger:
 /// <ul>
-///   <li>Expands {@code ${variable}} placeholders with the extracted variable values,
-///       wrapping them in italic markers ({@code *value*})</li>
-///   <li>Wraps remaining {@code ${placeholder}} references in italic markers for table-backed
-///       steps</li>
 ///   <li>Appends a status badge (✅ / ❌ / ⚠️ / ⏭️)</li>
 ///   <li>For BATCH steps, appends the table column names as a compact annotation</li>
 ///   <li>Inserts the {@code @Step} description (if any) as a blockquote italic line</li>
 ///   <li>For failures and errors, inserts an additional detail line with the error message</li>
 ///   <li>For SEQUENCE steps with table data, adds per-row status indicators to table rows</li>
 /// </ul>
+///
+/// <p>Variable values are expected to already be in italic format ({@code *value*} or
+/// {@code *{name}*}) in the source markdown, so no variable expansion is performed by the
+/// merger.
 public class StoryReportMerger {
 
   private static final Pattern STEP_DECLARATION =
@@ -34,8 +33,6 @@ public class StoryReportMerger {
   private static final Pattern TABLE_ROW = Pattern.compile("^>\\s*\\|.*\\|\\s*$");
 
   private static final Pattern TABLE_SEPARATOR = Pattern.compile("^>\\s*\\|[\\s:|-]+\\|\\s*$");
-
-  private static final Pattern REMAINING_PLACEHOLDER = Pattern.compile("\\$\\{([^}]+)\\}");
 
   /// Merges execution results into the original markdown content.
   ///
@@ -65,11 +62,9 @@ public class StoryReportMerger {
       if (!stepQueue.isEmpty() && STEP_DECLARATION.matcher(line.trim()).matches()) {
         StepExecutionResult stepResult = stepQueue.poll();
 
-        // Expand ${varName} placeholders with actual values (italic)
-        String annotatedLine = expandVariables(line, stepResult.variables());
-
-        // Wrap remaining ${...} placeholders in italic (for table-backed steps)
-        annotatedLine = italicizePlaceholders(annotatedLine);
+        // The step line already has variable values in italic (*value* or *{name}*),
+        // so no variable expansion is needed.
+        String annotatedLine = line;
 
         // For BATCH steps with data, append the column names before the status emoji
         if (stepResult.inputType() == InputType.BATCH
@@ -156,25 +151,6 @@ public class StoryReportMerger {
     }
 
     return merged.toString();
-  }
-
-  /// Replaces {@code ${varName}} placeholders in the step line with the extracted variable values,
-  /// wrapping each value in italic markers.
-  private String expandVariables(String line, Map<String, String> variables) {
-    if (variables == null || variables.isEmpty()) {
-      return line;
-    }
-    String result = line;
-    for (Map.Entry<String, String> entry : variables.entrySet()) {
-      result = result.replace("${" + entry.getKey() + "}", "*" + entry.getValue() + "*");
-    }
-    return result;
-  }
-
-  /// Wraps any remaining {@code ${placeholder}} references in italic markers.
-  /// This handles variables that come from table data rather than inline extraction.
-  private String italicizePlaceholders(String line) {
-    return REMAINING_PLACEHOLDER.matcher(line).replaceAll("*\\${$1}*");
   }
 
   private Deque<StepExecutionResult> buildStepQueue(StoryExecutionResult result) {

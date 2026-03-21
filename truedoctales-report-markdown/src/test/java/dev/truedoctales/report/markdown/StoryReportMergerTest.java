@@ -218,7 +218,7 @@ class StoryReportMergerTest {
 
         ## Scene: Test
 
-        > **Greeting** Greet ${name}
+        > **Greeting** Greet *Alice*
 
         """;
 
@@ -236,15 +236,16 @@ class StoryReportMergerTest {
     StoryExecutionResult result = buildStoryResult(List.of(step));
     String merged = merger.merge(markdown, result);
 
-    assertTrue(merged.contains("> **Greeting** Greet *Alice* ✅"), "Variable should be expanded");
-    assertFalse(merged.contains("${name}"), "Placeholder should be replaced");
+    assertTrue(
+        merged.contains("> **Greeting** Greet *Alice* ✅"),
+        "Inline italic value should be preserved");
   }
 
   @Test
   void merge_shouldExpandMultipleVariablesInStepLine() {
     String markdown =
         """
-        > **Greeting** Greet ${name} ${count} times
+        > **Greeting** Greet *John* *3* times
         """;
 
     StepExecutionResult step =
@@ -379,14 +380,14 @@ class StoryReportMergerTest {
   }
 
   @Test
-  void merge_shouldItalicizeRemainingPlaceholdersForTableInput() {
+  void merge_shouldPreservePlaceholderForTableInput() {
     String markdown =
         """
         # My Story
 
         ## Scene: Test
 
-        > **Greeting** Greet ${name}
+        > **Greeting** Greet *${name}*
         >
         > | name  |
         > |-------|
@@ -400,7 +401,7 @@ class StoryReportMergerTest {
             "Greeting",
             "Greet ${name}",
             InputType.SEQUENCE,
-            Map.of(),
+            Map.of("name", "${name}"),
             List.of(Map.of("name", "Alice")),
             ExecutionStatus.SUCCESS,
             null,
@@ -412,7 +413,7 @@ class StoryReportMergerTest {
 
     assertTrue(
         merged.contains("> **Greeting** Greet *${name}* ✅"),
-        "Table-backed placeholders should be wrapped in italic");
+        "Table-backed placeholder should be preserved in italic");
   }
 
   @Test

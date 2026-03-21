@@ -244,11 +244,11 @@ class StepParserTest {
   }
 
   @Test
-  void parse_shouldParseStepWithVariable() {
-    // Arrange - mirrors: > **Greeting** Greet John
+  void parse_shouldParseStepWithInlineItalicVariable() {
+    // Arrange - mirrors: > **Greeting** Greet *John*
     String block =
         """
-                        > **Greeting** Greet John
+                        > **Greeting** Greet *John*
                         """;
 
     // Act
@@ -256,16 +256,16 @@ class StepParserTest {
 
     // Assert
     assertEquals("Greeting", stepTask.call().plotName());
-    assertEquals("Greet John", stepTask.call().stepValue());
+    assertEquals("Greet *John*", stepTask.call().stepValue());
     assertTrue(stepTask.inputRows().isEmpty());
   }
 
   @Test
   void parse_shouldParseStepWithVariablePlaceholder() {
-    // Arrange - mirrors: > **Greeting** Greet ${name}
+    // Arrange - mirrors: > **Greeting** Greet *${name}*
     String block =
         """
-                        > **Greeting** Greet ${name}
+                        > **Greeting** Greet *${name}*
                         """;
 
     // Act
@@ -273,16 +273,16 @@ class StepParserTest {
 
     // Assert
     assertEquals("Greeting", stepTask.call().plotName());
-    assertEquals("Greet ${name}", stepTask.call().stepValue());
+    assertEquals("Greet *${name}*", stepTask.call().stepValue());
     assertTrue(stepTask.inputRows().isEmpty());
   }
 
   @Test
   void parse_shouldParseGreetingPlotWithMultipleNames() {
-    // Arrange - mirrors the exact example from 00_the-first-step.md
+    // Arrange - mirrors the exact example from 01_the-first-step.md with new format
     String block =
         """
-                        > **Greeting** Greet ${name}
+                        > **Greeting** Greet *${name}*
                         >
                         > | name  |
                         > |-------|
@@ -297,7 +297,7 @@ class StepParserTest {
     // Assert
     assertTrue(stepTask instanceof StepTask);
     assertEquals("Greeting", stepTask.call().plotName());
-    assertEquals("Greet ${name}", stepTask.call().stepValue());
+    assertEquals("Greet *${name}*", stepTask.call().stepValue());
     assertEquals(3, stepTask.inputRows().size());
     assertEquals("John", stepTask.inputRows().get(0).get("name"));
     assertEquals("Jane", stepTask.inputRows().get(1).get("name"));
