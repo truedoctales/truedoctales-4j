@@ -10,7 +10,9 @@ import java.util.regex.Pattern;
 
 /// Extracts variable values from scenario names using pattern matching.
 ///
-/// Supports ${variable} placeholders in patterns.
+/// Supports {@code ${variable}} placeholders in step patterns. In story markdown, variable
+/// values must be wrapped in italic markers: {@code *value*} for inline values or
+/// {@code *{name}*} for table-backed placeholders.
 public class VariableExtractor {
 
   private static final Logger LOGGER = Logger.getLogger(VariableExtractor.class.getName());
@@ -18,6 +20,8 @@ public class VariableExtractor {
   private static final int FIRST_GROUP_INDEX = 1;
 
   /// Checks if a scenario pattern matches a scenario value.
+  ///
+  /// Variable values in the scenario value must be wrapped in italic markers ({@code *...*}).
   ///
   /// @param scenarioPattern the pattern with optional ${variable} placeholders
   /// @param scenarioValue the actual scenario value
@@ -45,7 +49,31 @@ public class VariableExtractor {
     }
   }
 
+  /// Checks if a scenario value would match a pattern using the legacy format
+  /// (without italic markers). Used to produce clear error messages when variables
+  /// are not wrapped in {@code *...*}.
+  ///
+  /// @param scenarioPattern the pattern with optional ${variable} placeholders
+  /// @param scenarioValue the actual scenario value (without italic markers)
+  /// @return true if the pattern would match without requiring italic markers
+  public boolean matchesLegacyFormat(String scenarioPattern, String scenarioValue) {
+    List<String> variableNames = findVariableNames(scenarioPattern);
+    if (variableNames.isEmpty()) {
+      return false;
+    }
+    String regexPattern = buildLegacyRegexPattern(scenarioPattern);
+    try {
+      Matcher scenarioMatcher = buildMatcher(regexPattern, scenarioValue);
+      return scenarioMatcher.matches();
+    } catch (java.util.regex.PatternSyntaxException e) {
+      return false;
+    }
+  }
+
   /// Extracts inplaceVariables from a scenario title using a pattern.
+  ///
+  /// Variable values must be wrapped in italic markers ({@code *...*}) in the scenario name.
+  /// The extracted values will have the italic markers stripped.
   ///
   /// @param pattern the pattern with ${variable} placeholders
   /// @param scenarioName the actual scenario title
@@ -77,6 +105,22 @@ public class VariableExtractor {
   }
 
   private String buildRegexPattern(String pattern) {
+    StringBuilder regexBuilder = new StringBuilder();
+    Matcher matcher = VARIABLE_PATTERN.matcher(pattern);
+    int lastEnd = 0;
+
+    while (matcher.find()) {
+      appendLiteralPart(regexBuilder, pattern, lastEnd, matcher.start());
+      regexBuilder.append("\\*(.+?)\\*");
+      lastEnd = matcher.end();
+    }
+
+    appendRemainingPart(regexBuilder, pattern, lastEnd);
+    return regexBuilder.toString();
+  }
+
+  /// Builds a regex pattern without requiring italic markers (for error diagnostics).
+  private String buildLegacyRegexPattern(String pattern) {
     StringBuilder regexBuilder = new StringBuilder();
     Matcher matcher = VARIABLE_PATTERN.matcher(pattern);
     int lastEnd = 0;

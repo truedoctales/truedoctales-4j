@@ -36,12 +36,12 @@ public void greet(String name) {
     System.out.println("Hello, " + name + "!");
 }
 ```
-> **Greeting** Greet John
+> **Greeting** Greet *John*
 
 Or greet multiple people.
 You can still use the same plot.
 
-> **Greeting** Greet name
+> **Greeting** Greet *${name}*
 > 
 > | name  |
 > |-------|
@@ -52,7 +52,7 @@ You can still use the same plot.
 
 ### Check multiple results as table
 
-> **Greeting** Greet John 3 times
+> **Greeting** Greet *John* *3* times
 > 
 > | expected        |
 > |-----------------|
@@ -60,7 +60,7 @@ You can still use the same plot.
 > | 2. Hello, John! |
 > | 3. Hello, John! |
 
-> **Greeting** Greet John 3 times
+> **Greeting** Greet *John* *3* times
 > 
 > | expected        |
 > |-----------------|

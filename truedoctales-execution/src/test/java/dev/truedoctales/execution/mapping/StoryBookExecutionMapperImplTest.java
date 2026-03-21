@@ -51,7 +51,7 @@ class StoryBookExecutionMapperImplTest {
   @Test
   void mapStep_shouldMapStepWithVariable() {
     // Arrange
-    StepCall call = new StepCall("plot1", "With TestValue");
+    StepCall call = new StepCall("plot1", "With *TestValue*");
     StepTask stepModel = new StepTask(10, call);
     StepExecution expected =
         new StepExecution(

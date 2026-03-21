@@ -161,7 +161,16 @@ public class HtmlBookReportGenerator {
         String introTitle = readJsonField(jsonReportDirectory.resolve("meta.json"), "title");
         if (introTitle == null) introTitle = extractTitleFromMarkdown(introMd);
         entries.add(
-            new NavEntry(introMd, "00_intro.md", "00_intro.html", introTitle, false, null, "Book"));
+            new NavEntry(
+                introMd,
+                "00_intro.md",
+                "00_intro.html",
+                introTitle,
+                false,
+                null,
+                "Book",
+                null,
+                false));
       }
     }
 
@@ -197,7 +206,9 @@ public class HtmlBookReportGenerator {
                 chapterTitle,
                 true,
                 chapterDirName,
-                chapterTitle));
+                chapterTitle,
+                null,
+                false));
       }
 
       // Story JSON files (sorted, skip meta.json and any non-json)
@@ -219,6 +230,9 @@ public class HtmlBookReportGenerator {
           storyTitle = toLabel(storyJson.getFileName().toString().replace(".json", ""));
         }
 
+        String storyStatus = readStoryStatus(storyJson);
+        boolean storyHasErrors = "FAILURE".equals(storyStatus) || "ERROR".equals(storyStatus);
+
         String mdRelativePath =
             storyPathField != null
                 ? storyPathField
@@ -234,7 +248,9 @@ public class HtmlBookReportGenerator {
                 storyTitle,
                 false,
                 chapterDirName,
-                chapterTitle));
+                chapterTitle,
+                storyStatus,
+                storyHasErrors));
       }
     }
 
@@ -250,7 +266,9 @@ public class HtmlBookReportGenerator {
                 "Plot Glossary",
                 true,
                 "plots",
-                "Plots"));
+                "Plots",
+                null,
+                false));
       }
       Path plotsDir = markdownDirectory.resolve("plots");
       if (Files.isDirectory(plotsDir)) {
@@ -270,7 +288,9 @@ public class HtmlBookReportGenerator {
                             plotId,
                             false,
                             "plots",
-                            "Plots"));
+                            "Plots",
+                            null,
+                            false));
                   });
         }
       }
@@ -329,7 +349,15 @@ public class HtmlBookReportGenerator {
               boolean isIntro = isIntroPath(relativePath);
               entries.add(
                   new NavEntry(
-                      file, relativePath, htmlPath, title, isIntro, chapterDir, chapterLabel));
+                      file,
+                      relativePath,
+                      htmlPath,
+                      title,
+                      isIntro,
+                      chapterDir,
+                      chapterLabel,
+                      null,
+                      false));
             }
             return FileVisitResult.CONTINUE;
           }
@@ -388,8 +416,12 @@ public class HtmlBookReportGenerator {
         sb.append("        { \"title\": ")
             .append(jsonString(e.title()))
             .append(", \"htmlPath\": ")
-            .append(jsonString(e.htmlRelativePath()))
-            .append(" }");
+            .append(jsonString(e.htmlRelativePath()));
+        if (e.status() != null) {
+          sb.append(", \"status\": ").append(jsonString(e.status()));
+          sb.append(", \"hasErrors\": ").append(e.hasErrors());
+        }
+        sb.append(" }");
         if (si < stories.size() - 1) sb.append(",");
         sb.append("\n");
       }
@@ -576,6 +608,9 @@ public class HtmlBookReportGenerator {
   private static final Pattern JSON_FIELD_PATTERN =
       Pattern.compile("\"([^\"]+)\"\\s*:\\s*\"([^\"\\\\]*(\\\\.[^\"\\\\]*)*)\"");
 
+  private static final Pattern STATUS_FIELD_PATTERN =
+      Pattern.compile("\"status\"\\s*:\\s*\"(FAILURE|ERROR)\"");
+
   /// Reads a single string field value from a JSON file without a JSON library dependency.
   /// Returns {@code null} if the file does not exist, cannot be read, or the field is not found.
   private String readJsonField(Path jsonFile, String fieldName) {
@@ -594,6 +629,21 @@ public class HtmlBookReportGenerator {
       logger.warning("Could not read JSON field '" + fieldName + "' from: " + jsonFile);
     }
     return null;
+  }
+
+  /// Determines the overall status of a story from its JSON report file.
+  /// Returns "SUCCESS", "FAILURE", or "ERROR" by scanning step statuses in the JSON content.
+  private String readStoryStatus(Path storyJsonFile) {
+    try {
+      String content = Files.readString(storyJsonFile);
+      Matcher matcher = STATUS_FIELD_PATTERN.matcher(content);
+      if (matcher.find()) {
+        return matcher.group(1); // FAILURE or ERROR
+      }
+      return "SUCCESS";
+    } catch (IOException e) {
+      return null;
+    }
   }
 
   // -------------------------------------------------------------------------
@@ -660,7 +710,9 @@ public class HtmlBookReportGenerator {
       String title,
       boolean isChapterIntro,
       String chapterDirName,
-      String chapterLabel) {}
+      String chapterLabel,
+      String status,
+      boolean hasErrors) {}
 
   /// A group of {@link NavEntry} items belonging to the same chapter directory.
   record ChapterGroup(String label, String dirName, String introHtmlPath, List<NavEntry> stories) {}

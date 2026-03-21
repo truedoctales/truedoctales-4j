@@ -138,18 +138,7 @@ public class JupiterStoryTestExecutor implements JuniperStoryTestBuilder {
   private void propagateFailures(List<StepExecutionResult> stepResults) {
     for (StepExecutionResult result : stepResults) {
       if (result.status() == ExecutionStatus.ERROR || result.status() == ExecutionStatus.FAILURE) {
-        // Re-throw the original exception to fail the JUnit test
-        if (result.throwable() != null) {
-          if (result.throwable() instanceof Error error) {
-            throw error;
-          }
-          if (result.throwable() instanceof RuntimeException runtimeException) {
-            throw runtimeException;
-          }
-          throw new AssertionError(result.errorMessage(), result.throwable());
-        } else {
-          throw new AssertionError(result.errorMessage());
-        }
+        throw new AssertionError(result.errorMessage());
       }
     }
   }

@@ -53,9 +53,9 @@ class JupiterStoryTestExecutorTest {
             .findFirst()
             .orElseThrow(() -> new AssertionError("No scene test found"));
 
-    // Execute the test and verify it throws AssertionFailedError
+    // Execute the test and verify it throws AssertionError
     assertThrows(
-        AssertionFailedError.class,
+        AssertionError.class,
         () -> {
           if (sceneNode instanceof org.junit.jupiter.api.DynamicTest test) {
             test.getExecutable().execute();
@@ -81,9 +81,9 @@ class JupiterStoryTestExecutorTest {
             .findFirst()
             .orElseThrow(() -> new AssertionError("No scene test found"));
 
-    // Execute the test and verify it throws RuntimeException
+    // Execute the test and verify it throws AssertionError
     assertThrows(
-        RuntimeException.class,
+        AssertionError.class,
         () -> {
           if (sceneNode instanceof org.junit.jupiter.api.DynamicTest test) {
             test.getExecutable().execute();
