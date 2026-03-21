@@ -4,7 +4,7 @@ It is 9:47 on a Tuesday morning. The FinTrack payment platform has been live for
 
 In the operations room, 400 approval requests have arrived since 8:00. Every single payment — a €12 coffee subscription, a €7.50 parking fee, a €3 app store charge — is waiting for a manager to click *approve* before it can be processed.
 
-Thomas, the CFO, calls Emma. Emma calls Alex. Alex opens the ticket.
+Mirror Mike calls Pinky Princess. Pinky Princess calls Checklist Charlie. Checklist Charlie opens the ticket.
 
 *The ticket says exactly what he built.*
 
@@ -14,23 +14,23 @@ Thomas, the CFO, calls Emma. Emma calls Alex. Alex opens the ticket.
 
 ## Scene: The feature request — one paragraph, zero examples
 
-Three weeks ago, Thomas sent Emma a Slack message at 8:23 PM.
+Three weeks ago, Mirror Mike sent Pinky Princess a Slack message at 8:23 PM.
 
-*"Hey Emma, we had an audit finding last quarter. Payments above certain thresholds need manager approval before processing. Can we get this into the next sprint?"*
+*"Hey, we had an audit finding last quarter. Payments above certain thresholds need manager approval before processing. Can we get this into the next sprint?"*
 
-Emma was already preparing tomorrow's sprint planning. She had six other stories to finish. She wrote the story in 11 minutes.
+Pinky Princess was already preparing the next day's sprint planning. She had six other stories to finish. She wrote the story in eleven minutes.
 
 > **Quest** Create quest
 >
-> | id | name                    | description                                                                | status      |
-> |----|-------------------------|----------------------------------------------------------------------------|-------------|
-> | 10 | Implement Approval Flow | Add manager approval step before payments are processed                    | IN_PROGRESS |
+> | id | name                    | description                                             | status      |
+> |----|-------------------------|---------------------------------------------------------|-------------|
+> | 10 | Implement Approval Flow | Add manager approval step before payments are processed | IN_PROGRESS |
 
 > **Quest** Assign to hero
 >
-> | hero | quest                   |
-> |------|-------------------------|
-> | Alex | Implement Approval Flow |
+> | hero              | quest                   |
+> |-------------------|-------------------------|
+> | Checklist Charlie | Implement Approval Flow |
 
 > **Quest** Status is
 >
@@ -53,29 +53,29 @@ Acceptance Criteria:
 - A rejected payment is cancelled
 ```
 
-There was no example. No threshold. No definition of *which* payments. No mention of €10,000.
+No threshold. No example. No definition of *which* payments.
 
-Thomas never reviewed the story. He was in Dubai at a conference.
+Mirror Mike did not review the story. He was in Dubai at a conference.
 
-## Scene: Alex builds what the story says
+## Scene: Checklist Charlie builds what the story says
 
-Alex picks up the ticket on Monday morning. He reads the acceptance criteria three times. He has questions — but the sprint ends Friday, and asking Emma means waiting until Wednesday when she's back from her product strategy workshop.
+Checklist Charlie picks up the ticket on Monday morning. He reads the acceptance criteria three times.
 
-He implements what the story says.
+He has questions — but the sprint ends Friday, and asking Pinky Princess means waiting until Wednesday when she is back from her product strategy workshop. He implements what the story says.
 
 ```mermaid
 sequenceDiagram
-    participant T as Thomas (CFO)
-    participant E as Emma (Product Owner)
-    participant A as Alex (Developer)
+    participant MM as Mirror Mike (CFO)
+    participant PP as Pinky Princess (PO)
+    participant CC as Checklist Charlie (Dev)
 
-    T->>E: "Payments above certain thresholds need approval"
-    Note over E: Writes story in 11 minutes
-    E->>A: Story: "A manager wants to approve payments"
-    Note over A: No threshold. No example.
-    A->>A: Intercepts ALL payment transactions
-    A->>A: Routes every payment to approval queue
-    Note over A: "It says payments. I built payments."
+    MM->>PP: "Payments above certain thresholds need approval"
+    Note over PP: Writes story in 11 minutes. No threshold.
+    PP->>CC: Story: "A manager wants to approve payments"
+    Note over CC: No example. No limit. No edge case.
+    CC->>CC: Intercepts ALL payment transactions
+    CC->>CC: Routes every payment to approval queue
+    Note over CC: "It says payments. I built payments."
 ```
 
 > **Monster** Monster is alive
@@ -85,23 +85,17 @@ sequenceDiagram
 > | Documentation Drift     |
 > | Missing Acceptance Test |
 
-By Wednesday, the feature is built. By Thursday, it passes Alex's unit tests. By Friday afternoon, it is merged.
-
-On Monday morning, it goes live with the weekly deployment.
+By Wednesday the feature is built. By Thursday it passes Charlie's unit tests. By Friday it is merged. On Monday morning it goes live.
 
 ## Scene: The Tuesday morning crisis
 
-By 8:15, the operations team starts receiving approval requests.
-
-By 9:00, there are 127 of them. The team assumes it is a test environment leak and ignores it.
-
-By 9:47, there are 400 requests. Revenue processing has effectively stopped.
+By 8:15, the operations team starts receiving approval requests. By 9:47, there are 400 of them and payment processing has stopped.
 
 > **Quest** Complete quest
 >
-> | hero | quest                   |
-> |------|-------------------------|
-> | Alex | Implement Approval Flow |
+> | hero              | quest                   |
+> |-------------------|-------------------------|
+> | Checklist Charlie | Implement Approval Flow |
 
 > **Quest** Status is
 >
@@ -111,29 +105,29 @@ By 9:47, there are 400 requests. Revenue processing has effectively stopped.
 
 The ticket is green. The story is done. The system is broken.
 
-Thomas calls Emma. *"Why is every payment in an approval queue?"*
-Emma calls Alex. *"Why did you put every payment through approval?"*
-Alex opens the ticket. *"Because that is what the story says."*
+Mirror Mike: *"Why is every payment in an approval queue?"*
+Pinky Princess: *"Why did you put every payment through approval?"*
+Checklist Charlie: *"Because that is what the story says."*
 
 > **Fight** Attack fails
 >
-> | attacker | defender                | weapon              | result |
-> |----------|-------------------------|---------------------|--------|
-> | Alex     | Documentation Drift     | Code                | FAILED |
-> | Emma     | Missing Acceptance Test | Requirements Review | FAILED |
-> | Thomas   | Documentation Drift     | Sprint Feedback     | FAILED |
+> | attacker          | defender                | weapon              | result |
+> |-------------------|-------------------------|---------------------|--------|
+> | Checklist Charlie | Documentation Drift     | Code                | FAILED |
+> | Pinky Princess    | Missing Acceptance Test | Requirements Review | FAILED |
+> | Mirror Mike       | Documentation Drift     | Sprint Feedback     | FAILED |
 
-The feature is correct. The story is wrong. But nobody can agree on which, because there is no verified example to point to.
+The feature is correct. The story is wrong. Nobody can prove which, because there is no concrete example to point to.
 
 ## Scene: The mirror's verdict
 
-Thomas opens the documentation and reads it aloud in the post-mortem.
+Mirror Mike opens the documentation and reads it aloud in the post-mortem.
 
 *"As a manager, I want to approve payments before they are processed."*
 
-*"That,* says Thomas, *does not say every payment. It says large transactions. The audit finding was about transactions above ten thousand euros."*
+*"That does not say every payment. It says large transactions. The audit finding was about transactions above ten thousand euros."*
 
-*"That,* says Alex, *is not written in the story."*
+Checklist Charlie: *"That is not in the story."*
 
 > **Monster** Monster is alive
 >
@@ -141,28 +135,22 @@ Thomas opens the documentation and reads it aloud in the post-mortem.
 > |---------------|
 > | Blame Culture |
 
-Emma is caught in the middle. She wrote the story. She did not write it wrong — she wrote it the way Thomas described it verbally. But she also did not ask for a concrete example. She also did not say *which* payments.
+Pinky Princess wrote what she heard. Checklist Charlie built what she wrote. Mirror Mike communicated what he assumed was obvious. At no step was the result verified against a concrete example.
 
 > **Fight** Attack fails
 >
-> | attacker | defender      | weapon          | result |
-> |----------|---------------|-----------------|--------|
-> | Stefan   | Blame Culture | Architecture Review | FAILED |
-> | Emma     | Blame Culture | Story Revision  | FAILED |
+> | attacker       | defender      | weapon              | result |
+> |----------------|---------------|---------------------|--------|
+> | Blueprint Ben  | Blame Culture | Architecture Review | FAILED |
+> | Pinky Princess | Blame Culture | Story Revision      | FAILED |
 
-The platform is patched in two hours. The feature is restricted to payments above €10,000. The operations team clears the approval queue by lunchtime.
-
-The post-mortem report is filed. The root cause listed: *"Ambiguous acceptance criteria."*
+The platform is patched in two hours. The feature is restricted to payments above €10,000. The operations team clears the queue by lunchtime. The post-mortem report lists the root cause: *"Ambiguous acceptance criteria."*
 
 That is the polite way of saying: the mirror showed everyone what they wanted to see.
 
 ## Moral of the Story
 
-**A user story without a concrete, verified example is not a specification. It is an invitation to be misunderstood.**
-
-Thomas had a precise business need: *payments above €10,000 need approval*. He communicated it as a paragraph. Emma transcribed it as a sentence. Alex implemented it as an absolute rule.
-
-At each step, information was lost. At no step was the result verified against the original intent.
+**A requirement without a concrete example is not a requirement. It is an invitation to be misunderstood.**
 
 If the story had contained a single example table:
 
@@ -172,11 +160,10 @@ If the story had contained a single example table:
 | €500.00       | false            |
 | €10,001.00    | true             |
 
-— then Alex would have built the right thing. Maria would have verified it. Thomas would have approved it. And it would have been Tuesday morning, processing transactions, completely unremarkably.
+— then Checklist Charlie would have built the right thing. Bugfinder Betty would have verified it. Mirror Mike would have approved it. And Tuesday morning would have been completely, unremarkably normal.
 
-- ✗ One ambiguous sentence cost four hours of revenue processing
-- ✗ Three people were right. Three people were wrong. Nobody could prove it.
-- ✗ The mirror in documentation reflects what each reader brings to it
+- ✗ One ambiguous sentence caused four hours of zero revenue processing
+- ✗ Three colleagues were right. Three colleagues were wrong. Nobody could prove it.
+- ✗ The mirror reflects what each reader brings to it
 
-*The post-mortem ends. The next sprint begins.*
-*The next story is already one sentence long.*
+*The next sprint begins. The next story is already one sentence long.*

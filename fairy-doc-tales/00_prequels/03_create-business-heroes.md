@@ -1,101 +1,95 @@
-# The Team — Who They Are and What They Carry
+# The Team — Meet Your Colleagues
 
-Every software project has the same cast. Different names, different companies, different tech stacks — but the same roles, the same strengths, and eerily similar blind spots.
+You have worked with these people. Maybe not these exact names — but these exact habits.
 
-This is that team.
+Welcome to FinTrack Solutions, where six talented professionals deliver software together and occasionally, spectacularly, against each other.
 
-## Scene: The team assembles at FinTrack Solutions
-
-FinTrack Solutions is a growing fintech company. Thirty-five developers, one overloaded product owner, two QA engineers, and a CFO who reads every sprint report.
-
-They are about to start the most important quarter of the year.
+## Scene: The team assembles
 
 > **Hero** Create hero
 >
-> | id | name   | species | age |
-> |----|--------|---------|-----|
-> | 10 | Emma   | Human   | 38  |
-> | 11 | Alex   | Human   | 29  |
-> | 12 | Maria  | Human   | 33  |
-> | 13 | Thomas | Human   | 52  |
-> | 14 | Stefan | Human   | 41  |
-> | 15 | Lucas  | Human   | 24  |
+> | id | name              | species | age |
+> |----|-------------------|---------|-----|
+> | 10 | Pinky Princess    | Human   | 38  |
+> | 11 | Checklist Charlie | Human   | 29  |
+> | 12 | Bugfinder Betty   | Human   | 33  |
+> | 13 | Mirror Mike       | Human   | 52  |
+> | 14 | Blueprint Ben     | Human   | 41  |
+> | 15 | Rookie Ron        | Human   | 24  |
 
 > **Hero** Hero exists
 >
-> | name   |
-> |--------|
-> | Emma   |
-> | Alex   |
-> | Maria  |
-> | Thomas |
-> | Stefan |
-> | Lucas  |
+> | name              |
+> |-------------------|
+> | Pinky Princess    |
+> | Checklist Charlie |
+> | Bugfinder Betty   |
+> | Mirror Mike       |
+> | Blueprint Ben     |
+> | Rookie Ron        |
 
-## Scene: What each person does well
+## Scene: What each person does brilliantly
 
-They are good at their jobs. That is not the problem.
+They are all good at their jobs. That is not what makes the stories interesting.
 
 > **Hero** Grant skill
 >
-> | heroName | skill                     |
-> |----------|---------------------------|
-> | Emma     | Writing User Stories      |
-> | Emma     | Stakeholder Communication |
-> | Emma     | Product Vision            |
-> | Alex     | Java                      |
-> | Alex     | REST API Design           |
-> | Alex     | Fast Delivery             |
-> | Maria    | Test Automation           |
-> | Maria    | Exploratory Testing       |
-> | Maria    | Defect Analysis           |
-> | Thomas   | Business Domain           |
-> | Thomas   | Audit Compliance          |
-> | Thomas   | Contract Negotiation      |
-> | Stefan   | Software Architecture     |
-> | Stefan   | Code Review               |
-> | Stefan   | Technical Mentoring       |
-> | Lucas    | Java                      |
-> | Lucas    | Enthusiasm                |
+> | heroName          | skill                     |
+> |-------------------|---------------------------|
+> | Pinky Princess    | Writing User Stories      |
+> | Pinky Princess    | Stakeholder Communication |
+> | Pinky Princess    | Product Vision            |
+> | Checklist Charlie | Java                      |
+> | Checklist Charlie | REST API Design           |
+> | Checklist Charlie | Fast Delivery             |
+> | Bugfinder Betty   | Test Automation           |
+> | Bugfinder Betty   | Exploratory Testing       |
+> | Bugfinder Betty   | Defect Analysis           |
+> | Mirror Mike       | Business Domain           |
+> | Mirror Mike       | Audit Compliance          |
+> | Mirror Mike       | Contract Negotiation      |
+> | Blueprint Ben     | Software Architecture     |
+> | Blueprint Ben     | Code Review               |
+> | Blueprint Ben     | Technical Mentoring       |
+> | Rookie Ron        | Java                      |
+> | Rookie Ron        | Enthusiasm                |
 
 > **Hero** Has skill
 >
-> | heroName | skill                 |
-> |----------|-----------------------|
-> | Emma     | Writing User Stories  |
-> | Alex     | Java                  |
-> | Maria    | Test Automation       |
-> | Thomas   | Business Domain       |
-> | Stefan   | Software Architecture |
-> | Lucas    | Java                  |
+> | heroName          | skill                 |
+> |-------------------|-----------------------|
+> | Pinky Princess    | Writing User Stories  |
+> | Checklist Charlie | Java                  |
+> | Bugfinder Betty   | Test Automation       |
+> | Mirror Mike       | Business Domain       |
+> | Blueprint Ben     | Software Architecture |
+> | Rookie Ron        | Java                  |
 
-## Scene: Where each person struggles
+## Scene: Where each person quietly fails
 
-Skills tell half the story. The other half lives here — in the habits, assumptions, and shortcuts that nobody puts on a CV.
+These weaknesses never appear on CVs. They appear in post-mortems.
 
-| Name   | Role             | Known Weakness                                                                 |
-|--------|------------------|--------------------------------------------------------------------------------|
-| Emma   | Product Owner    | Documents features as if they already exist. Rarely checks if they were built. |
-| Alex   | Senior Developer | Reads the first acceptance criterion, implements it, and calls the ticket done. |
-| Maria  | QA Engineer      | Finds defects precisely — but is brought in too late to prevent them.          |
-| Thomas | CFO / Stakeholder| Communicates business goals as single sentences. Expects others to fill the gaps. |
-| Stefan | Tech Lead        | Focused on architecture. Loses track of whether delivery matches the specification. |
-| Lucas  | Junior Developer | Picks up tickets eagerly. Skims requirements. Misses the second half of every story. |
+| Name              | Role             | The Habit That Costs the Team                                                   |
+|-------------------|------------------|---------------------------------------------------------------------------------|
+| Pinky Princess    | Product Owner    | Documents features as if they already exist. Rarely checks if they were built.  |
+| Checklist Charlie | Developer        | Reads the first acceptance criterion, implements it, marks the ticket done.     |
+| Bugfinder Betty   | QA Engineer      | Finds defects with precision — but is brought in too late to prevent them.      |
+| Mirror Mike       | CFO / Stakeholder| Communicates business needs in single sentences. Expects others to fill the gaps.|
+| Blueprint Ben     | Tech Lead        | Focuses on architecture. Loses track of whether delivery matches the spec.      |
+| Rookie Ron        | Junior Developer | Picks up tickets with great energy. Skims requirements. Misses the second half. |
 
-These weaknesses are not character flaws. They are what happens when a team works without a shared, verified source of truth.
+## Scene: Who does what
 
-## Scene: The tasks they are responsible for
+Every sprint, the same tasks are divided between the same people. Here is how they are supposed to work.
 
-Every sprint, the same work is distributed across the same people. These are the tasks that move a feature from idea to production.
+| Task                   | Owner             | What Should Happen                                                         |
+|------------------------|-------------------|----------------------------------------------------------------------------|
+| Write User Story       | Pinky Princess    | Define the feature with context, acceptance criteria, and concrete examples|
+| Develop Feature        | Checklist Charlie | Implement ALL acceptance criteria before marking the ticket done           |
+| Update Documentation   | Pinky Princess    | Keep the product catalogue aligned with what was actually built            |
+| Validate Documentation | Bugfinder Betty   | Verify that documented behaviour matches the running system                |
+| Code Review            | Blueprint Ben     | Review implementation for completeness against the full specification      |
+| Exploratory Testing    | Bugfinder Betty   | Test edge cases not covered by the acceptance criteria                     |
+| Sprint Sign-off        | Mirror Mike       | Confirm delivered features meet the business expectation with a clear example |
 
-| Task                     | Owner  | Description                                                                 |
-|--------------------------|--------|-----------------------------------------------------------------------------|
-| Write User Story         | Emma   | Define the feature with context, acceptance criteria, and concrete examples |
-| Develop Feature          | Alex   | Implement the feature according to the agreed specification                 |
-| Update Documentation     | Emma   | Keep the product catalogue aligned with what was actually built             |
-| Validate Documentation   | Maria  | Verify that documented behaviour matches the running system                 |
-| Code Review              | Stefan | Review implementation for correctness against the specification             |
-| Exploratory Testing      | Maria  | Test edge cases and scenarios not covered by the acceptance criteria        |
-| Sprint Sign-off          | Thomas | Confirm that the delivered feature meets the business expectation           |
-
-The problem is not that these tasks exist. The problem is that **validating documentation** and **verifying specification coverage** happen last — if at all.
+*"Supposed to" is doing a lot of work in that sentence.*

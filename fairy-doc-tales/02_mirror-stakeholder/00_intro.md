@@ -1,50 +1,63 @@
 # Mirror, Mirror — Who Wrote It Wrong?
 
-## Overview
+## Meet the cast
 
-Thomas is the CFO of FinTrack Solutions. He approves feature budgets, attends sprint reviews, and reads documentation like a contract.
+Before the story begins, meet the three colleagues who will make Tuesday morning very expensive.
 
-Emma is the Product Owner. She writes user stories between Zoom calls. She is good at it — fast, clear, confident.
+---
 
-Alex is the developer. He builds what the story says. He does not guess. He does not invent.
+### 🪞 Mirror Mike — Chief Financial Officer
 
-This is the story of a feature that everyone understood differently — and how a single missing example brought a payment platform to its knees for four hours on a Tuesday morning.
+**His superpower:** Turns a complex compliance requirement into a single Slack message at 8:23 PM.
+
+**His weakness:** Communicates business needs in one sentence and considers his job done. The details, the edge cases, the thresholds — those are *someone else's problem*. When things go wrong, Mirror Mike opens the documentation, holds it up like a mirror, and sees exactly what he expected to find: someone else's mistake.
+
+> *"I said approval step. I never said every payment. That was obvious."*
+
+---
+
+### 👑 Pinky Princess — Product Owner
+
+**Her superpower:** Can write a user story in eleven minutes flat. Clear language. Good structure. Confident tone.
+
+**Her weakness:** Writes what she heard, not what was meant. Never asks for a concrete example. Never checks whether the story she wrote matches the intent of the person who asked. In her mind, a well-written sentence is a well-defined requirement.
+
+> *"It says what it says. I can't help what people read into it."*
+
+---
+
+### ✅ Checklist Charlie — Senior Developer
+
+**His superpower:** Fastest ticket closure rate on the team. Monday morning pickup, Friday afternoon green.
+
+**His weakness:** Reads the first acceptance criterion, builds it precisely, and marks the ticket done. He is not lazy — he is literal. The story said "approve payments". He approved payments. All of them. Every single one.
+
+> *"The ticket says payments. I built payments. Show me where it says ten thousand euros."*
+
+---
 
 ## The Problem
 
-Thomas asked for an **approval workflow for payments**. He meant: *large transactions above €10,000 should require manager sign-off*.
+A compliance requirement needs a payment approval workflow. It gets communicated as a paragraph, written as a sentence, and implemented as an absolute rule — because nobody, at any point, wrote down a single concrete example.
 
-Emma wrote: *"As a manager, I want to approve payments before they are processed."*
-
-Alex read it and built exactly that. Every payment. Every amount. Every time.
-
-Nobody reviewed the story with a concrete example. Nobody asked: *which payments, exactly?*
-
-## What Goes Wrong
-
-- ✗ The requirement is one sentence with no example and no threshold
-- ✗ The developer builds the most literal interpretation of the story
-- ✗ Operations receives 400 approval requests in two hours
-- ✗ Payment processing stops. Revenue drops 40% for the morning.
-- ✗ Thomas quotes the requirement. Alex quotes the implementation. Both are correct.
-- ✗ Nobody can prove who was right — because the story was never verified
+By Tuesday morning, every €7.50 coffee subscription in the country is waiting for a manager to click *approve*.
 
 ## Story Structure
 
 ```mermaid
 graph TD
-    A[Thomas: we need payment approvals] --> B[Emma writes a one-sentence story]
-    B --> C[Alex reads it literally]
-    C --> D[Every payment now requires approval]
-    D --> E[Operations flooded with 400 requests]
+    A[Mirror Mike: 8:23 PM Slack message] --> B[Pinky Princess writes a one-sentence story]
+    B --> C[Checklist Charlie reads it literally]
+    C --> D[Every payment routed to approval queue]
+    D --> E[400 approval requests by 9:47 AM]
     E --> F[Payment processing stops]
-    F --> G[Thomas opens the documentation]
+    F --> G[Mirror Mike opens the documentation]
     G --> H{Does it say what he meant?}
-    H -->|He thinks yes| I[Blame Alex]
-    H -->|Alex thinks yes| J[Points to the ticket]
+    H -->|He thinks yes| I[Blame Checklist Charlie]
+    H -->|Charlie thinks yes| J[Points to the ticket]
     I --> K[Both are right. Both are wrong.]
     J --> K
-    K --> L[4 hours of downtime. Trust destroyed.]
+    K --> L[4 hours downtime. Trust destroyed.]
     style F fill:#f66
     style L fill:#f66
 ```
