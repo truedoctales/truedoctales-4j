@@ -410,6 +410,15 @@ article blockquote {
   border-radius: 0 8px 8px 0;
 }
 
+article blockquote em {
+    font-style: italic;
+    font-size: 1.2rem;
+    background: rgba(34,197,  94, 0.15);
+    border-radius: 8px;
+    padding: 0.25rem 0.5rem;
+
+}
+
 /* Status-specific step boxes */
 article blockquote.step-success {
   border-left-color: #16a34a;
