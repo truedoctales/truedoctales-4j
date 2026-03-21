@@ -36,7 +36,7 @@
 
 ### 🪞 Mirror Mike — CFO
 
-**His weakness:** Opens the velocity chart on Friday. Sees 43 points. Sends a congratulatory message to the channel. Does not look at the QA report until the InnoConnect call at 4 PM.
+**His weakness:** Opens the velocity chart on Friday. Sees 43 points. Sends a congratulatory message to the channel. Does not look at the QA report until the Ka-Ching Corp call at 4 PM.
 
 > *"The burndown chart shows a perfect sprint. Why is the go-live delayed?"*
 
@@ -46,7 +46,7 @@
 
 Sprint 14: 43 story points planned, 43 reported as done — by Wednesday. No specification examples existed for any task. When Bugfinder Betty returned from sick leave on Thursday, she found zero tasks she could verify. The sprint closed as FAILED.
 
-InnoConnect's go-live, scheduled for that Friday, was postponed two weeks.
+Ka-Ching Corp's go-live, scheduled for that Friday, was postponed two weeks.
 
 ## Story Structure
 
@@ -59,7 +59,7 @@ graph TD
     E --> F[Zero tasks verifiable]
     F --> G[Verified velocity: 0]
     G --> H[Sprint closes as FAILED]
-    H --> I[InnoConnect go-live postponed 2 weeks]
+    H --> I[Ka-Ching Corp go-live postponed 2 weeks]
     style D fill:#f66
     style H fill:#f66
     style I fill:#f66

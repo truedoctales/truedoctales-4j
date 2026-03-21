@@ -26,7 +26,7 @@
 
 **His weakness:** Sent the product catalogue to the sales team and called it the feature list.
 
-> *"I need to call InnoConnect. They're going to invoke the penalty clause."*
+> *"I need to call Ka-Ching Corp. They're going to invoke the penalty clause."*
 
 ---
 
@@ -34,7 +34,7 @@
 
 Pinky Princess has been product owner for four years. Her Confluence space has 847 pages. New hires are told to read it in their first week.
 
-The product catalogue lists 8 features that InnoConnect specifically contracted for.
+The product catalogue lists 8 features that Ka-Ching Corp specifically contracted for.
 
 None of them were ever built.
 
@@ -44,11 +44,11 @@ None of them were ever built.
 graph TD
     A[Pinky Princess documents 8 features] --> B[Written as if already live]
     B --> C[Mirror Mike gives catalogue to sales]
-    C --> D[InnoConnect signs €200K contract]
+    C --> D[Ka-Ching Corp signs €200K contract]
     D --> E[Blueprint Ben checks the codebase]
     E --> F[8 contracted features not found]
     F --> G[Project Feature not live — confirmed]
-    G --> H[InnoConnect invokes penalty clause]
+    G --> H[Ka-Ching Corp invokes penalty clause]
     H --> I[€50K penalty. Trust destroyed.]
     style F fill:#f66
     style I fill:#f66

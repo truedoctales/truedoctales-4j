@@ -28,9 +28,9 @@ Before the sprint begins, three business risks are already active at FinTrack. T
 
 ## Scene: Sprint 14 — the most important sprint in FinTrack history
 
-InnoConnect is FinTrack's largest enterprise prospect. After three months of evaluation and two product demos, they have agreed to a pilot. The condition: User Registration must be live and fully working by end of sprint — this Friday.
+Ka-Ching Corp is FinTrack's largest enterprise prospect. After three months of evaluation and two product demos, they have agreed to a pilot. The condition: User Registration must be live and fully working by end of sprint — this Friday.
 
-The User Registration feature is more complex than it sounds. It is not just a form and a database row. It includes email validation, a confirmation email flow, duplicate account prevention, a GDPR-compliant audit log, and a password reset flow. InnoConnect specifically asked about the audit log — their legal team reviewed the requirement list and highlighted it.
+The User Registration feature is more complex than it sounds. It is not just a form and a database row. It includes email validation, a confirmation email flow, duplicate account prevention, a GDPR-compliant audit log, and a password reset flow. Ka-Ching Corp specifically asked about the audit log — their legal team reviewed the requirement list and highlighted it.
 
 Sprint planning is on Monday morning. Mirror Mike attends for the first five minutes to reinforce the stakes. He leaves to take a call.
 
@@ -38,7 +38,7 @@ Sprint planning is on Monday morning. Mirror Mike attends for the first five min
 >
 > | id | name      | plannedPoints | goal                                            |
 > |----|-----------|---------------|-------------------------------------------------|
-> | 1  | Sprint 14 | 43            | User Registration ready for InnoConnect go-live |
+> | 1  | Sprint 14 | 43            | User Registration ready for Ka-Ching Corp go-live |
 
 Six tickets are added to the sprint. Together they cover the full User Registration feature. Forty-three story points — an ambitious but achievable target for the team.
 
@@ -174,7 +174,7 @@ This is how Blueprint Ben has always done code review. This is how most tech lea
 > |-----------|----------|
 > | Sprint 14 | 43       |
 
-The sprint board shows six green tickets. Forty-three story points. The most productive sprint in FinTrack history. Pinky Princess books the InnoConnect demo for Friday 3 PM.
+The sprint board shows six green tickets. Forty-three story points. The most productive sprint in FinTrack history. Pinky Princess books the Ka-Ching Corp demo for Friday 3 PM.
 
 ---
 
@@ -210,7 +210,7 @@ Then she calls Mirror Mike directly.
 > | GDPR Audit Log               |
 > | Password Reset Flow          |
 
-*"The sprint is not done,"* she says. *"None of the tickets are fully implemented. The GDPR audit log is a log statement. InnoConnect's legal team will ask to see audit entries. There are none."*
+*"The sprint is not done,"* she says. *"None of the tickets are fully implemented. The GDPR audit log is a log statement. Ka-Ching Corp's legal team will ask to see audit entries. There are none."*
 
 Mirror Mike is quiet for four seconds. *"The demo is tomorrow at 3 PM,"* he says.
 
@@ -233,7 +233,7 @@ Bugfinder Betty asks: *"Can you show me the GDPR audit log entry that was create
 
 Checklist Charlie opens the audit log table in the database viewer. It is empty. He opens the application log. There is a `log.info` entry with an email address. *"It logs here,"* he says. *"It logs the registration event."*
 
-Bugfinder Betty: *"The GDPR requirement is for entries in the audit log table with a retention policy. That is what InnoConnect's legal team reviewed. That is what they will ask to see."*
+Bugfinder Betty: *"The GDPR requirement is for entries in the audit log table with a retention policy. That is what Ka-Ching Corp's legal team reviewed. That is what they will ask to see."*
 
 Checklist Charlie: *"The ticket said all registration events must be logged. I logged them."*
 Pinky Princess: *"In the audit log. The ticket says audit log."*
@@ -247,7 +247,7 @@ Blueprint Ben looks at the ticket. He looks at the pull request. The code is cle
 > |---------------|
 > | Blame Culture |
 
-Mirror Mike looks at the burndown chart he printed. He looks at the empty audit log table. He picks up his phone and cancels the 3 PM InnoConnect call.
+Mirror Mike looks at the burndown chart he printed. He looks at the empty audit log table. He picks up his phone and cancels the 3 PM Ka-Ching Corp call.
 
 > **Sprint** Close sprint
 >
@@ -269,7 +269,7 @@ Mirror Mike looks at the burndown chart he printed. He looks at the empty audit 
 
 Forty-three reported points. Zero verified points. Sprint: FAILED.
 
-InnoConnect's go-live is postponed two weeks. Their project manager sends a polite but firm email. The word *"contractual"* appears twice.
+Ka-Ching Corp's go-live is postponed two weeks. Their project manager sends a polite but firm email. The word *"contractual"* appears twice.
 
 ---
 

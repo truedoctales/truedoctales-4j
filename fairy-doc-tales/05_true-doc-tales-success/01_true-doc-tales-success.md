@@ -1,6 +1,6 @@
 # The Day Documentation Became Evidence
 
-Six months ago, Mirror Mike was on a call with InnoConnect's legal team authorizing a €50,000 penalty payment.
+Six months ago, Mirror Mike was on a call with Ka-Ching Corp's legal team authorizing a €50,000 penalty payment.
 
 Today he is on a call with their CEO. They are discussing expanding the contract to include four new country markets.
 
@@ -16,7 +16,7 @@ The difference between those two calls is not a different team, a new process, o
 
 ## Scene: The same team — six months later
 
-Six months after the InnoConnect penalty. Same six people. Same six risks. One new rule.
+Six months after the Ka-Ching Corp penalty. Same six people. Same six risks. One new rule.
 
 > **Team Member** Create team member
 >
@@ -56,7 +56,7 @@ Every risk that caused the three incidents is still active. They were acknowledg
 
 ## Scene: The retrospective nobody wanted to have
 
-The retrospective after the InnoConnect penalty was scheduled for a Tuesday afternoon. Attendance was mandatory. The room had six people and the atmosphere of a courtroom.
+The retrospective after the Ka-Ching Corp penalty was scheduled for a Tuesday afternoon. Attendance was mandatory. The room had six people and the atmosphere of a courtroom.
 
 Three incidents had been formally reviewed in the previous three months. The payment platform going down after Sprint 11. The failed Sprint 14 with zero verified velocity. The €50,000 penalty from the unbuilt catalogue features. Each incident had a different surface cause. Each had a different owner in the post-mortem report.
 
@@ -289,7 +289,7 @@ Before: Mirror Mike opened the sprint report. He looked at the velocity number. 
 > |-------------|------------------------|
 > | Mirror Mike | Verified Documentation |
 
-After: Mirror Mike opens the story book. He finds the stories for the features he cares about — the ones he will be asked about in client calls, the ones in InnoConnect's contract, the ones the sales team is using. He runs them. Green means the feature exists and has been proven this week. Red means there is a gap to address before the feature can be claimed.
+After: Mirror Mike opens the story book. He finds the stories for the features he cares about — the ones he will be asked about in client calls, the ones in Ka-Ching Corp's contract, the ones the sales team is using. He runs them. Green means the feature exists and has been proven this week. Red means there is a gap to address before the feature can be claimed.
 
 He no longer needs to trust that someone has checked. He can check. The story is the evidence. Running it is the act of verification.
 
@@ -421,9 +421,9 @@ He sends one message: *"This is what done looks like."*
 
 ---
 
-## Scene: InnoConnect returns — and asks to run the stories themselves
+## Scene: Ka-Ching Corp returns — and asks to run the stories themselves
 
-Three months later, InnoConnect calls again. They want to expand the contract. Before they sign, their IT lead asks a question nobody has asked before:
+Three months later, Ka-Ching Corp calls again. They want to expand the contract. Before they sign, their IT lead asks a question nobody has asked before:
 
 *"Can we run your tests? Not look at them — run them."*
 
@@ -443,24 +443,24 @@ Pinky Princess shares the story book with their IT team over a screen share. She
 > |----------------|
 > | Multi-Currency |
 
-She runs it. All three examples pass. InnoConnect's IT lead watches the output.
+She runs it. All three examples pass. Ka-Ching Corp's IT lead watches the output.
 
 ```mermaid
 sequenceDiagram
-    participant IC as InnoConnect IT Lead
+    participant IC as Ka-Ching Corp IT Lead
     participant PP as Pinky Princess
     participant TDT as True Doc Tales
 
-    IC->>PP: "Can we run your tests ourselves?"
+    IC->>PP: Can we run your tests ourselves?
     PP->>TDT: Opens multi-currency story
-    TDT->>IC: Example 1 — GBP→EUR: ✅ PASS
-    TDT->>IC: Example 2 — USD→JPY: ✅ PASS
-    TDT->>IC: Example 3 — EUR→GBP: ✅ PASS
-    IC->>PP: "What about the audit trail export?"
+    TDT->>IC: Example 1 - GBP to EUR - PASS
+    TDT->>IC: Example 2 - USD to JPY - PASS
+    TDT->>IC: Example 3 - EUR to GBP - PASS
+    IC->>PP: What about the audit trail export?
     PP->>TDT: Runs audit trail specification
-    TDT->>IC: All 4 scenarios: ✅ PASS
+    TDT->>IC: All 4 scenarios - PASS
     Note over IC: No penalty clause needed.
-    IC->>PP: "We have seen enough. Send us the contract."
+    IC->>PP: We have seen enough. Send us the contract.
 ```
 
 The IT lead: *"Last time we had to take your word for it. This time we saw it run."*
@@ -477,7 +477,7 @@ The IT lead: *"Last time we had to take your word for it. This time we saw it ru
 > |----------|----------------|
 > | FinTrack | Multi-Currency |
 
-InnoConnect signs the renewal. The contract includes an expanded feature set. There is no Section 7.3 penalty clause. Their legal team reviewed the story book instead.
+Ka-Ching Corp signs the renewal. The contract includes an expanded feature set. There is no Section 7.3 penalty clause. Their legal team reviewed the story book instead.
 
 ---
 
@@ -515,7 +515,7 @@ Three incidents. One gap. A gap between what was written and what was verified. 
 
 The stories are not test scripts. They are not boring test automation output. They are readable narratives that tell the business story of the system. And they happen to also be executable proof of every claim they contain.
 
-When InnoConnect asked *"can we run your tests?"*, Pinky Princess did not open a CI dashboard or share a test report. She opened a story. The story read like a human document. And it ran like evidence.
+When Ka-Ching Corp asked *"can we run your tests?"*, Pinky Princess did not open a CI dashboard or share a test report. She opened a story. The story read like a human document. And it ran like evidence.
 
 *The documentation stopped being a mirror.*
 *It became proof.*

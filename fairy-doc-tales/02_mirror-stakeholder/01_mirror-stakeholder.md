@@ -169,15 +169,15 @@ sequenceDiagram
     participant BB as Blueprint Ben
     participant CC as Checklist Charlie
 
-    MM->>PP: "Payments above certain thresholds need approval"
+    MM->>PP: Payments above certain thresholds need approval
     Note over PP: Writes story in 11 minutes. No threshold, no example.
-    PP->>BB: Story: "A manager wants to approve payments"
-    Note over BB: Format looks good. Criteria listed. Approved. ✓
+    PP->>BB: Story - A manager wants to approve payments
+    Note over BB: Format looks good. Criteria listed. Approved.
     BB->>CC: Story approved and ready
     CC->>CC: Reads the story three times
-    Note over CC: "It says payments. I will intercept all payments."
+    Note over CC: It says payments. I will intercept all payments.
     CC->>CC: Implements intercept for ALL payment transactions
-    Note over CC: "It says payments. I built payments. Done."
+    Note over CC: It says payments. I built payments. Done.
 ```
 
 He spends three days building it. He builds it well. The code is clean. The architecture follows the existing patterns. The approval queue works exactly as specified. Every payment entering the system is intercepted and routed to the approval queue before it is processed.

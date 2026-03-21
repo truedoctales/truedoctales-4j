@@ -109,9 +109,9 @@ The documentation remained. Nobody deleted it. Nobody marked it as *"not yet imp
 
 ---
 
-## Scene: InnoConnect comes knocking
+## Scene: Ka-Ching Corp comes knocking
 
-InnoConnect is a B2B payments processor with 3,400 clients across eleven European countries. They are looking for an expense management platform that handles multi-currency and multi-entity consolidation — both critical for their clients who operate across borders.
+Ka-Ching Corp is a B2B payments processor with 3,400 clients across eleven European countries. They are looking for an expense management platform that handles multi-currency and multi-entity consolidation — both critical for their clients who operate across borders.
 
 Their procurement team sends a feature requirements checklist to three vendors. FinTrack is one of them.
 
@@ -134,25 +134,25 @@ She closes both tabs. She opens a new Confluence page. She starts writing.
 
 ```mermaid
 sequenceDiagram
-    participant IC as InnoConnect Procurement
-    participant MM as Mirror Mike (CFO)
+    participant IC as Ka-Ching Corp Procurement
+    participant MM as Mirror Mike CFO
     participant PP as Pinky Princess
     participant BB as Blueprint Ben
 
     IC->>MM: Feature requirements checklist
-    MM->>PP: "Do we support all of these?"
+    MM->>PP: Do we support all of these?
     PP->>PP: Opens catalogue. Checks each feature.
-    PP->>MM: "Yes — all in the catalogue"
-    MM->>IC: "Full feature support confirmed"
+    PP->>MM: Yes - all in the catalogue
+    MM->>IC: Full feature support confirmed
     IC->>IC: Legal review of contract terms
-    IC->>MM: Signs €200,000 annual contract
-    MM->>MM: Announces in all-hands ✨
-    Note over BB: Multi-currency: never built
-    Note over BB: Multi-entity: never built
-    Note over BB: Partner API: never built
+    IC->>MM: Signs 200.000 EUR annual contract
+    MM->>MM: Announces in all-hands. Deal closed!
+    Note over BB: Multi-currency - never built
+    Note over BB: Multi-entity - never built
+    Note over BB: Partner API - never built
 ```
 
-InnoConnect signs a €200,000 annual contract. Mirror Mike announces it in the all-hands meeting. He specifically thanks Pinky Princess for the quality of the product catalogue, which was *"instrumental in closing the deal."*
+Ka-Ching Corp signs a €200,000 annual contract. Mirror Mike announces it in the all-hands meeting. He specifically thanks Pinky Princess for the quality of the product catalogue, which was *"instrumental in closing the deal."*
 
 The contract includes a standard enterprise clause: Section 7.3. Failure to deliver contracted features results in a €50,000 penalty per quarter of delay.
 
@@ -162,11 +162,11 @@ Nobody reads Section 7.3 until much later.
 
 ## Scene: Day one of onboarding — Blueprint Ben opens the codebase
 
-InnoConnect's project manager sends the onboarding kickoff agenda on a Monday morning. Item one: activate contracted features in the InnoConnect sandbox environment.
+Ka-Ching Corp's project manager sends the onboarding kickoff agenda on a Monday morning. Item one: activate contracted features in the Ka-Ching Corp sandbox environment.
 
 Blueprint Ben is responsible for the technical onboarding. He receives the feature list. He opens the codebase. He starts searching.
 
-Multi-Currency Support: he searches for *"currency conversion"* in the codebase. He finds a branch called `feature/multi-currency-v1` that was last committed eighteen months ago. The branch has code for EUR and GBP conversion. InnoConnect needs six currencies. The branch was never merged.
+Multi-Currency Support: he searches for *"currency conversion"* in the codebase. He finds a branch called `feature/multi-currency-v1` that was last committed eighteen months ago. The branch has code for EUR and GBP conversion. Ka-Ching Corp needs six currencies. The branch was never merged.
 
 > **Attempt** Fails
 >
@@ -187,7 +187,7 @@ He sends Mirror Mike a Slack message at 4:47 PM: *"We have a problem."*
 
 ## Scene: The penalty clause
 
-The call with InnoConnect's legal team is on Thursday morning. Mirror Mike is in the room. So is Blueprint Ben, Pinky Princess, and the FinTrack legal counsel.
+The call with Ka-Ching Corp's legal team is on Thursday morning. Mirror Mike is in the room. So is Blueprint Ben, Pinky Princess, and the FinTrack legal counsel.
 
 > **Risk** Risk is active
 >
@@ -196,7 +196,7 @@ The call with InnoConnect's legal team is on Thursday morning. Mirror Mike is in
 > | Audit Failure |
 > | Blame Culture |
 
-InnoConnect's legal team is polite and methodical. They go through each contracted feature. For each one, they ask Blueprint Ben to confirm it is available in the sandbox environment. For each one, Blueprint Ben says it is not.
+Ka-Ching Corp's legal team is polite and methodical. They go through each contracted feature. For each one, they ask Blueprint Ben to confirm it is available in the sandbox environment. For each one, Blueprint Ben says it is not.
 
 > **Attempt** Fails
 >
@@ -205,7 +205,7 @@ InnoConnect's legal team is polite and methodical. They go through each contract
 > | Pinky Princess | Audit Failure | Feature Roadmap Promises | FAILED |
 > | Mirror Mike    | Audit Failure | Executive Explanation    | FAILED |
 
-Mirror Mike explains that the features are on an accelerated roadmap and will be delivered in Q1. Pinky Princess says the documentation accurately reflected the product direction. InnoConnect's legal team listens carefully.
+Mirror Mike explains that the features are on an accelerated roadmap and will be delivered in Q1. Pinky Princess says the documentation accurately reflected the product direction. Ka-Ching Corp's legal team listens carefully.
 
 Then they cite Section 7.3.
 

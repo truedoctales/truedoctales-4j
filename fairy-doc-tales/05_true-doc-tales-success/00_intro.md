@@ -2,7 +2,7 @@
 
 ## The same team. Six months later. Different rules.
 
-After the InnoConnect penalty, after Sprint 14's fictional velocity, after the Tuesday morning payment crisis — the team made one decision:
+After the Ka-Ching Corp penalty, after Sprint 14's fictional velocity, after the Tuesday morning payment crisis — the team made one decision:
 
 **Every story we write will be a test we can run.**
 
@@ -65,7 +65,7 @@ graph TD
     D --> E[Mirror Mike earns Verified Documentation]
     E --> F[Blueprint Ben earns Executable Specifications]
     F --> G[All six risks are mitigated]
-    G --> H[InnoConnect returns for a second chance]
+    G --> H[Ka-Ching Corp returns for a second chance]
     H --> I[Team runs the stories live in the demo]
     I --> J[All stories pass]
     J --> K[Contract renewed. Trust restored.]
@@ -73,5 +73,5 @@ graph TD
     style K fill:#6f6
 ```
 
-*InnoConnect asked: "Can you show us the tests that prove it works?"*
+*Ka-Ching Corp asked: "Can you show us the tests that prove it works?"*
 *This time, the answer was yes.*
