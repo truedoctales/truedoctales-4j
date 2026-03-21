@@ -45,9 +45,9 @@ class PlotGlossaryGeneratorTest {
               "plotId": "Hero",
               "steps": [
                 { "plot": "Hero", "pattern": "Create hero", "inputType": "SEQUENCE",
-                  "variables": [], "headers": [] },
+                  "inplaceVariables": [], "tableVariables": [] },
                 { "plot": "Hero", "pattern": "Hero exists", "inputType": "SEQUENCE",
-                  "variables": [], "headers": [] }
+                  "inplaceVariables": [], "tableVariables": [] }
               ]
             }
           ]
@@ -85,11 +85,11 @@ class PlotGlossaryGeneratorTest {
                   "plot": "Hero",
                   "pattern": "Create hero",
                   "inputType": "SEQUENCE",
-                  "variables": [
+                  "inplaceVariables": [
                     { "name": "id", "type": "Long", "description": "Unique identifier" },
                     { "name": "name", "type": "String", "description": "Hero name" }
                   ],
-                  "headers": []
+                  "tableVariables": []
                 }
               ]
             }
@@ -118,7 +118,7 @@ class PlotGlossaryGeneratorTest {
               "plotId": "Greeting",
               "steps": [
                 { "plot": "Greeting", "pattern": "Say Hello", "inputType": "SEQUENCE",
-                  "variables": [], "headers": [] }
+                  "inplaceVariables": [], "tableVariables": [] }
               ]
             }
           ]
@@ -133,7 +133,7 @@ class PlotGlossaryGeneratorTest {
     assertTrue(
         content.contains("```\n> **Greeting** Say Hello\n```"),
         "Usage should be wrapped in code block");
-    assertFalse(content.contains("### Variables"), "No variables section when none present");
+    assertFalse(content.contains("### Variables"), "No inplaceVariables section when none present");
   }
 
   @Test
@@ -143,8 +143,8 @@ class PlotGlossaryGeneratorTest {
         """
         {
           "plots": [
-            { "plotId": "Zorro",  "steps": [{ "plot": "Zorro",  "pattern": "z step", "inputType": "SEQUENCE", "variables": [], "headers": [] }] },
-            { "plotId": "Alpha",  "steps": [{ "plot": "Alpha",  "pattern": "a step", "inputType": "SEQUENCE", "variables": [], "headers": [] }] }
+            { "plotId": "Zorro",  "steps": [{ "plot": "Zorro",  "pattern": "z step", "inputType": "SEQUENCE", "inplaceVariables": [], "tableVariables": [] }] },
+            { "plotId": "Alpha",  "steps": [{ "plot": "Alpha",  "pattern": "a step", "inputType": "SEQUENCE", "inplaceVariables": [], "tableVariables": [] }] }
           ]
         }
         """);
@@ -195,7 +195,7 @@ class PlotGlossaryGeneratorTest {
             {
               "plotId": "Hero",
               "steps": [{ "plot": "Hero", "pattern": "Create hero", "inputType": "SEQUENCE",
-                          "variables": [], "headers": [] }]
+                          "inplaceVariables": [], "tableVariables": [] }]
             }
           ]
         }
@@ -223,7 +223,7 @@ class PlotGlossaryGeneratorTest {
                   "pattern": "Create hero",
                   "inputType": "SEQUENCE",
                   "description": "Creates a new hero with the given attributes.",
-                  "variables": [], "headers": []
+                  "inplaceVariables": [], "tableVariables": []
                 }
               ]
             }
@@ -253,8 +253,8 @@ class PlotGlossaryGeneratorTest {
                   "plot": "Hero",
                   "pattern": "Create hero",
                   "inputType": "SEQUENCE",
-                  "variables": [],
-                  "headers": [
+                  "inplaceVariables": [],
+                  "tableVariables": [
                     { "name": "id", "type": "Long", "description": "Unique identifier" },
                     { "name": "name", "type": "String", "description": "Hero name" },
                     { "name": "species", "type": "String", "description": "Species" },
@@ -278,7 +278,7 @@ class PlotGlossaryGeneratorTest {
     assertTrue(content.contains("| `age` | `Integer` | Age in years |"), "Should list header age");
     assertTrue(
         content.contains("| id | name | species | age |"),
-        "Usage example should show table with headers");
+        "Usage example should show table with tableVariables");
   }
 
   @Test
@@ -292,9 +292,9 @@ class PlotGlossaryGeneratorTest {
               "plotId": "Greeting",
               "steps": [
                 { "plot": "Greeting", "pattern": "Say Hello", "inputType": "SEQUENCE",
-                  "variables": [], "headers": [] },
+                  "inplaceVariables": [], "tableVariables": [] },
                 { "plot": "Greeting", "pattern": "Batch greet", "inputType": "BATCH",
-                  "variables": [], "headers": [] }
+                  "inplaceVariables": [], "tableVariables": [] }
               ]
             }
           ]
@@ -322,11 +322,11 @@ class PlotGlossaryGeneratorTest {
                   "plot": "Greeting",
                   "pattern": "Greet ${name} ${count} times",
                   "inputType": "BATCH",
-                  "variables": [
+                  "inplaceVariables": [
                     { "name": "name", "type": "String", "description": "Name of the person" },
                     { "name": "count", "type": "Integer", "description": "How many times" }
                   ],
-                  "headers": [
+                  "tableVariables": [
                     { "name": "expected", "type": "String", "description": "Expected output" }
                   ]
                 }
@@ -347,10 +347,10 @@ class PlotGlossaryGeneratorTest {
     assertTrue(
         content.contains("| `expected` | `String` | Expected output |"),
         "Should list header expected");
-    // Usage example includes all columns: variables + headers
+    // Usage example includes all columns: inplaceVariables + tableVariables
     assertTrue(
         content.contains("| name | count | expected |"),
-        "Usage example should include both variables and headers");
+        "Usage example should include both inplaceVariables and tableVariables");
   }
 
   @Test
@@ -368,7 +368,7 @@ class PlotGlossaryGeneratorTest {
                   "plot": "Hero",
                   "pattern": "Create hero",
                   "inputType": "SEQUENCE",
-                  "headers": ["id", "name"]
+                  "tableVariables": ["id", "name"]
                 }
               ]
             }

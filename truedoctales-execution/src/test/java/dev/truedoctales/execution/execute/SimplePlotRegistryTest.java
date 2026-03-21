@@ -69,7 +69,7 @@ class SimplePlotRegistryTest {
     StepBinding step =
         new StepBinding("TestPlot", "Simple binding", InputType.SEQUENCE, "description");
     var call = new StepCall("TestPlot", "Simple binding");
-    StepExecution execution = new StepExecution(step, call, List.of(), 0);
+    StepExecution execution = StepExecution.simplCall(0, step, call);
 
     // Act
     registry.invoke(execution);
@@ -87,7 +87,7 @@ class SimplePlotRegistryTest {
     StepBinding binding = new StepBinding("TestPlot", "Step with ${param}", InputType.SEQUENCE, "");
     var call = new StepCall("TestPlot", "Step with test-value");
     List<Map<String, String>> data = List.of(Map.of("param", "test-value"));
-    StepExecution execution = new StepExecution(binding, call, data, 0);
+    StepExecution execution = StepExecution.table(0, binding, call, data);
 
     // Act
     registry.invoke(execution);
@@ -101,7 +101,7 @@ class SimplePlotRegistryTest {
     // Arrange
     StepBinding step = new StepBinding("NonExistentPlot", "Some binding", InputType.SEQUENCE, "");
     var call = new StepCall("NonExistentPlot", "Some binding");
-    StepExecution execution = new StepExecution(step, call, List.of(), 0);
+    StepExecution execution = StepExecution.simplCall(0, step, call);
 
     // Act & Assert
     Exception exception =
@@ -115,7 +115,7 @@ class SimplePlotRegistryTest {
     registry.register(new TestPlot());
     StepBinding step = new StepBinding("TestPlot", "Non-existent binding", InputType.SEQUENCE, "");
     var call = new StepCall("TestPlot", "Non-existent binding");
-    StepExecution execution = new StepExecution(step, call, List.of(), 0);
+    StepExecution execution = StepExecution.simplCall(0, step, call);
 
     // Act & Assert
     Exception exception =
@@ -133,11 +133,11 @@ class SimplePlotRegistryTest {
     // Act
     StepBinding step1 = new StepBinding("TestPlot", "Simple binding", InputType.SEQUENCE, "");
     var call1 = new StepCall("TestPlot", "Simple binding");
-    registry.invoke(new StepExecution(step1, call1, List.of(), 0));
+    registry.invoke(StepExecution.simplCall(0, step1, call1));
 
     StepBinding step2 = new StepBinding("AnotherPlot", "Another binding", InputType.SEQUENCE, "");
     var call2 = new StepCall("AnotherPlot", "Another binding");
-    registry.invoke(new StepExecution(step2, call2, List.of(), 0));
+    registry.invoke(StepExecution.simplCall(0, step2, call2));
 
     // Assert
     assertTrue(plot1.simpleCalled);
@@ -200,7 +200,7 @@ class SimplePlotRegistryTest {
         List.of(
             new VariableBinding("id", "Long", "Unique identifier"),
             new VariableBinding("name", "String", "Item name")),
-        step.variables(),
+        step.inplaceVariables(),
         "@Var should provide header names");
   }
 
@@ -212,7 +212,7 @@ class SimplePlotRegistryTest {
     // Act
     Set<PlotBinding> bindings = registry.getBindings();
 
-    // Assert - the step has @Step headers AND @Var; @Var should win
+    // Assert - the step has @Step tableVariables AND @Var; @Var should win
     StepBinding step =
         bindings.stream()
             .flatMap(b -> b.steps().stream())
@@ -221,8 +221,8 @@ class SimplePlotRegistryTest {
             .orElseThrow();
     assertEquals(
         List.of(new VariableBinding("paramA", "String", "Description from @Var")),
-        step.variables(),
-        "@Var should take precedence over @Step.headers()");
+        step.inplaceVariables(),
+        "@Var should take precedence over @Step.tableVariables()");
   }
 
   @Test
@@ -233,7 +233,7 @@ class SimplePlotRegistryTest {
     // Act
     Set<PlotBinding> bindings = registry.getBindings();
 
-    // Assert - the step has @Step headers but no @Var
+    // Assert - the step has @Step tableVariables but no @Var
     StepBinding step =
         bindings.stream()
             .flatMap(b -> b.steps().stream())
@@ -243,8 +243,8 @@ class SimplePlotRegistryTest {
     assertEquals(
         List.of(
             new VariableBinding("col1", "String", ""), new VariableBinding("col1", "String", "")),
-        step.variables(),
-        "Should fall back to @Step.headers() when no @Var present");
+        step.inplaceVariables(),
+        "Should fall back to @Step.tableVariables() when no @Var present");
   }
 
   @Plot("AnnotatedTypePlot")

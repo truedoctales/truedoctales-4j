@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 /// Maps story book models to execution models with bound steps.
 ///
 /// Resolves binding bindings by matching binding patterns with plot bindings and extracts
-/// variables from binding values.
+/// inplaceVariables from binding values.
 public class StoryBookExecutionMapperImpl implements Function<StoryBookModel, StoryBookExecution> {
 
   private static final Logger LOGGER =
@@ -170,11 +170,11 @@ public class StoryBookExecutionMapperImpl implements Function<StoryBookModel, St
             variableExtractor.extractVariables(stepBinding.pattern(), stepModel.call().stepValue());
         List<Map<String, String>> inputRows = new ArrayList<>(stepModel.inputRows());
 
-        // Keep variables separate from table data
+        // Keep inplaceVariables separate from table data
         Map<String, String> variables = extractedVariables != null ? extractedVariables : Map.of();
 
         return new StepExecution(
-            stepBinding, stepModel.call(), inputRows, stepModel.lineNumber(), variables);
+            stepModel.lineNumber(), stepBinding, stepModel.call(), variables, inputRows);
       } catch (Exception e) {
         throw new RuntimeException("Error mapping binding: " + stepModel, e);
       }

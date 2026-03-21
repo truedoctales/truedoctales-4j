@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 
 /// Handles method invocation with automatic parameter conversion.
 ///
-/// Converts table data and variables to method parameters, supporting:
+/// Converts table data and inplaceVariables to method parameters, supporting:
 /// - Simple parameters (String, Long, Integer, Boolean, LocalDate, enums)
 /// - Data table rows as individual parameters
 /// - Data table rows as typed collections (List<Record>, List<Map>)
@@ -25,13 +25,13 @@ public class MethodInvoker {
 
   private static final Logger LOGGER = Logger.getLogger(MethodInvoker.class.getName());
 
-  /// Invokes a method with data from table rows and extracted variables.
+  /// Invokes a method with data from table rows and extracted inplaceVariables.
   ///
   /// @param instance  the object instance
   /// @param method    the method to invoke
   /// @param inputType
   /// @param maps      the table data rows
-  /// @param variables extracted variables from pattern matching
+  /// @param variables extracted inplaceVariables from pattern matching
   /// @return the method result
   /// @throws Exception if invocation fails
   public Object invoke(
@@ -59,12 +59,13 @@ public class MethodInvoker {
       throws Exception {
     var results = new ArrayList<>();
     for (Map<String, String> map : maps) {
-      // Merge variables with each row
+      // Merge inplaceVariables with each row
       Map<String, String> mergedData = new HashMap<>(variables);
       mergedData.putAll(map);
       results.add(invokeWithDataRow(instance, method, mergedData));
     }
-    // If there are no table rows but we have variables, invoke once with just the variables
+    // If there are no table rows but we have inplaceVariables, invoke once with just the
+    // inplaceVariables
     if (maps.isEmpty() && !variables.isEmpty()) {
       results.add(invokeWithDataRow(instance, method, variables));
     }

@@ -36,11 +36,10 @@ class StoryBookExecutionMapperImplTest {
     // Arrange
     StepTask stepModel = new StepTask(10, new StepCall("plot1", "Without variable"), List.of());
     StepExecution expected =
-        new StepExecution(
+        StepExecution.simplCall(
+            10,
             new StepBinding("plot1", "Without variable", SEQUENCE),
-            new StepCall("plot1", "Without variable"),
-            List.of(),
-            10);
+            new StepCall("plot1", "Without variable"));
 
     // Act
     StepExecution result = mapper.mapStep(stepModel);
@@ -56,11 +55,11 @@ class StoryBookExecutionMapperImplTest {
     StepTask stepModel = new StepTask(10, call);
     StepExecution expected =
         new StepExecution(
+            10,
             new StepBinding("plot1", "With ${variable}", SEQUENCE),
             call,
-            List.of(),
-            10,
-            Map.of("variable", "TestValue"));
+            Map.of("variable", "TestValue"),
+            List.of());
 
     // Act
     StepExecution result = mapper.mapStep(stepModel);

@@ -15,7 +15,8 @@ import java.lang.annotation.Target;
 ///
 /// Method parameters annotated with {@link Variable} become the step's variable bindings,
 /// and any parameter annotated with {@link Table} is the receiver of tabular input data.
-/// The extracted metadata (variables, headers, descriptions, types) is serialised into
+/// The extracted metadata (inplaceVariables, tableVariables, descriptions, types) is serialised
+// into
 /// {@code plot-registry.json} and rendered in the generated plot glossary and HTML report.
 ///
 /// ### Usage

@@ -31,7 +31,7 @@ import java.lang.annotation.Target;
 /// ```
 ///
 /// The extracted metadata is serialised into {@code plot-registry.json} as an array of
-/// {@code {"name", "type", "description"}} objects under the {@code variables} key of each
+/// {@code {"name", "type", "description"}} objects under the {@code inplaceVariables} key of each
 /// step binding.
 ///
 /// @see Step

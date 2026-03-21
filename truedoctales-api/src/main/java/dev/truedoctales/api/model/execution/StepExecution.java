@@ -8,22 +8,28 @@ import java.util.Map;
 /// Represents a binding execution with all necessary data for invocation.
 ///
 /// Contains the binding binding, original value from markdown, table data, line number, optional
-/// description, and extracted variables for method parameter binding.
+/// description, and extracted inplaceVariables for method parameter binding.
 public record StepExecution(
+    int lineNumber,
     StepBinding binding,
     StepCall call,
-    List<Map<String, String>> stepData,
-    int lineNumber,
-    Map<String, String> variables) {
+    Map<String, String> inplaceVariables,
+    List<Map<String, String>> tableData) {
 
-  /// Creates a binding execution without variables.
-  ///
-  /// @param step the binding binding
-  /// @param stepCall the original binding call from markdown
-  /// @param stepData the table data rows
-  /// @param lineNumber the line number in the markdown file
-  public StepExecution(
-      StepBinding step, StepCall stepCall, List<Map<String, String>> stepData, int lineNumber) {
-    this(step, stepCall, stepData, lineNumber, Map.of());
+  public static StepExecution simplCall(int lineNumber, StepBinding binding, StepCall call) {
+    return new StepExecution(lineNumber, binding, call, Map.of(), List.of());
+  }
+
+  public static StepExecution inplace(
+      int lineNumber, StepBinding binding, StepCall call, Map<String, String> inplaceVariables) {
+    return new StepExecution(lineNumber, binding, call, inplaceVariables, List.of());
+  }
+
+  public static StepExecution table(
+      int lineNumber,
+      StepBinding binding,
+      StepCall call,
+      List<Map<String, String>> tableVariables) {
+    return new StepExecution(lineNumber, binding, call, Map.of(), tableVariables);
   }
 }

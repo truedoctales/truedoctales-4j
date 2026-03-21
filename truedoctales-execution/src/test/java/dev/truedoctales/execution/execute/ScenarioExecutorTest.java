@@ -32,8 +32,7 @@ class ScenarioExecutorTest {
   void execute_shouldCallListenerAndRegistry() {
     // Arrange
     StepBinding binding = new StepBinding("plot", "binding", InputType.SEQUENCE);
-    StepExecution execution =
-        new StepExecution(binding, new StepCall("plot", "binding"), java.util.List.of(), 0);
+    StepExecution execution = StepExecution.simplCall(0, binding, new StepCall("plot", "binding"));
 
     // Act
     executor.execute(execution);
@@ -50,7 +49,7 @@ class ScenarioExecutorTest {
 
     StepBinding binding = new StepBinding("plot", "binding", InputType.SEQUENCE);
     var stepCall = new StepCall("plot", "binding");
-    StepExecution execution = new StepExecution(binding, stepCall, java.util.List.of(), 10);
+    StepExecution execution = StepExecution.simplCall(10, binding, stepCall);
     plotRegistry.shouldThrow = true;
 
     // Act
@@ -70,7 +69,7 @@ class ScenarioExecutorTest {
     // Arrange
     StepBinding binding = new StepBinding("plot", "binding", InputType.SEQUENCE);
     var stepCall = new StepCall("plot", "binding");
-    StepExecution execution = new StepExecution(binding, stepCall, java.util.List.of(), 42);
+    StepExecution execution = StepExecution.simplCall(42, binding, stepCall);
     plotRegistry.shouldThrow = true;
 
     // Act
@@ -86,7 +85,7 @@ class ScenarioExecutorTest {
     // Arrange
     StepBinding binding = new StepBinding("plot", "binding", InputType.SEQUENCE);
     var stepCall = new StepCall("plot", "binding");
-    StepExecution execution = new StepExecution(binding, stepCall, java.util.List.of(), 0);
+    StepExecution execution = StepExecution.simplCall(0, binding, stepCall);
     plotRegistry.shouldThrow = true;
 
     // Act

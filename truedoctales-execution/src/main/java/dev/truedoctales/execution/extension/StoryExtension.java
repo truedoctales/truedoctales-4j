@@ -262,7 +262,7 @@ public class StoryExtension
 
     // Use the accumulated parameter table as step data (will grow with each invocation)
     List<Map<String, String>> tableSnapshot = new ArrayList<>(parameterTable);
-    StepExecution implicitStep = new StepExecution(binding, call, tableSnapshot, 0);
+    StepExecution implicitStep = StepExecution.table(0, binding, call, tableSnapshot);
 
     StepExecutionResult stepResult = new StepExecutionResult(implicitStep);
 
@@ -358,7 +358,7 @@ public class StoryExtension
     // Create failed step
     StepBinding binding = buildBinding(context.getRequiredTestClass());
     StepCall call = new StepCall(CODE_STEP_TYPE, sceneAnnotation.title());
-    StepExecution implicitStep = new StepExecution(binding, call, List.of(), 0);
+    StepExecution implicitStep = StepExecution.simplCall(0, binding, call);
 
     StepExecutionResult stepResult = new StepExecutionResult(implicitStep, cause);
 
@@ -503,7 +503,7 @@ public class StoryExtension
     if (stepData.isEmpty()) {
       return;
     }
-    // Get column headers from the first row
+    // Get column tableVariables from the first row
     List<String> headers = new ArrayList<>(stepData.getFirst().keySet());
 
     // Calculate column widths

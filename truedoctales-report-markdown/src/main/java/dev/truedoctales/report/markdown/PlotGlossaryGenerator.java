@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 /// <ul>
 ///   <li>{@code plot-glossary.md} — index listing all plots with links to their detail pages
 ///   <li>{@code plots/<PlotId>.md} — one detail page per plot with an H2 section per step,
-///       its variables, and a usage example
+///       its inplaceVariables, and a usage example
 /// </ul>
 public class PlotGlossaryGenerator {
 
@@ -136,7 +136,8 @@ public class PlotGlossaryGenerator {
   /// A single variable/header entry extracted from JSON.
   record VarEntry(String name, String type, String description) {}
 
-  /// Appends a single step section (H2 + description + variables/headers + usage example) to the
+  /// Appends a single step section (H2 + description + inplaceVariables/tableVariables + usage
+  // example) to the
   /// builder.
   private void appendStepSection(StringBuilder md, String plotId, JsonNode step) {
     String pattern = step.path("pattern").asText("");
@@ -199,20 +200,20 @@ public class PlotGlossaryGenerator {
     md.append("\n---\n");
   }
 
-  /// Extracts variable bindings from the step JSON node's {@code variables} array.
+  /// Extracts variable bindings from the step JSON node's {@code inplaceVariables} array.
   ///
   /// Supports both the new object format ({@code {"name", "type", "description"}}) and the
   /// legacy flat string format for backward compatibility.
   static List<VarEntry> extractVariableBindings(JsonNode step) {
-    return extractBindingArray(step, "variables");
+    return extractBindingArray(step, "inplaceVariables");
   }
 
-  /// Extracts header bindings from the step JSON node's {@code headers} array.
+  /// Extracts header bindings from the step JSON node's {@code tableVariables} array.
   ///
   /// Supports both the new object format ({@code {"name", "type", "description"}}) and the
   /// legacy flat string format for backward compatibility.
   static List<VarEntry> extractHeaderBindings(JsonNode step) {
-    return extractBindingArray(step, "headers");
+    return extractBindingArray(step, "tableVariables");
   }
 
   private static List<VarEntry> extractBindingArray(JsonNode step, String fieldName) {

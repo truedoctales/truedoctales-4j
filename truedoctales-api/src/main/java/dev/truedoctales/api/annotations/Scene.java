@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 ///
 /// Marks a test method as a scene within a code-based story.
 ///
-/// Scenes are the main sections of a story, similar to markdown `## Scene:` headers.
+/// Scenes are the main sections of a story, similar to markdown `## Scene:` tableVariables.
 /// Each scene can have a title and description, and contains the test logic that
 /// will be executed and documented.
 ///

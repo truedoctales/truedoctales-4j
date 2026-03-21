@@ -112,8 +112,8 @@ public class SimplePlotRegistry implements PlotRegistry {
           call.instance(),
           call.method(),
           getInputType(call.method()),
-          stepExecution.stepData(),
-          stepExecution.variables());
+          stepExecution.tableData(),
+          stepExecution.inplaceVariables());
     } catch (InvocationTargetException e) {
       Throwable cause = e.getTargetException();
       // Always throw as RuntimeException to ensure it can be caught and wrapped properly

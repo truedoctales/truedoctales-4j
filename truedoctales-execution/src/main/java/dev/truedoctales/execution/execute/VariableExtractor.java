@@ -45,7 +45,7 @@ public class VariableExtractor {
     }
   }
 
-  /// Extracts variables from a scenario title using a pattern.
+  /// Extracts inplaceVariables from a scenario title using a pattern.
   ///
   /// @param pattern the pattern with ${variable} placeholders
   /// @param scenarioName the actual scenario title
