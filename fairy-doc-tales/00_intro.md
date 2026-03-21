@@ -1,149 +1,82 @@
 # True Doc Tales
 
-*Fairy tales become reality*
-
+*From fairy tale to trusted truth*
 
 ![True Doc Tales](assets/big_icon_full.png)
 
-Welcome to True Doc Tales, a framework for creating **living documentation** - documentation that executes as tests and validates itself with every run.
+True Doc Tales exists to solve a common business problem: teams write documentation with the best intentions, but as soon as software changes, the documentation starts drifting away from reality.
 
-## The Problem with Traditional Documentation
+At first, those documents look helpful. Product owners use them to explain requirements. Developers use them to understand behavior. Testers use them to validate expectations. But over time, the system evolves, small changes accumulate, and the written story no longer matches the implemented one.
 
-We've all seen it happen:
+In the age of AI-generated code, this risk becomes even bigger. Teams can produce changes faster than ever, but speed without validation also means that misunderstandings, false assumptions, and undocumented behavior can spread much faster.
 
-📄 **Day 1:** Beautiful documentation, perfectly describing the system  
-📅 **Week 3:** Code evolves, docs drift  
-🕸️ **Month 6:** Documentation becomes fiction  
-❌ **Year 1:** Nobody trusts the docs anymore
+That is the moment when documentation turns into a fairy tale: it sounds plausible, it was once true, but nobody can fully trust it anymore.
 
-**Traditional documentation dies the moment you write it.** It can't verify itself. It can't adapt. It becomes a historical artifact rather than a living guide.
+## Why This Project Exists
 
-## Living Documentation: A Different Paradigm
+True Doc Tales was created to close the gap between **what people say the system does** and **what the system actually does**.
 
-**What if your documentation could run?**  
-**What if it validated itself every time your tests run?**  
-**What if being out-of-date was impossible because outdated docs simply fail?**
+The idea is simple:
+- business stories should not live separately from validation
+- examples should not be static text that silently becomes outdated
+- documentation should earn trust by being verified continuously
+- AI-generated implementation should be guided by clear, testable expectations
 
-This is **living documentation** - documentation that:
-- ✅ **Executes** as part of your test suite
-- ✅ **Validates** its own accuracy with every run
-- ✅ **Fails** immediately when reality diverges from documentation
-- ✅ **Lives** alongside your code, staying perpetually current
+Instead of treating documentation as a passive artifact, True Doc Tales turns it into a reliable source of truth. When stories are executed and validated by tests, they stop being wishful thinking and become evidence.
 
-True Doc Tales makes your documentation **executable** and **self-verifying**. When the docs run green, they're guaranteed to be correct. When requirements change, outdated docs fail fast, forcing updates.
+This also gives teams more control over AI-supported development. If the specification is executable, AI-generated code can be checked against real expectations instead of being accepted just because it looks convincing.
 
-## How It Works
+## The Business Problem It Tackles
 
-Instead of writing documentation that *describes* how your system works, you write documentation that *demonstrates* how it works:
+In many projects, the same pain appears again and again:
+- Requirements are written, but they are interpreted differently by each role
+- Documentation is approved once, then forgotten while implementation keeps moving
+- Product owners cannot easily see whether the documented behavior is still real
+- Teams lose trust in specifications because they describe a world that no longer exists
+- Onboarding becomes slower because newcomers do not know which documents are still relevant
+- AI-generated code can accelerate delivery, but also amplify mistakes when expectations are not validated
+- Teams want to experiment with vibe coding, but without testable specs they lose control over what is actually being built
 
-```markdown
-# The Brave Little Tailor
+This creates friction across the whole delivery process. Decisions become slower. Alignment becomes harder. Reviews become more subjective. Teams spend time debating what is true instead of building the next valuable change.
 
-## Scene: The tailor's great boast
+## Why Stakeholders Need It
 
-> **Hero** Create hero
-> 
-> | id | name   | species | age |
-> |----|--------|---------|-----|
-> | 1  | Tailor | Human   | 25  |
+True Doc Tales helps product owners, developers, and testers work with the same shared understanding.
 
-> **Hero** Grant skill
-> 
-> | heroName | skill      |
-> |----------|------------|
-> | Tailor   | Cleverness |
-```
+For product owners, it creates confidence that the documented business story is not only well written, but actually proven.
 
-This markdown **runs as a test**. It executes real code. It validates real behavior. It's simultaneously:
-- 📖 **Documentation** - Readable by humans, tells a story
-- ✅ **Test** - Executable by machines, verifies correctness
-- 📋 **Specification** - Defines expected behavior precisely
-- 🛡️ **Guard** - Fails when documentation lies
+For developers, it reduces ambiguity by connecting expectations directly to executable validation.
 
-## Why Stories? Why Grimm Brothers Fairy Tales?
+For testers and quality engineers, it provides examples that are both readable and enforceable.
 
-**One excellent example beats a dozen incomplete ones.**
+For teams working with AI-generated code, it creates an additional layer of control. The story becomes the guardrail that helps evaluate whether generated output really fulfills the intended business behavior.
 
-The Brothers Grimm collected some of the most memorable stories in human history. These fairy tales provide the perfect living documentation metaphor:
-- ✅ **Memorable** - "Tailor tricks giants" > "User #42 workflow"
-- ✅ **Complete** - Full story lifecycle from setup to resolution
-- ✅ **Engaging** - Narrative docs are maintainable docs
-- ✅ **Universal** - Maps to real patterns (quests = processes, heroes = users)
+For teams exploring vibe coding, it creates the possibility to test specifications quickly and safely, so fast experimentation does not come at the cost of trust.
 
-The storytelling approach isn't just stylistic - it's strategic. Stories are:
-- **Comprehensible** - Anyone can understand a fairy tale narrative
-- **Maintainable** - Good stories resist rot better than technical specs
-- **Educational** - New developers learn by reading executable tales
-- **Validating** - The story only passes if the system truly behaves that way
+For the whole organization, it strengthens trust. The documentation is no longer only a communication tool. It becomes a validation tool.
 
-Business logic wrapped in fairy tales:
-- **Heroes** → Users/Actors
-- **Quests** → Workflows/Processes  
-- **Villains** → Edge Cases/Threats
-- **Magic** → Capabilities/Features
-- **Happy Endings** → Success States/Completions
+## Why the Name Matters
 
-The patterns are universal, but the stories make them unforgettable AND verifiable.
+The name reflects the lifecycle of many documents.
 
-## What You'll Find in This Book
+A story starts as an idea, an expectation, or even a utopia. For a short time, once implemented, it may be true. But if nobody validates it continuously, it slowly becomes just another fairy tale beginning with: *long, long ago...*
 
-```mermaid
-graph TD
-    A[Book of Grimm Stories] --> B[Prequels Character Setup]
-    A --> C[Chapter 1: Framework Basics]
-    A --> D[Chapter 2: The Brave Little Tailor]
-    A --> E[Chapter 3: The Devil with Three Golden Hairs]
-    A --> F[Chapter 4: Jorinde and Joringel]
-    B --> B1[Create Heroes]
-    B --> B2[Create Villains]    
-    C --> C1[Hello World Example]
-    D --> D1[Cleverness Over Strength]
-    E --> E1[Multi-Stage Quest]
-    F --> F1[Rescue and Magic]
-```
+True Doc Tales changes that ending.
 
-### Chapter 1: Framework Basics - Your First Living Document
-**Learn the fundamentals** of creating executable documentation.
-- Setting up your first living doc (Hello World)
-- Connecting markdown stories to real code
-- Understanding the execution model
-- The Greeting plot in action
+The fairy tale becomes a **true doc tale** only when the story is executed, the behavior is validated, and reality confirms the narrative.
 
-### Chapter 2: The Brave Little Tailor - Cleverness Defeats Giants
-**Seven at one blow!** A humble tailor tricks his way to glory.
-- A tailor's boast leads to impossible challenges
-- Outwitting giants and fierce beasts through cunning
-- Winning a kingdom through cleverness, not strength
-- Demonstrates: Quest lifecycle, skill-based victories, achievement progression
+## The Outcome
 
-### Chapter 3: The Devil with the Three Golden Hairs - Multi-Stage Adventure  
-**A perilous journey through hell and back.**
-- A young hero must obtain three golden hairs from the devil
-- Multiple helpers aid the quest (grandmother, ferryman)
-- Solving riddles and completing sub-quests
-- Demonstrates: Complex quest chains, multi-hero collaboration, quest completion rewards
+With True Doc Tales, teams can build documentation that is:
+- **Trustworthy** because it is continuously validated
+- **Useful** because it supports communication across roles
+- **Current** because change is detected immediately
+- **Actionable** because mismatches are visible as soon as they appear
+- **Controlling** because AI-generated code can be checked against real business expectations
+- **Enabling** because specs can be tested and used as a safer foundation for vibe coding
 
-### Chapter 4: Jorinde and Joringel - Rescue from the Witch's Castle
-**Love conquers dark magic.**
-- Jorinde transformed into a nightingale by an evil fairy
-- Joringel's quest to find the magic flower
-- Rescuing Jorinde and defeating the fairy's curse
-- Demonstrates: Monster encounters, magic items, rescue missions, happy endings
-
-## The Promise
-
-With True Doc Tales, your documentation:
-- **Never lies** - If it runs, it's true. If it's false, it fails.
-- **Never rots** - Breaking changes break the docs, forcing updates
-- **Never confuses** - Stories are clearer than specifications
-- **Never bores** - Fairy tales beat dry technical writing
-
-## Getting Started
-
-1. **Prequels:** Setup your fairy tale world with heroes and villains
-2. **Chapter 1-3:** Experience three complete Grimm Brothers tales
-3. **Your Domain:** Transform your specs into executable fairy tales
-
-*Once upon a time, there was documentation that always told the truth...*
+This project exists so that business stories do not fade into fiction.
+It exists so that teams can rely on their documentation again.
+It exists to turn promising stories into trusted truth.
 
 ![True Doc Tales](assets/big_icon_full.png)
