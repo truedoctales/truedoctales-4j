@@ -28,19 +28,19 @@
         sb += '<ul>\n';
         stories.forEach(function (s) {
           var failedClass = s.status === 'FAILURE' || s.status === 'ERROR' ? 'nav-failed' : '';
-          var badge = s.errorCount > 0 ? '<span class="nav-error-badge">' + s.errorCount + '</span>' : '';
+          var badge = s.hasErrors ? '<span class="nav-error-badge" title="Has failures">\u26A0\uFE0F</span>' : '';
           sb += '<li><a href="#' + escHtml(s.htmlPath) + '" class="' + failedClass + '">' + escHtml(s.title) + badge + '</a></li>\n';
         });
         sb += '</ul>\n';
       } else {
         var num = ch.dirName ? parseInt(ch.dirName.split('_')[0], 10) : null;
         var badge = isNaN(num) || num === 0 ? '' : numberBadge(num);
-        var chapterErrorCount = 0;
+        var chapterHasErrors = false;
         stories.forEach(function (s) {
-          if (s.errorCount > 0) chapterErrorCount += s.errorCount;
+          if (s.hasErrors) chapterHasErrors = true;
         });
-        var chapterFailedClass = chapterErrorCount > 0 ? ' nav-failed' : '';
-        var chapterBadge = chapterErrorCount > 0 ? '<span class="nav-error-badge">' + chapterErrorCount + '</span>' : '';
+        var chapterFailedClass = chapterHasErrors ? ' nav-failed' : '';
+        var chapterBadge = chapterHasErrors ? '<span class="nav-error-badge" title="Has failures">\u26A0\uFE0F</span>' : '';
         sb += '<div class="nav-chapter">\n';
         sb += '  <div class="nav-chapter-row">';
         if (ch.introPage) {
@@ -55,7 +55,7 @@
         stories.forEach(function (s, idx) {
           var storyNum = idx + 1;
           var failedClass = s.status === 'FAILURE' || s.status === 'ERROR' ? 'nav-failed' : '';
-          var storyBadge = s.errorCount > 0 ? '<span class="nav-error-badge">' + s.errorCount + '</span>' : '';
+          var storyBadge = s.hasErrors ? '<span class="nav-error-badge" title="Has failures">\u26A0\uFE0F</span>' : '';
           sb += '    <li><a href="#' + escHtml(s.htmlPath) + '" class="' + failedClass + '">' + numberBadge(storyNum) + escHtml(s.title) + storyBadge + '</a></li>\n';
         });
         sb += '  </ul>\n';

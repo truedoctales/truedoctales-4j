@@ -162,7 +162,15 @@ public class HtmlBookReportGenerator {
         if (introTitle == null) introTitle = extractTitleFromMarkdown(introMd);
         entries.add(
             new NavEntry(
-                introMd, "00_intro.md", "00_intro.html", introTitle, false, null, "Book", null, 0));
+                introMd,
+                "00_intro.md",
+                "00_intro.html",
+                introTitle,
+                false,
+                null,
+                "Book",
+                null,
+                false));
       }
     }
 
@@ -200,7 +208,7 @@ public class HtmlBookReportGenerator {
                 chapterDirName,
                 chapterTitle,
                 null,
-                0));
+                false));
       }
 
       // Story JSON files (sorted, skip meta.json and any non-json)
@@ -223,7 +231,7 @@ public class HtmlBookReportGenerator {
         }
 
         String storyStatus = readStoryStatus(storyJson);
-        int storyErrorCount = countStoryErrors(storyJson);
+        boolean storyHasErrors = "FAILURE".equals(storyStatus) || "ERROR".equals(storyStatus);
 
         String mdRelativePath =
             storyPathField != null
@@ -242,7 +250,7 @@ public class HtmlBookReportGenerator {
                 chapterDirName,
                 chapterTitle,
                 storyStatus,
-                storyErrorCount));
+                storyHasErrors));
       }
     }
 
@@ -260,7 +268,7 @@ public class HtmlBookReportGenerator {
                 "plots",
                 "Plots",
                 null,
-                0));
+                false));
       }
       Path plotsDir = markdownDirectory.resolve("plots");
       if (Files.isDirectory(plotsDir)) {
@@ -282,7 +290,7 @@ public class HtmlBookReportGenerator {
                             "plots",
                             "Plots",
                             null,
-                            0));
+                            false));
                   });
         }
       }
@@ -349,7 +357,7 @@ public class HtmlBookReportGenerator {
                       chapterDir,
                       chapterLabel,
                       null,
-                      0));
+                      false));
             }
             return FileVisitResult.CONTINUE;
           }
@@ -411,7 +419,7 @@ public class HtmlBookReportGenerator {
             .append(jsonString(e.htmlRelativePath()));
         if (e.status() != null) {
           sb.append(", \"status\": ").append(jsonString(e.status()));
-          sb.append(", \"errorCount\": ").append(e.errorCount());
+          sb.append(", \"hasErrors\": ").append(e.hasErrors());
         }
         sb.append(" }");
         if (si < stories.size() - 1) sb.append(",");
@@ -638,21 +646,6 @@ public class HtmlBookReportGenerator {
     }
   }
 
-  /// Counts the number of failed/errored steps in a story JSON file.
-  private int countStoryErrors(Path storyJsonFile) {
-    try {
-      String content = Files.readString(storyJsonFile);
-      Matcher matcher = STATUS_FIELD_PATTERN.matcher(content);
-      int count = 0;
-      while (matcher.find()) {
-        count++;
-      }
-      return count;
-    } catch (IOException e) {
-      return 0;
-    }
-  }
-
   // -------------------------------------------------------------------------
   // Label / title helpers
   // -------------------------------------------------------------------------
@@ -719,7 +712,7 @@ public class HtmlBookReportGenerator {
       String chapterDirName,
       String chapterLabel,
       String status,
-      int errorCount) {}
+      boolean hasErrors) {}
 
   /// A group of {@link NavEntry} items belonging to the same chapter directory.
   record ChapterGroup(String label, String dirName, String introHtmlPath, List<NavEntry> stories) {}

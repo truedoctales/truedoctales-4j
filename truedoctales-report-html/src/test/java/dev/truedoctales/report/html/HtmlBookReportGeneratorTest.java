@@ -768,6 +768,6 @@ class HtmlBookReportGeneratorTest {
     String navJson = Files.readString(htmlOutputDir.resolve("report-nav.json"));
     assertTrue(navJson.contains("\"status\""), "Nav JSON should contain status field for stories");
     assertTrue(
-        navJson.contains("\"errorCount\""), "Nav JSON should contain errorCount field for stories");
+        navJson.contains("\"hasErrors\""), "Nav JSON should contain hasErrors field for stories");
   }
 }

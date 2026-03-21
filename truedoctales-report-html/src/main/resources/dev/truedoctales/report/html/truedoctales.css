@@ -240,21 +240,11 @@ body {
   flex-shrink: 0;
 }
 
-/* Error count badge for stories and chapters with failures */
+/* Warning indicator for stories and chapters with failures */
 .nav-error-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 1.2em;
-  height: 1.2em;
-  font-size: 0.62rem;
-  font-weight: 700;
-  color: #fff;
-  background: #dc2626;
-  border-radius: 50%;
-  padding: 0 0.3em;
   margin-left: auto;
   flex-shrink: 0;
+  font-size: 0.85rem;
   line-height: 1;
 }
 
