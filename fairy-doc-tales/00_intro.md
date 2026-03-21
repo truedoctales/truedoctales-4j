@@ -5,7 +5,36 @@
 
 ![True Doc Tales](assets/big_icon_full.png)
 
-Welcome to True Doc Tales, a framework for creating **living documentation** - documentation that executes as tests and validates itself with every run.
+Welcome to **True Doc Tales** — a framework for creating **living documentation**: documentation that executes as tests and validates itself with every run.
+
+## Why Is It Called "True Doc Tales"?
+
+Every great name tells a story. This one tells the story of documentation itself.
+
+| Stage | What happens |
+|-------|-------------|
+| 📖 **Written** | Documentation is a *utopia* — a vision of how the system should work |
+| 🚀 **Implemented** | For a while, the docs are accurate and *true* |
+| ⏳ **Over time** | Reality drifts, code evolves, the docs become a *fairy tale* — "once upon a time, this is how it worked…" |
+| ✅ **Tested & Validated** | When examples are continuously executed and verified by real tests, the documentation becomes trustworthy again — it is a *true* story you can rely on |
+
+That journey — from **utopia** to **truth** to **fairy tale** and back to **truth** — is exactly what this project addresses.  
+The book of stories you can trust: **True Doc Tales**.
+
+## A Real-World Example: The DNS Mystery
+
+Imagine this scenario — one that every engineer or operations person has lived through:
+
+> *"I set up my home network with a Pi-hole as the DNS server. My router has DHCP disabled, everything looks correct in the config. After a restart, everything seems to work fine… but something feels off. I run `nslookup` on my laptop and discover it's not actually using Pi-hole as the DNS server at all."*
+
+**The documented configuration** says Pi-hole is the DNS.  
+**The actual runtime behaviour** says otherwise.
+
+No error. No alarm. Just silent divergence between what is written and what is real.
+
+This gap — between *expected behaviour* and *actual behaviour* — is not unique to home networks. It lives in every production system, every microservice, every API contract. And it is almost always invisible until something breaks at the worst possible moment.
+
+> **True Doc Tales exists to close that gap.**
 
 ## The Problem with Traditional Documentation
 
@@ -31,6 +60,33 @@ This is **living documentation** - documentation that:
 - ✅ **Lives** alongside your code, staying perpetually current
 
 True Doc Tales makes your documentation **executable** and **self-verifying**. When the docs run green, they're guaranteed to be correct. When requirements change, outdated docs fail fast, forcing updates.
+
+## Why Product Owners and Stakeholders Need This
+
+If you are a **product owner**, a **team lead**, or anyone who relies on documentation to make decisions, this section is for you.
+
+### The Business Cost of Untrustworthy Docs
+
+When documentation cannot be trusted, the hidden costs multiply:
+
+| Problem | Business Impact |
+|---------|----------------|
+| Outdated specs | Developers build the wrong thing |
+| Undiscoverable behaviour | New team members make avoidable mistakes |
+| Silent configuration drift | Production incidents that surprise everyone |
+| "I thought it worked that way" | Bugs discovered by customers, not by the team |
+
+The DNS example above is not an edge case — it is the *norm* in complex systems. The config looks right. The documentation says it is right. But the system behaves differently, and nobody notices until it matters.
+
+### What True Doc Tales Gives You
+
+- 🔒 **Confidence** — If the docs run green, they describe how the system actually behaves right now
+- 🚀 **Faster onboarding** — New team members read stories that are guaranteed to be accurate
+- 🛡️ **Reduced risk** — Breaking changes immediately surface as failing docs, not as production incidents
+- 🤝 **Shared language** — Product, engineering, and operations all work from the same verified source of truth
+- 📈 **Sustainable quality** — Documentation stays current because it *has* to: outdated docs fail
+
+> **For a product owner:** You no longer have to wonder whether the feature you approved actually works the way the spec says. The passing tests *are* the proof.
 
 ## How It Works
 
