@@ -1,0 +1,35 @@
+project:
+  name: truedoctales-4j
+  description: "A story-based testing framework with custom annotations for writing expressive, narrative-driven test scenarios"
+  authors:
+    - Kay Landeck
+  license: Apache-2.0
+  inceptionYear: "2024"
+  links:
+    homepage: https://github.com/truedoctales/truedoctales-4j
+    documentation: https://github.com/truedoctales/truedoctales-4j
+    bugTracker: https://github.com/truedoctales/truedoctales-4j/issues
+
+release:
+  github:
+    overwrite: true
+    changelog:
+      formatted: ALWAYS
+      preset: conventional-commits
+      contributors:
+        format: "- {{contributorName}}"
+
+# ---------------------------------------------------------------------------
+# Deploy
+# ---------------------------------------------------------------------------
+# Currently: GitHub Packages only.
+# Maven Central will be added here later (deploy.maven.mavenCentral section).
+# ---------------------------------------------------------------------------
+deploy:
+  maven:
+    githubPackages:
+      truedoctales:
+        active: ALWAYS
+        url: "https://maven.pkg.github.com/truedoctales/truedoctales-4j"
+        stagingRepositories:
+          - target/staging-deploy

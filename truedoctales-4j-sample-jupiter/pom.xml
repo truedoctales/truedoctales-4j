@@ -15,6 +15,10 @@
   <name>True Doc Tales - Sample Jupiter</name>
   <description>Sample module demonstrating JUnit Jupiter usage</description>
 
+  <properties>
+    <maven.deploy.skip>true</maven.deploy.skip>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>dev.truedoctales</groupId>

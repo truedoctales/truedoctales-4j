@@ -11,61 +11,40 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write
+  contents: write  # create GitHub Release and upload assets
+  packages: write  # publish to GitHub Packages
 
 jobs:
   release:
-    name: Build and publish to Maven Central
+    name: Build and release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # full history required for JReleaser changelog
 
       - name: Set release version from tag
         id: version
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
 
-      - name: Set up Java 25 with GPG signing
+      - name: Set up Java 25
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '25'
           cache: maven
-          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
-          gpg-passphrase: MAVEN_GPG_PASSPHRASE
-          server-id: central
-          server-username: MAVEN_CENTRAL_USERNAME
-          server-password: MAVEN_CENTRAL_TOKEN
 
-      - name: Build and deploy to Maven Central
+      - name: Build and stage artifacts
+        run: |
+          ./mvnw --no-transfer-progress clean deploy \
+            -Prelease \
+            -Drevision=${{ steps.version.outputs.VERSION }} \
+            -DaltDeploymentRepository="local::default::file://${GITHUB_WORKSPACE}/target/staging-deploy"
+
+      - name: Release with JReleaser
+        uses: jreleaser/release-action@v2
         env:
-          MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
-          MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
-          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
-        run: >
-          ./mvnw --no-transfer-progress clean deploy
-          -Prelease
-          -Drevision=${{ steps.version.outputs.VERSION }}
-          -DskipTests=false
+          JRELEASER_PROJECT_VERSION: ${{ steps.version.outputs.VERSION }}
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          name: ${{ github.ref_name }}
-          body: |
-            ## ${{ github.ref_name }}
-
-            Published to Maven Central: [dev.truedoctales](https://central.sonatype.com/search?q=dev.truedoctales)
-
-            ### Artifacts
-
-            Add the following to your `pom.xml`:
-            ```xml
-            <dependency>
-              <groupId>dev.truedoctales</groupId>
-              <artifactId>truedoctales-4j-api</artifactId>
-              <version>${{ steps.version.outputs.VERSION }}</version>
-            </dependency>
-            ```
-          draft: false
-          prerelease: ${{ contains(github.ref_name, '-') }}
