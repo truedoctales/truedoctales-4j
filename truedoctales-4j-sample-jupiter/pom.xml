@@ -4,12 +4,12 @@
 
   <parent>
     <groupId>dev.truedoctales</groupId>
-    <artifactId>truedoctales-parent</artifactId>
+    <artifactId>truedoctales-4j-parent</artifactId>
     <version>${revision}</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>truedoctales-sample-jupiter</artifactId>
+  <artifactId>truedoctales-4j-sample-jupiter</artifactId>
   <packaging>jar</packaging>
 
   <name>True Doc Tales - Sample Jupiter</name>
@@ -18,18 +18,18 @@
   <dependencies>
     <dependency>
       <groupId>dev.truedoctales</groupId>
-      <artifactId>truedoctales-sample-domain</artifactId>
+      <artifactId>truedoctales-4j-sample-domain</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>dev.truedoctales</groupId>
-      <artifactId>truedoctales-execution</artifactId>
+      <artifactId>truedoctales-4j-execution</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>dev.truedoctales</groupId>
-      <artifactId>truedoctales-report-json</artifactId>
+      <artifactId>truedoctales-4j-report-json</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
@@ -44,7 +44,7 @@
            Usage: mvn clean verify -->
       <plugin>
         <groupId>dev.truedoctales</groupId>
-        <artifactId>truedoctales-maven-plugin</artifactId>
+        <artifactId>truedoctales-4j-maven-plugin</artifactId>
         <version>${project.version}</version>
         <executions>
           <execution>

@@ -4,12 +4,12 @@
 
   <parent>
     <groupId>dev.truedoctales</groupId>
-    <artifactId>truedoctales-parent</artifactId>
+    <artifactId>truedoctales-4j-parent</artifactId>
     <version>${revision}</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>truedoctales-report-markdown</artifactId>
+  <artifactId>truedoctales-4j-report-markdown</artifactId>
   <packaging>jar</packaging>
 
   <name>True Doc Tales - Report Markdown</name>
@@ -30,7 +30,7 @@
     </dependency>
     <dependency>
       <groupId>dev.truedoctales</groupId>
-      <artifactId>truedoctales-api</artifactId>
+      <artifactId>truedoctales-4j-api</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

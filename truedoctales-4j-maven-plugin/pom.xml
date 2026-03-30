@@ -4,12 +4,12 @@
 
   <parent>
     <groupId>dev.truedoctales</groupId>
-    <artifactId>truedoctales-parent</artifactId>
+    <artifactId>truedoctales-4j-parent</artifactId>
     <version>${revision}</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>truedoctales-maven-plugin</artifactId>
+  <artifactId>truedoctales-4j-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
 
   <name>True Doc Tales - Maven Plugin</name>
@@ -25,12 +25,12 @@
   <dependencies>
     <dependency>
       <groupId>dev.truedoctales</groupId>
-      <artifactId>truedoctales-report-html</artifactId>
+      <artifactId>truedoctales-4j-report-html</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>dev.truedoctales</groupId>
-      <artifactId>truedoctales-report-markdown</artifactId>
+      <artifactId>truedoctales-4j-report-markdown</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

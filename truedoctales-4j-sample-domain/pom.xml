@@ -4,12 +4,12 @@
 
   <parent>
     <groupId>dev.truedoctales</groupId>
-    <artifactId>truedoctales-parent</artifactId>
+    <artifactId>truedoctales-4j-parent</artifactId>
     <version>${revision}</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>truedoctales-sample-domain</artifactId>
+  <artifactId>truedoctales-4j-sample-domain</artifactId>
   <packaging>jar</packaging>
 
   <name>True Doc Tales - Sample Domain</name>
@@ -17,7 +17,7 @@
   <dependencies>
     <dependency>
       <groupId>dev.truedoctales</groupId>
-      <artifactId>truedoctales-api</artifactId>
+      <artifactId>truedoctales-4j-api</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

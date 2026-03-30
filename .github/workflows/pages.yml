@@ -32,15 +32,15 @@ jobs:
           cache: maven
 
       - name: Build and generate HTML report
-        run: ./mvnw clean verify -pl truedoctales-sample-jupiter -am
+        run: ./mvnw clean verify -pl truedoctales-4j-sample-jupiter -am
 
       - name: Add CNAME for custom domain
-        run: echo "www.truedoctales.dev" > truedoctales-sample-jupiter/target/truedoctales-html/CNAME
+        run: echo "www.truedoctales.dev" > truedoctales-4j-sample-jupiter/target/truedoctales-html/CNAME
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: truedoctales-sample-jupiter/target/truedoctales-html
+          path: truedoctales-4j-sample-jupiter/target/truedoctales-html
 
   deploy:
     name: Deploy to GitHub Pages
