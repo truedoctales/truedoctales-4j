@@ -1,0 +1,555 @@
+/* ========================================================================
+   True Doc Tales — Report Layout
+   Bootstrap 5 handles all base styling (typography, tables, code, etc.).
+   This file provides the SPA shell layout, sidebar, and Bootstrap overrides.
+   ======================================================================== */
+
+/* Override Bootstrap's primary colour to match the True Doc Tales brand */
+:root {
+  --bs-primary: #2563eb;
+  --bs-primary-rgb: 37, 99, 235;
+  --bs-link-color: #2563eb;
+  --bs-link-hover-color: #1d4ed8;
+  /* Keep --primary as an alias so downstream code can use either */
+  --primary: var(--bs-primary);
+  --primary-dark: #1d4ed8;
+  --primary-light: #3b82f6;
+  --primary-bg: rgba(var(--bs-primary-rgb), 0.08);
+  --sidebar-width: 290px;
+  --sidebar-edge: 40px;
+  --header-height: 3.75rem;
+}
+
+/* --- Body layout ---------------------------------------------------- */
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+/* --- Top Header Bar ------------------------------------------------- */
+
+.top-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--header-height);
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1.25rem;
+  z-index: 1030;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .12);
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+.top-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: #fff;
+  max-height: 100%;
+}
+.top-header-brand:hover { color: #fff; text-decoration: none; }
+.top-header-brand img {
+  width: auto;
+  height: calc(var(--header-height) - 0.75rem);
+  max-height: 48px;
+  aspect-ratio: 1;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .2);
+  margin: 0;
+  flex-shrink: 0;
+}
+.top-header-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.top-header-brand-text .brand-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.top-header-brand-text .brand-subtitle {
+  font-size: 0.65rem;
+  font-weight: 400;
+  opacity: 0.85;
+  letter-spacing: 0.02em;
+}
+.theme-toggle {
+  position: absolute;
+  right: 1.25rem;
+  background: rgba(255, 255, 255, .15);
+  border: 1px solid rgba(255, 255, 255, .25);
+  color: #fff;
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+.theme-toggle:hover { background: rgba(255, 255, 255, .25); }
+
+/* Dark-mode header — subdued slate instead of the light-mode blue gradient */
+[data-bs-theme="dark"] .top-header {
+  background: linear-gradient(135deg, #1e293b, #334155);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
+}
+
+/* --- Sidebar -------------------------------------------------------- */
+
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--bs-body-bg);
+  border-right: 1px solid var(--bs-border-color);
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  height: calc(100vh - var(--header-height));
+  /* Collapsed to --sidebar-edge strip; slides in on hover */
+  transform: translateX(calc(var(--sidebar-edge) - var(--sidebar-width)));
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s;
+  z-index: 1020;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.sidebar:hover,
+.sidebar:focus-within {
+  transform: translateX(0);
+  box-shadow: 4px 0 20px rgba(0, 0, 0, .1);
+}
+
+/* Keep sidebar pinned while a flyout panel is open */
+.sidebar.flyout-open {
+  transform: translateX(0);
+  box-shadow: 4px 0 20px rgba(0, 0, 0, .1);
+}
+
+/* Icon handle — visible in the collapsed strip, hides when sidebar is open */
+.sidebar-handle {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease;
+  z-index: 1;
+}
+.sidebar-handle img {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .2);
+}
+.sidebar:hover .sidebar-handle,
+.sidebar:focus-within .sidebar-handle,
+.sidebar.open .sidebar-handle {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sidebar-content {
+  padding: 0.75rem 0;
+  flex: 1;
+  overflow-y: auto;
+}
+.sidebar-content::-webkit-scrollbar { width: 6px; }
+.sidebar-content::-webkit-scrollbar-track { background: transparent; }
+.sidebar-content::-webkit-scrollbar-thumb {
+  background: var(--bs-border-color);
+  border-radius: 3px;
+}
+.sidebar-content::-webkit-scrollbar-thumb:hover { background: var(--bs-secondary-color); }
+
+.sidebar-content .nav-group-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--bs-secondary-color);
+  padding: 1rem 1.5rem 0.375rem;
+}
+/* Chapter row — OS-style flyout trigger */
+.nav-chapter {
+  border-bottom: 1px solid var(--bs-border-color);
+}
+.nav-chapter-row {
+  padding: 0.625rem 1.5rem;
+  cursor: default;
+  user-select: none;
+  transition: background 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.nav-chapter-row:hover { background: var(--bs-tertiary-bg); }
+
+/* Chapter title link */
+.nav-chapter-row .chapter-link {
+  flex: 1;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--bs-body-color);
+  text-decoration: none;
+  padding: 0;
+  line-height: 1.4;
+  transition: color 0.15s;
+}
+.nav-chapter-row .chapter-link:hover,
+.nav-chapter-row .chapter-link.active { color: var(--bs-primary); }
+
+/* Flyout indicator arrow */
+.flyout-arrow {
+  flex-shrink: 0;
+  color: var(--bs-secondary-color);
+  font-size: 0.9rem;
+  pointer-events: none;
+  line-height: 1;
+}
+
+/* Chapter / story number badge shown before the title */
+.nav-number {
+  display: inline-block;
+  min-width: 1.4em;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--bs-secondary-color);
+  opacity: 0.65;
+  letter-spacing: 0;
+  flex-shrink: 0;
+}
+
+/* Warning indicator for stories and chapters with failures */
+.nav-error-badge {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+/* Red title for failed stories in navigation */
+.sidebar-content li a.nav-failed { color: #dc2626; }
+.sidebar-content li a.nav-failed:hover { color: #b91c1c; }
+#nav-flyout li a.nav-failed { color: #dc2626; }
+#nav-flyout li a.nav-failed:hover { color: #b91c1c; }
+.nav-chapter-row .chapter-link.nav-failed { color: #dc2626; }
+.nav-chapter-row .chapter-link.nav-failed:hover { color: #b91c1c; }
+
+/* Flyout submenu — positioned via JS to the right of the sidebar */
+.flyout-menu {
+  position: fixed;
+  min-width: 220px;
+  background: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0 8px 8px 8px;
+  box-shadow: 4px 4px 16px rgba(0, 0, 0, .12);
+  z-index: 1025;
+  display: none;
+  padding: 0.375rem 0;
+  list-style: none;
+  margin: 0;
+}
+.flyout-menu.flyout-visible { display: block; }
+
+/* Story items inside the global flyout panel (#nav-flyout is outside .sidebar-content) */
+#nav-flyout li { display: block; list-style: none; }
+#nav-flyout li a {
+  display: block;
+  padding: 0.375rem 1.25rem;
+  color: var(--bs-secondary-color);
+  text-decoration: none;
+  font-size: 0.84rem;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+#nav-flyout li a:hover { background: var(--bs-tertiary-bg); color: var(--bs-primary); }
+#nav-flyout li a:focus { outline: 2px solid var(--bs-primary); outline-offset: -2px; }
+#nav-flyout li a.active { color: var(--bs-primary); font-weight: 600; }
+
+/* Reset Bootstrap's nav/list defaults inside the sidebar */
+.sidebar-content ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: block;
+}
+/* Data-holder story lists must stay hidden inside the sidebar */
+.sidebar-content .chapter-stories { display: none; }
+.sidebar-content li { display: block; width: 100%; }
+.sidebar-content li a {
+  display: block;
+  padding: 0.375rem 1.5rem;
+  color: var(--bs-secondary-color);
+  text-decoration: none;
+  font-size: 0.84rem;
+  font-weight: 500;
+  border-left: 3px solid transparent;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  line-height: 1.5;
+}
+.sidebar-content li a:hover {
+  background: var(--bs-tertiary-bg);
+  border-left-color: var(--primary-light);
+  color: var(--bs-primary);
+}
+.sidebar-content li a.active {
+  background: var(--primary-bg);
+  border-left-color: var(--bs-primary);
+  color: var(--bs-primary);
+  font-weight: 600;
+}
+
+.sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: 5px;
+  left: 1rem;
+  z-index: 1040;
+  background: var(--bs-primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.625rem 0.875rem;
+  font-size: 1.25rem;
+  cursor: pointer;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1);
+  transition: background 0.15s, transform 0.15s;
+}
+.sidebar-toggle:hover { background: var(--primary-dark); transform: scale(1.05); }
+
+/* --- Main content area --------------------------------------------- */
+
+.content {
+  margin-left: var(--sidebar-edge);
+  margin-top: var(--header-height);
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--header-height));
+  padding: 0;
+}
+
+/* page-content hosts the lazily loaded <article> fragments */
+#page-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+article {
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 2.5rem 3rem 4rem;
+  width: 100%;
+  flex: 1;
+}
+article h1:first-child { margin-top: 0; }
+article img { border-radius: 12px; max-width: 100%; }
+
+/* Bootstrap-quality table styles for markdown-generated tables */
+article table {
+  width: 100%;
+  margin-bottom: 1rem;
+  vertical-align: top;
+  border-color: var(--bs-border-color);
+  border-collapse: collapse;
+}
+article table > :not(caption) > * > * {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--bs-border-color);
+}
+article thead > tr > th {
+  font-weight: 600;
+  border-bottom-width: 2px;
+  border-bottom-color: var(--bs-border-color);
+}
+
+/* --- Plot description styling --------------------------------------- */
+
+/* Step blockquotes — bordered box around each step */
+article blockquote {
+  border: 1px solid var(--bs-border-color);
+  border-left: 4px solid var(--bs-primary);
+  padding: 0.75rem 1rem;
+  margin: 1rem 0 1.5rem;
+  background: var(--primary-bg);
+  border-radius: 0 8px 8px 0;
+}
+
+article blockquote em {
+    font-style: italic;
+    font-size: 1.2rem;
+    background: rgba(34,197,  94, 0.15);
+    border-radius: 8px;
+    padding: 0.25rem 0.5rem;
+
+}
+
+/* Status-specific step boxes */
+article blockquote.step-success {
+  border-left-color: #16a34a;
+  background: rgba(22, 163, 74, 0.06);
+}
+article blockquote.step-failure {
+  border-left-color: #dc2626;
+  border-color: rgba(220, 38, 38, 0.3);
+  background: rgba(220, 38, 38, 0.06);
+}
+article blockquote.step-error {
+  border-left-color: #d97706;
+  border-color: rgba(217, 119, 6, 0.3);
+  background: rgba(217, 119, 6, 0.06);
+}
+article blockquote.step-skipped {
+  border-left-color: #6b7280;
+  border-color: rgba(107, 114, 128, 0.3);
+  background: rgba(107, 114, 128, 0.06);
+}
+
+/* Step description as a blockquote italic line */
+article blockquote em:only-child {
+  display: block;
+  color: var(--bs-secondary-color);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+/* Plot binding reference intro line */
+article > blockquote:first-of-type {
+  border-left: 4px solid var(--bs-primary);
+  padding: 0.75rem 1rem;
+  margin: 1rem 0 1.5rem;
+  background: var(--primary-bg);
+  border-radius: 0 8px 8px 0;
+}
+
+/* H2 step sections — visual separation */
+article h2 {
+  border-bottom: 2px solid var(--bs-border-color);
+  padding-bottom: 0.4rem;
+  margin-top: 2rem;
+}
+
+/* Horizontal rule between steps */
+article hr {
+  border: none;
+  border-top: 1px solid var(--bs-border-color);
+  margin: 2rem 0;
+}
+
+/* Metadata list items (Pattern, Input type) */
+article ul:has(> li > strong) {
+  list-style: none;
+  padding-left: 0;
+  margin: 0.75rem 0;
+}
+article ul:has(> li > strong) > li {
+  padding: 0.25rem 0;
+  font-size: 0.92rem;
+}
+
+/* Code blocks inside articles — usage examples */
+article pre {
+  background: var(--bs-tertiary-bg);
+  border: 1px solid var(--bs-border-color);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+article pre code {
+  background: transparent;
+  padding: 0;
+}
+
+/* Inline code */
+article code {
+  background: var(--bs-tertiary-bg);
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.875em;
+}
+
+/* --- Mermaid diagrams ----------------------------------------------- */
+
+.mermaid {
+  background: var(--bs-body-bg);
+  padding: 2rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 12px;
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+/* --- Footer --------------------------------------------------------- */
+
+.report-footer {
+  border-top: 1px solid var(--bs-border-color);
+  padding: 2rem 3rem;
+  text-align: center;
+  color: var(--bs-secondary-color);
+  font-size: 0.8rem;
+  line-height: 1.6;
+  background: var(--bs-body-bg);
+}
+.report-footer a { font-weight: 600; }
+.report-footer .footer-brand {
+  font-weight: 700;
+  color: var(--bs-body-color);
+  font-size: 0.85rem;
+}
+
+/* --- Responsive ----------------------------------------------------- */
+
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .sidebar:hover,
+  .sidebar:focus-within { transform: translateX(-100%); box-shadow: none; }
+  .sidebar.open { transform: translateX(0) !important; box-shadow: 4px 0 20px rgba(0, 0, 0, .15); }
+  .sidebar-toggle { display: block; }
+  .content { margin-left: 0; }
+  article { padding: 2rem 1.25rem 3rem; }
+  .report-footer { padding: 1.5rem 1.25rem; }
+}
+
+@media (max-width: 480px) {
+  article { padding: 1.5rem 1rem 2.5rem; }
+}
+
+/* --- Print ---------------------------------------------------------- */
+
+@media print {
+  .top-header { display: none !important; }
+  .sidebar, .sidebar-toggle { display: none !important; }
+  .content { margin-left: 0 !important; margin-top: 0 !important; }
+  article { max-width: none; padding: 0; }
+  .report-footer { display: none; }
+}

@@ -1,0 +1,169 @@
+package dev.truedoctales.execution.execute;
+
+import dev.truedoctales.api.model.execution.*;
+import dev.truedoctales.api.model.plot.PlotBinding;
+import dev.truedoctales.api.model.plot.StepBinding;
+import dev.truedoctales.api.model.story.*;
+import java.util.*;
+import java.util.function.Function;
+import java.util.logging.Logger;
+
+/// Maps story book models to execution models with bound steps.
+///
+/// Resolves binding bindings by matching binding patterns with plot bindings and extracts
+/// inplaceVariables from binding values.
+public class StoryBookExecutionMapperImpl implements Function<StoryBookModel, StoryBookExecution> {
+
+  private static final Logger LOGGER =
+      Logger.getLogger(StoryBookExecutionMapperImpl.class.getName());
+
+  private final Set<PlotBinding> plotBindings;
+  private final ChapterExecutionMapper chapterExecutionMapper = new ChapterExecutionMapper();
+  private final StoryExecutionMapper storyExecutionMapper = new StoryExecutionMapper();
+  private final SceneExecutionMapper sceneExecutionMapper = new SceneExecutionMapper();
+  private final StepExecutionMapper stepExecutionMapper = new StepExecutionMapper();
+  private final VariableExtractor variableExtractor = new VariableExtractor();
+
+  /// Creates a new mapper with the given plot bindings.
+  ///
+  /// @param plotBindings the available plot bindings
+  public StoryBookExecutionMapperImpl(Set<PlotBinding> plotBindings) {
+    this.plotBindings = plotBindings;
+  }
+
+  @Override
+  public StoryBookExecution apply(StoryBookModel book) {
+    LOGGER.info("Build execution model for story book: " + book.title());
+    StoryBookExecution storyBookExecution =
+        new StoryBookExecution(
+            book.path(),
+            book.title(),
+            Optional.ofNullable(book.prequelChapter()).map(chapterExecutionMapper).orElse(null),
+            book.chapters().stream().map(chapterExecutionMapper).toList());
+    LOGGER.info("Build execution model for story book: " + storyBookExecution.title());
+    return storyBookExecution;
+  }
+
+  /// Maps a binding model to execution model.
+  ///
+  /// @param stepModel the binding task model
+  /// @return the binding execution
+  public StepExecution mapStep(StepTask stepModel) {
+    return stepExecutionMapper.apply(stepModel);
+  }
+
+  class ChapterExecutionMapper implements Function<ChapterModel, ChapterExecution> {
+
+    @Override
+    public ChapterExecution apply(ChapterModel chapterModel) {
+      if (chapterModel == null) {
+        return null;
+      }
+      LOGGER.info("Build execution model for chapter: " + chapterModel.title());
+      return new ChapterExecution(
+          chapterModel.number(),
+          chapterModel.path(),
+          chapterModel.title(),
+          chapterModel.stories().stream().map(storyExecutionMapper).toList());
+    }
+  }
+
+  class StoryExecutionMapper implements Function<StoryModel, StoryExecution> {
+
+    @Override
+    public StoryExecution apply(StoryModel storyModel) {
+      if (storyModel == null) {
+        return null;
+      }
+      LOGGER.info("Build execution model for story: " + storyModel.title());
+
+      return new StoryExecution(
+          storyModel.number(),
+          storyModel.path(),
+          storyModel.title(),
+          storyModel.prequels(),
+          storyModel.scenes().stream().map(sceneExecutionMapper).toList());
+    }
+  }
+
+  class SceneExecutionMapper implements Function<SceneModel, SceneExecution> {
+
+    @Override
+    public SceneExecution apply(SceneModel sceneModel) {
+      if (sceneModel == null) {
+        return null;
+      }
+      LOGGER.fine("Build execution model for scene: " + sceneModel.title());
+      // Filter to only execute StepTask instances, StepDescription instances are for documentation
+      return new SceneExecution(
+          sceneModel.title(),
+          sceneModel.startLineNumber(),
+          sceneModel.steps().stream().map(stepExecutionMapper).toList());
+    }
+  }
+
+  StepBinding findStepBinding(StepCall stepCall) {
+    List<StepBinding> matchingBindings = findMatchingStepBindings(stepCall);
+
+    if (matchingBindings.size() > 1) {
+      LOGGER.warning(
+          () ->
+              "Multiple bindings found for step call: %s. Matching bindings: %s"
+                  .formatted(stepCall, matchingBindings));
+    }
+    return matchingBindings.stream()
+        .sorted(Comparator.comparing((StepBinding m) -> m.pattern().length()).reversed())
+        .findFirst()
+        .orElseThrow(() -> throwNoBindingFoundError(stepCall));
+  }
+
+  private List<StepBinding> findMatchingStepBindings(StepCall stepCall) {
+    return plotBindings.stream()
+        .filter(p -> p.plotId().equals(stepCall.plotName()))
+        .flatMap(p -> p.steps().stream())
+        .filter(p -> variableExtractor.matches(p.pattern(), stepCall.stepValue()))
+        .toList();
+  }
+
+  private IllegalStateException throwNoBindingFoundError(StepCall stepCall) {
+    // Check if variables are missing italic markers (common migration error)
+    boolean wouldMatchLegacyFormat =
+        plotBindings.stream()
+            .filter(p -> p.plotId().equals(stepCall.plotName()))
+            .flatMap(p -> p.steps().stream())
+            .anyMatch(
+                p -> variableExtractor.matchesLegacyFormat(p.pattern(), stepCall.stepValue()));
+    if (wouldMatchLegacyFormat) {
+      return new IllegalStateException(
+          "Step '"
+              + stepCall
+              + "' has variable values that are not wrapped in italic markers (*...*). "
+              + "Use *{variable}* for table-backed variables or *value* for inline values.");
+    }
+    return new IllegalStateException("No binding found for binding key: " + stepCall);
+  }
+
+  class StepExecutionMapper implements Function<StepTask, StepExecution> {
+
+    @Override
+    public StepExecution apply(StepTask stepModel) {
+      if (stepModel == null) {
+        return null;
+      }
+      try {
+        StepBinding stepBinding = findStepBinding(stepModel.call());
+        Map<String, String> extractedVariables =
+            variableExtractor.extractVariables(stepBinding.pattern(), stepModel.call().stepValue());
+        List<Map<String, String>> inputRows = new ArrayList<>(stepModel.inputRows());
+
+        // Keep inplaceVariables separate from table data
+        Map<String, String> variables = extractedVariables != null ? extractedVariables : Map.of();
+
+        return new StepExecution(
+            stepModel.lineNumber(), stepBinding, stepModel.call(), variables, inputRows);
+      } catch (Exception e) {
+        throw new RuntimeException("Error mapping binding: " + stepModel, e);
+      }
+    }
+  }
+}
