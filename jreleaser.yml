@@ -27,7 +27,7 @@ release:
 # ---------------------------------------------------------------------------
 deploy:
   maven:
-    githubPackages:
+    github:
       truedoctales:
         active: ALWAYS
         url: "https://maven.pkg.github.com/truedoctales/truedoctales-4j"
