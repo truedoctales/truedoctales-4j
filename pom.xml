@@ -76,6 +76,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <revision>0.0.1-SNAPSHOT</revision>
     <spotless-maven-plugin.version>3.1.0</spotless-maven-plugin.version>
+    <central-publishing-maven-plugin.version>0.7.0</central-publishing-maven-plugin.version>
   </properties>
 
   <dependencyManagement>
@@ -188,6 +189,11 @@
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
           <version>${jacoco.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.sonatype.central</groupId>
+          <artifactId>central-publishing-maven-plugin</artifactId>
+          <version>${central-publishing-maven-plugin.version}</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -345,6 +351,17 @@
                 </configuration>
               </execution>
             </executions>
+          </plugin>
+          <!-- Publish to Maven Central via Sonatype Central Portal -->
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <extensions>true</extensions>
+            <configuration>
+              <publishingServerId>central</publishingServerId>
+              <autoPublish>true</autoPublish>
+              <waitUntil>published</waitUntil>
+            </configuration>
           </plugin>
         </plugins>
       </build>

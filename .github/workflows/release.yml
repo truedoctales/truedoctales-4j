@@ -1,0 +1,71 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+# Allow only one concurrent release
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and publish to Maven Central
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set release version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Java 25 with GPG signing
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+          server-id: central
+          server-username: MAVEN_CENTRAL_USERNAME
+          server-password: MAVEN_CENTRAL_TOKEN
+
+      - name: Build and deploy to Maven Central
+        env:
+          MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+        run: >
+          ./mvnw --no-transfer-progress clean deploy
+          -Prelease
+          -Drevision=${{ steps.version.outputs.VERSION }}
+          -DskipTests=false
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ github.ref_name }}
+          body: |
+            ## ${{ github.ref_name }}
+
+            Published to Maven Central: [dev.truedoctales](https://central.sonatype.com/search?q=dev.truedoctales)
+
+            ### Artifacts
+
+            Add the following to your `pom.xml`:
+            ```xml
+            <dependency>
+              <groupId>dev.truedoctales</groupId>
+              <artifactId>truedoctales-4j-api</artifactId>
+              <version>${{ steps.version.outputs.VERSION }}</version>
+            </dependency>
+            ```
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') }}
