@@ -1,0 +1,50 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+# Allow only one concurrent release
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write  # create GitHub Release and upload assets
+  packages: write  # publish to GitHub Packages
+
+jobs:
+  release:
+    name: Build and release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # full history required for JReleaser changelog
+
+      - name: Set release version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      - name: Build and stage artifacts
+        run: |
+          ./mvnw --no-transfer-progress clean deploy \
+            -Prelease \
+            -Drevision=${{ steps.version.outputs.VERSION }} \
+            -DaltDeploymentRepository="local::default::file://${GITHUB_WORKSPACE}/target/staging-deploy"
+
+      - name: Release with JReleaser
+        uses: jreleaser/release-action@v2
+        env:
+          JRELEASER_PROJECT_VERSION: ${{ steps.version.outputs.VERSION }}
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
