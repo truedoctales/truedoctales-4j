@@ -4,20 +4,24 @@
 
   <parent>
     <groupId>dev.truedoctales</groupId>
-    <artifactId>truedoctales-parent</artifactId>
+    <artifactId>truedoctales-4j-parent</artifactId>
     <version>${revision}</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>truedoctales-sample-domain</artifactId>
+  <artifactId>truedoctales-4j-sample-domain</artifactId>
   <packaging>jar</packaging>
 
   <name>True Doc Tales - Sample Domain</name>
   <description>Sample domain objects and services for True Doc Tales examples</description>
+
+  <properties>
+    <maven.deploy.skip>true</maven.deploy.skip>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>dev.truedoctales</groupId>
-      <artifactId>truedoctales-api</artifactId>
+      <artifactId>truedoctales-4j-api</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

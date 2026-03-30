@@ -16,7 +16,7 @@ Add the plugin to the module that runs your True Doc Tales tests:
   <plugins>
     <plugin>
       <groupId>dev.truedoctales</groupId>
-      <artifactId>truedoctales-maven-plugin</artifactId>
+      <artifactId>truedoctales-4j-maven-plugin</artifactId>
       <version>${project.version}</version>
       <executions>
         <execution>

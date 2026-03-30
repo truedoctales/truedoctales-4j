@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>dev.truedoctales</groupId>
-  <artifactId>truedoctales-parent</artifactId>
+  <artifactId>truedoctales-4j-parent</artifactId>
   <version>${revision}</version>
   <packaging>pom</packaging>
 
@@ -28,15 +28,15 @@
   </developers>
 
   <modules>
-    <module>truedoctales-api</module>
-    <module>truedoctales-parser</module>
-    <module>truedoctales-execution</module>
-    <module>truedoctales-report-json</module>
-    <module>truedoctales-report-html</module>
-    <module>truedoctales-report-markdown</module>
-    <module>truedoctales-maven-plugin</module>
-    <module>truedoctales-sample-domain</module>
-    <module>truedoctales-sample-jupiter</module>
+    <module>truedoctales-4j-api</module>
+    <module>truedoctales-4j-parser</module>
+    <module>truedoctales-4j-execution</module>
+    <module>truedoctales-4j-report-json</module>
+    <module>truedoctales-4j-report-html</module>
+    <module>truedoctales-4j-report-markdown</module>
+    <module>truedoctales-4j-maven-plugin</module>
+    <module>truedoctales-4j-sample-domain</module>
+    <module>truedoctales-4j-sample-jupiter</module>
   </modules>
 
   <scm>
@@ -290,7 +290,7 @@
   </build>
 
   <profiles>
-    <!-- Profile for Maven Central releases -->
+    <!-- Release profile: attach sources and javadoc JARs for publishing -->
     <profile>
       <id>release</id>
       <build>
@@ -322,27 +322,6 @@
                 <goals>
                   <goal>jar</goal>
                 </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <!-- Sign artifacts with GPG -->
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-                <phase>verify</phase>
-                <configuration>
-                  <!-- Prevent gpg from using pinentry programs -->
-                  <gpgArguments>
-                    <arg>--pinentry-mode</arg>
-                    <arg>loopback</arg>
-                  </gpgArguments>
-                </configuration>
               </execution>
             </executions>
           </plugin>
