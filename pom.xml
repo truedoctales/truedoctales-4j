@@ -11,6 +11,14 @@
   <description>A story-based testing framework with custom annotations for writing expressive, narrative-driven test scenarios</description>
   <url>https://github.com/truedoctales/truedoctales-4j</url>
 
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
   <developers>
     <developer>
       <id>coding4kay</id>
