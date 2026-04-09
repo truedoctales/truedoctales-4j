@@ -106,7 +106,7 @@ public class PlotGlossaryGenerator {
       md.append("| [")
           .append(plotId)
           .append("](plots/")
-          .append(plotId)
+          .append(plotId.replace(" ", "%20"))
           .append(".md) | ")
           .append(stepCount)
           .append(" step")

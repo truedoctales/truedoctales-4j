@@ -112,6 +112,42 @@ class HtmlBookReportGeneratorTest {
   }
 
   @Test
+  void generate_shouldRenderMermaidDiagramWithBlankLines() throws IOException {
+    // A blank line inside a mermaid block terminates CommonMark's type-6 HTML block early,
+    // which corrupts the div content and causes an intermittent mermaid syntax error in the
+    // browser. Blank lines are cosmetic in all mermaid diagram types, so they are stripped.
+    String markdown =
+        """
+        # Sequence Diagram Page
+
+        ```mermaid
+        sequenceDiagram
+            participant MM as Mirror Mike
+            participant PP as Pinky Princess
+
+            MM->>PP: Payments above certain thresholds need approval
+            Note over PP: Writes story in 11 minutes.
+        ```
+        """;
+    Files.writeString(markdownDir.resolve("sequence.md"), markdown);
+
+    HtmlBookReportGenerator generator = new HtmlBookReportGenerator(markdownDir, htmlOutputDir);
+    generator.generate();
+
+    String html = Files.readString(htmlOutputDir.resolve("sequence.html"));
+    assertTrue(html.contains("<div class=\"mermaid\">"), "Should render mermaid as div");
+    assertTrue(
+        html.contains("MM->>PP: Payments above certain thresholds need approval"),
+        "Sequence interactions after the blank line must be inside the mermaid div");
+    assertFalse(
+        html.contains("<pre><code>"),
+        "Blank line in mermaid block must not produce a <pre><code> child inside the div");
+    assertFalse(
+        html.contains("&gt;&gt;"),
+        "Arrow characters must not be HTML-escaped inside the mermaid div");
+  }
+
+  @Test
   void generate_shouldIncludeProfessionalCssStyling() throws IOException {
     Files.writeString(markdownDir.resolve("intro.md"), "# Intro\n\nHello.");
 

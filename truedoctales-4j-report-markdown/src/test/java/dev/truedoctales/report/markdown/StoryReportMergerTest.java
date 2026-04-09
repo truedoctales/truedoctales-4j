@@ -499,6 +499,65 @@ class StoryReportMergerTest {
     assertTrue(merged.contains("❌ |"), "Second row should be marked FAILURE");
   }
 
+  @Test
+  void merge_shouldNotAnnotateStepLikeLineInsideCodeBlock() {
+    // A line that looks like a step declaration (> **Plot** action) but lives inside a fenced
+    // code block must not consume a StepExecutionResult and must not receive an execution marker.
+    String markdown =
+        """
+        # My Story
+
+        ## Scene: How to call a step
+
+        Here is example story syntax:
+
+        ```markdown
+        > **Greeting** Say Hello
+        ```
+
+        > **Greeting** Say Hello
+        """;
+
+    StoryExecutionResult result = buildStoryResult(List.of(buildStep(ExecutionStatus.SUCCESS)));
+    String merged = merger.merge(markdown, result);
+
+    // The real step (outside the code block) should be annotated
+    assertTrue(merged.contains("> **Greeting** Say Hello ✅"), "Real step should be annotated");
+    // The code-block copy must not have a status emoji appended
+    long annotatedCount =
+        java.util.Arrays.stream(merged.split("\n"))
+            .filter(l -> l.contains("> **Greeting** Say Hello ✅"))
+            .count();
+    assertEquals(1, annotatedCount, "Only the real step line should carry the execution marker");
+  }
+
+  @Test
+  void merge_shouldNotAnnotateStepLikeLineInsideBlockquoteWrappedCodeBlock() {
+    // Same test but the code fence uses the blockquote-wrapped form (> ```lang).
+    String markdown =
+        """
+        # My Story
+
+        ## Scene: How to call a step
+
+        > ```markdown
+        > **Greeting** Say Hello
+        > ```
+
+        > **Greeting** Say Hello
+        """;
+
+    StoryExecutionResult result = buildStoryResult(List.of(buildStep(ExecutionStatus.SUCCESS)));
+    String merged = merger.merge(markdown, result);
+
+    assertTrue(merged.contains("> **Greeting** Say Hello ✅"), "Real step should be annotated");
+    long annotatedCount =
+        java.util.Arrays.stream(merged.split("\n"))
+            .filter(l -> l.contains("> **Greeting** Say Hello ✅"))
+            .count();
+    assertEquals(1, annotatedCount, "Only the real step line should carry the execution marker");
+  }
+
   // Helper methods
 
   private StoryExecutionResult buildStoryResult(List<StepExecutionResult> steps) {

@@ -446,4 +446,111 @@ class MarkdownStoryParserImplTest {
     Files.writeString(file, content);
     return file;
   }
+
+  @Test
+  void parse_shouldIgnoreStandardCodeBlocksInScenes() throws IOException {
+    // Standard fenced code blocks (```lang) between steps must not become fake steps
+    String content =
+        """
+        # Story
+
+        ## Scene: With Code Block
+
+        Here is how you create a plot:
+
+        ```java
+        @Plot("Greeting")
+        public class GreetingPlot {}
+        ```
+
+        > **TestPlot** Action
+        """;
+    createTempFile(STORY_MD, content);
+
+    StoryModel story = parser.parse(tempDir, Path.of(STORY_MD));
+
+    assertEquals(1, story.scenes().size());
+    assertEquals(1, story.scenes().getFirst().steps().size());
+    assertEquals("Action", story.scenes().getFirst().steps().getFirst().call().stepValue());
+  }
+
+  @Test
+  void parse_shouldIgnoreBlockquoteWrappedCodeBlocksInScenes() throws IOException {
+    // Blockquote-wrapped code fences (> ```lang) between steps must not become fake steps
+    String content =
+        """
+        # Story
+
+        ## Scene: With Blockquote Code Block
+
+        > ```java
+        > @Plot("Greeting")
+        > public class GreetingPlot {}
+        > ```
+
+        > **TestPlot** Action
+        """;
+    createTempFile(STORY_MD, content);
+
+    StoryModel story = parser.parse(tempDir, Path.of(STORY_MD));
+
+    assertEquals(1, story.scenes().size());
+    assertEquals(1, story.scenes().getFirst().steps().size());
+    assertEquals("Action", story.scenes().getFirst().steps().getFirst().call().stepValue());
+  }
+
+  @Test
+  void parse_shouldIgnoreCodeBlocksBetweenSteps() throws IOException {
+    // Code blocks appearing between two executable steps must not create extra steps
+    String content =
+        """
+        # Story
+
+        ## Scene: Mixed
+
+        > **TestPlot** First step
+
+        ```java
+        // some example code
+        ```
+
+        > **TestPlot** Second step
+        """;
+    createTempFile(STORY_MD, content);
+
+    StoryModel story = parser.parse(tempDir, Path.of(STORY_MD));
+
+    assertEquals(1, story.scenes().size());
+    assertEquals(2, story.scenes().getFirst().steps().size());
+    assertEquals("First step", story.scenes().getFirst().steps().get(0).call().stepValue());
+    assertEquals("Second step", story.scenes().getFirst().steps().get(1).call().stepValue());
+  }
+
+  @Test
+  void parse_shouldIgnoreStepCallInsideCodeBlock() throws IOException {
+    // A line that looks like an executable step (> **Plot** step) inside a code block
+    // must be treated as documentation and not produce an executable StepTask
+    String content =
+        """
+        # Story
+
+        ## Scene: With Step-Like Code Block
+
+        Here is an example of how to call a step in your story:
+
+        ```markdown
+        > **Greeting** Say Hello
+        ```
+
+        > **TestPlot** Actual step
+        """;
+    createTempFile(STORY_MD, content);
+
+    StoryModel story = parser.parse(tempDir, Path.of(STORY_MD));
+
+    assertEquals(1, story.scenes().size());
+    // Only the real step outside the code block must be parsed
+    assertEquals(1, story.scenes().getFirst().steps().size());
+    assertEquals("Actual step", story.scenes().getFirst().steps().getFirst().call().stepValue());
+  }
 }

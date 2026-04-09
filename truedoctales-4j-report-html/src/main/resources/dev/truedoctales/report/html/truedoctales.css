@@ -506,6 +506,83 @@ article code {
   text-align: center;
 }
 
+/* --- Previous / Next page navigation -------------------------------- */
+
+.page-nav {
+  border-top: 1px solid var(--bs-border-color);
+  padding: 1.5rem 3rem;
+  background: var(--bs-body-bg);
+}
+
+.page-nav-inner {
+  max-width: 52rem;
+  margin: 0 auto;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.page-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.25rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--bs-body-color);
+  background: var(--bs-body-bg);
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  flex: 1;
+  max-width: 48%;
+  min-width: 0;
+}
+
+.page-nav-btn:hover {
+  border-color: var(--bs-primary);
+  background: var(--primary-bg);
+  color: var(--bs-primary);
+  text-decoration: none;
+}
+
+.page-nav-next { justify-content: flex-end; text-align: right; }
+.page-nav-prev { justify-content: flex-start; text-align: left; }
+.page-nav-disabled { visibility: hidden; }
+
+.page-nav-arrow {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  color: var(--bs-secondary-color);
+  transition: color 0.15s;
+}
+
+.page-nav-btn:hover .page-nav-arrow { color: var(--bs-primary); }
+
+.page-nav-label {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.page-nav-hint {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--bs-secondary-color);
+  transition: color 0.15s;
+}
+
+.page-nav-btn:hover .page-nav-hint { color: var(--bs-primary); }
+
+.page-nav-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* --- Footer --------------------------------------------------------- */
 
 .report-footer {
@@ -538,10 +615,13 @@ article code {
   .content { margin-left: 0; }
   article { padding: 2rem 1.25rem 3rem; }
   .report-footer { padding: 1.5rem 1.25rem; }
+  .page-nav { padding: 1.25rem; }
 }
 
 @media (max-width: 480px) {
   article { padding: 1.5rem 1rem 2.5rem; }
+  .page-nav-inner { flex-direction: column; }
+  .page-nav-btn { max-width: 100%; }
 }
 
 /* --- Print ---------------------------------------------------------- */
