@@ -309,6 +309,35 @@ class PlotGlossaryGeneratorTest {
   }
 
   @Test
+  void generate_shouldUrlEncodeSpacesInIndexLinks() throws IOException {
+    Files.writeString(
+        executionDir.resolve("plot-registry.json"),
+        """
+        {
+          "plots": [
+            {
+              "plotId": "Team Member",
+              "steps": [
+                { "plot": "Team Member", "pattern": "Team member exists", "inputType": "SEQUENCE",
+                  "inplaceVariables": [], "tableVariables": [] }
+              ]
+            }
+          ]
+        }
+        """);
+
+    new PlotGlossaryGenerator(executionDir, outputDir).generate();
+
+    String index = Files.readString(outputDir.resolve("plot-glossary.md"));
+    assertTrue(
+        index.contains("[Team Member](plots/Team%20Member.md)"),
+        "Index link should URL-encode spaces so the Markdown link is valid");
+    assertFalse(
+        index.contains("plots/Team Member.md"),
+        "Index link must not contain a raw space in the URL");
+  }
+
+  @Test
   void generate_shouldShowBothVariablesAndHeadersSections() throws IOException {
     Files.writeString(
         executionDir.resolve("plot-registry.json"),
