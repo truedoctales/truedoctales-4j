@@ -525,4 +525,32 @@ class MarkdownStoryParserImplTest {
     assertEquals("First step", story.scenes().getFirst().steps().get(0).call().stepValue());
     assertEquals("Second step", story.scenes().getFirst().steps().get(1).call().stepValue());
   }
+
+  @Test
+  void parse_shouldIgnoreStepCallInsideCodeBlock() throws IOException {
+    // A line that looks like an executable step (> **Plot** step) inside a code block
+    // must be treated as documentation and not produce an executable StepTask
+    String content =
+        """
+        # Story
+
+        ## Scene: With Step-Like Code Block
+
+        Here is an example of how to call a step in your story:
+
+        ```markdown
+        > **Greeting** Say Hello
+        ```
+
+        > **TestPlot** Actual step
+        """;
+    createTempFile(STORY_MD, content);
+
+    StoryModel story = parser.parse(tempDir, Path.of(STORY_MD));
+
+    assertEquals(1, story.scenes().size());
+    // Only the real step outside the code block must be parsed
+    assertEquals(1, story.scenes().getFirst().steps().size());
+    assertEquals("Actual step", story.scenes().getFirst().steps().getFirst().call().stepValue());
+  }
 }
