@@ -546,7 +546,12 @@ public class HtmlBookReportGenerator {
   }
 
   /// Converts mermaid fenced code blocks to HTML div blocks before commonmark parsing.
-  /// The div is output as an HTML block which commonmark passes through verbatim.
+  ///
+  /// <p>The div is output as a CommonMark type-6 HTML block, which is passed through verbatim.
+  /// However, type-6 HTML blocks are terminated by the first blank line they contain, which would
+  /// split a mermaid diagram that uses blank lines for visual spacing. Blank lines inside a mermaid
+  /// diagram are purely cosmetic — they are ignored by all standard mermaid diagram types — so they
+  /// are stripped here to keep the {@code <div>} block intact.
   private String preprocessMermaid(String markdown) {
     StringBuilder sb = new StringBuilder();
     String[] lines = markdown.split("\n", -1);
@@ -563,7 +568,11 @@ public class HtmlBookReportGenerator {
         sb.append(mermaidBlock);
         sb.append("</div>\n\n");
       } else if (inMermaid) {
-        mermaidBlock.append(line).append("\n");
+        // Skip blank lines: they are cosmetic in mermaid and would terminate the CommonMark
+        // type-6 HTML block early, corrupting the diagram content.
+        if (!line.isBlank()) {
+          mermaidBlock.append(line).append("\n");
+        }
       } else {
         sb.append(line).append("\n");
       }
