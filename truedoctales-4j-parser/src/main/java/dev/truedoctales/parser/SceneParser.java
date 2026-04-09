@@ -30,6 +30,7 @@ final class SceneParser {
 
   private static final String SCENE_PREFIX = "##";
   private static final String STEP_PREFIX = ">";
+  private static final String CODE_FENCE_PREFIX = "```";
   private static final Pattern STEP_DECLARATION_PATTERN = Pattern.compile("^>\\s*\\*\\*.+");
 
   private final String title;
@@ -56,6 +57,18 @@ final class SceneParser {
     if (trimmedLine.startsWith(SCENE_PREFIX)) {
       finishCurrentStep();
       return false; // Scene parsing complete
+    }
+
+    // Toggle code-block state on fenced code fence lines (handles both
+    // standard ```lang and blockquote-wrapped > ```lang formats).
+    if (isFencedCodeBlockLine(trimmedLine)) {
+      context.toggleCodeBlock();
+      return true;
+    }
+
+    // While inside a code block, skip all lines without further processing.
+    if (context.inCodeBlock) {
+      return true;
     }
 
     // If we encounter a new step declaration while currently parsing a step, close the current step
@@ -118,6 +131,7 @@ final class SceneParser {
 
     private int lineNumber;
     private StepParser currentStepParser;
+    private boolean inCodeBlock = false;
 
     ParseContext(int startLine) {
       this.lineNumber = startLine;
@@ -128,9 +142,25 @@ final class SceneParser {
     }
 
     void transitionToStepParsing() {}
+
+    void toggleCodeBlock() {
+      inCodeBlock = !inCodeBlock;
+    }
   }
 
   private boolean isStepDeclarationLine(String trimmedLine) {
     return STEP_DECLARATION_PATTERN.matcher(trimmedLine).matches();
+  }
+
+  /** Returns true if the line is a fenced code-block delimiter (standard or blockquote-wrapped). */
+  private static boolean isFencedCodeBlockLine(String trimmedLine) {
+    if (trimmedLine.startsWith(CODE_FENCE_PREFIX)) {
+      return true;
+    }
+    if (trimmedLine.startsWith(STEP_PREFIX)) {
+      String content = trimmedLine.substring(STEP_PREFIX.length()).trim();
+      return content.startsWith(CODE_FENCE_PREFIX);
+    }
+    return false;
   }
 }
