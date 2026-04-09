@@ -74,7 +74,7 @@ When stories are executed and validated by tests, they stop being wishful thinki
 <dependency>
   <groupId>dev.truedoctales</groupId>
   <artifactId>truedoctales-4j-execution</artifactId>
-  <version>VERSION</version>
+  <version>0.0.1</version>
   <scope>test</scope>
 </dependency>
 ```
