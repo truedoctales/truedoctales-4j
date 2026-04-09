@@ -34,6 +34,9 @@ public class StoryReportMerger {
 
   private static final Pattern TABLE_SEPARATOR = Pattern.compile("^>\\s*\\|[\\s:|-]+\\|\\s*$");
 
+  private static final String CODE_FENCE = "```";
+  private static final String BLOCKQUOTE_PREFIX = ">";
+
   /// Merges execution results into the original markdown content.
   ///
   /// @param originalMarkdown the original markdown content
@@ -54,12 +57,24 @@ public class StoryReportMerger {
     int tableRowIndex = 0;
     boolean seenTableHeader = false;
     boolean seenTableSeparator = false;
+    boolean inCodeBlock = false;
 
     for (int i = 0; i < lines.length; i++) {
       String line = lines[i];
       boolean isLast = i == lines.length - 1;
 
-      if (!stepQueue.isEmpty() && STEP_DECLARATION.matcher(line.trim()).matches()) {
+      // Toggle code-block state on fenced code-fence lines so that step-like
+      // lines inside a code block are never treated as executable steps.
+      if (isFencedCodeBlockLine(line.trim())) {
+        inCodeBlock = !inCodeBlock;
+        merged.append(line);
+        if (!isLast) {
+          merged.append("\n");
+        }
+        continue;
+      }
+
+      if (!inCodeBlock && !stepQueue.isEmpty() && STEP_DECLARATION.matcher(line.trim()).matches()) {
         StepExecutionResult stepResult = stepQueue.poll();
 
         // The step line already has variable values in italic (*value* or *{name}*),
@@ -172,5 +187,21 @@ public class StoryReportMerger {
       case ERROR -> "⚠️";
       case SKIPPED -> "⏭️";
     };
+  }
+
+  /**
+   * Returns {@code true} if {@code trimmedLine} is a fenced code-block delimiter — either a
+   * standard triple-backtick line ({@code ```lang}) or a blockquote-wrapped one ({@code >
+   * ```lang}).
+   */
+  private static boolean isFencedCodeBlockLine(String trimmedLine) {
+    if (trimmedLine.startsWith(CODE_FENCE)) {
+      return true;
+    }
+    if (trimmedLine.startsWith(BLOCKQUOTE_PREFIX)) {
+      String content = trimmedLine.substring(BLOCKQUOTE_PREFIX.length()).trim();
+      return content.startsWith(CODE_FENCE);
+    }
+    return false;
   }
 }
