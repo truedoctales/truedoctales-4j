@@ -202,7 +202,7 @@
         if (typeof mermaid !== 'undefined') {
           mermaid.run({ querySelector: '#page-content .mermaid' });
         }
-        document.querySelector('.content').scrollTop = 0;
+        window.scrollTo(0, 0);
       });
   }
 
