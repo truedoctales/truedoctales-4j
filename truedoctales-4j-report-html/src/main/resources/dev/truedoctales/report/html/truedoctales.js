@@ -5,6 +5,7 @@
   var navFlyout = document.getElementById('nav-flyout');
   var flyoutHideTimer = null;
   var activeChapterEl = null;
+  var pageList = [];
 
   // ---------------------------------------------------------------
   // Navigation JSON loader — builds the sidebar from report-nav.json
@@ -66,7 +67,58 @@
   }
 
   // ---------------------------------------------------------------
-  // Path utilities
+  // Flat ordered page list — used for prev/next navigation
+  // ---------------------------------------------------------------
+  function buildPageList(nav) {
+    var list = [];
+    var chapters = nav.chapters || [];
+    chapters.forEach(function (ch) {
+      if (ch.introPage) {
+        list.push({ htmlPath: ch.introPage, title: ch.label });
+      }
+      (ch.stories || []).forEach(function (s) {
+        list.push({ htmlPath: s.htmlPath, title: s.title });
+      });
+    });
+    return list;
+  }
+
+  function renderPageNav(path) {
+    var pageNav = document.getElementById('page-nav');
+    if (!pageNav || !pageList.length) { return; }
+    var idx = -1;
+    for (var i = 0; i < pageList.length; i++) {
+      if (pageList[i].htmlPath === path) { idx = i; break; }
+    }
+    if (idx === -1) { pageNav.innerHTML = ''; return; }
+    var prev = idx > 0 ? pageList[idx - 1] : null;
+    var next = idx < pageList.length - 1 ? pageList[idx + 1] : null;
+    var html = '<div class="page-nav-inner">';
+    if (prev) {
+      html += '<a href="#' + escHtml(prev.htmlPath) + '" class="page-nav-btn page-nav-prev">'
+        + '<span class="page-nav-arrow" aria-hidden="true">&#8592;</span>'
+        + '<span class="page-nav-label">'
+        + '<span class="page-nav-hint">Previous</span>'
+        + '<span class="page-nav-title">' + escHtml(prev.title) + '</span>'
+        + '</span></a>';
+    } else {
+      html += '<span class="page-nav-btn page-nav-prev page-nav-disabled" aria-hidden="true"></span>';
+    }
+    if (next) {
+      html += '<a href="#' + escHtml(next.htmlPath) + '" class="page-nav-btn page-nav-next">'
+        + '<span class="page-nav-label">'
+        + '<span class="page-nav-hint">Next</span>'
+        + '<span class="page-nav-title">' + escHtml(next.title) + '</span>'
+        + '</span>'
+        + '<span class="page-nav-arrow" aria-hidden="true">&#8594;</span>'
+        + '</a>';
+    } else {
+      html += '<span class="page-nav-btn page-nav-next page-nav-disabled" aria-hidden="true"></span>';
+    }
+    html += '</div>';
+    pageNav.innerHTML = html;
+  }
+
   // ---------------------------------------------------------------
   function resolvePath(base, rel) {
     if (!rel || rel.charAt(0) === '#' || rel.indexOf('//') !== -1 || rel.indexOf(':') !== -1) {
@@ -146,6 +198,7 @@
         saveMermaidSources(container);
         classifyStepBlocks(container);
         updateActiveNav(currentPath);
+        renderPageNav(currentPath);
         if (typeof mermaid !== 'undefined') {
           mermaid.run({ querySelector: '#page-content .mermaid' });
         }
@@ -343,6 +396,7 @@
         }
         var sc = document.getElementById('sidebar-content');
         if (sc) { sc.innerHTML = buildSidebarFromNav(nav); }
+        pageList = buildPageList(nav);
       }
       bindNavEvents();
       loadContent(location.hash ? location.hash.slice(1) : null);
