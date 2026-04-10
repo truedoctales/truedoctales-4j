@@ -2,10 +2,8 @@ package dev.truedoctales.sample.jupiter;
 
 import dev.truedoctales.api.annotations.StoryBook;
 import dev.truedoctales.api.execute.StoryExecutionListener;
-import dev.truedoctales.api.model.execution.StoryBookExecution;
 import dev.truedoctales.api.model.story.StoryBookModel;
 import dev.truedoctales.execution.execute.SimplePlotRegistry;
-import dev.truedoctales.execution.execute.StoryBookExecutionMapperImpl;
 import dev.truedoctales.execution.jupiter.JupiterStoryTestExecutor;
 import dev.truedoctales.execution.jupiter.StoryTestProvider;
 import dev.truedoctales.report.json.JsonStoryListener;
@@ -62,6 +60,7 @@ public class StoryBookTest {
     var projectService = new ProjectService();
 
     SimplePlotRegistry plotRegistry = new SimplePlotRegistry();
+    plotRegistry.register(new GreetingPlot());
 
     // Business-domain plots — used in the four FinTrack business chapters
     plotRegistry.register(new TeamMemberPlot(heroService));
@@ -74,12 +73,7 @@ public class StoryBookTest {
     plotRegistry.register(new AchievementPlot());
 
     // Framework-demo plot — used in 01_framework-basics
-    plotRegistry.register(new GreetingPlot());
 
-    StoryBookExecutionMapperImpl executionMapper =
-        new StoryBookExecutionMapperImpl(plotRegistry.getBindings());
-    StoryBookExecution bookExecution = executionMapper.apply(book);
-    return new JupiterStoryTestExecutor(plotRegistry, listener)
-        .buildDynamicTests(bookExecution, storyPath);
+    return new JupiterStoryTestExecutor(plotRegistry, listener).buildDynamicTests(book, storyPath);
   }
 }

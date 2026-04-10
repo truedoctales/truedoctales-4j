@@ -8,7 +8,9 @@ import dev.truedoctales.api.model.listener.ExecutionStatus;
 import dev.truedoctales.api.model.listener.SceneExecutionResult;
 import dev.truedoctales.api.model.listener.StepExecutionResult;
 import dev.truedoctales.api.model.story.ChapterModel;
+import dev.truedoctales.api.model.story.StoryBookModel;
 import dev.truedoctales.execution.execute.StepExecutor;
+import dev.truedoctales.execution.execute.StoryBookExecutionMapperImpl;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +43,10 @@ public class JupiterStoryTestExecutor implements JuniperStoryTestBuilder {
   }
 
   @Override
-  public Stream<DynamicNode> buildDynamicTests(StoryBookExecution book, Path storyPath) {
+  public Stream<DynamicNode> buildDynamicTests(StoryBookModel bookModel, Path storyPath) {
+    StoryBookExecutionMapperImpl executionMapper =
+        new StoryBookExecutionMapperImpl(plotRegistry.getBindings());
+    StoryBookExecution book = executionMapper.apply(bookModel);
     executionListener.onPlotBindings(plotRegistry.getBindings());
 
     StoryExecution story = book.loadStory(storyPath);
@@ -87,7 +92,7 @@ public class JupiterStoryTestExecutor implements JuniperStoryTestBuilder {
 
     // Add prequels container if prequels exist
     if (!story.prequels().isEmpty()) {
-      nodes.add(buildPrequelsContainer(book, story));
+      nodes.add(buildPrequelsContainer(bookModel, story));
     }
 
     // Add each scene as a dynamic test
@@ -105,7 +110,7 @@ public class JupiterStoryTestExecutor implements JuniperStoryTestBuilder {
   }
 
   private DynamicContainer buildPrequelsContainer(
-      StoryBookExecution book, StoryExecution storyExecution) {
+      StoryBookModel book, StoryExecution storyExecution) {
 
     Stream<DynamicNode> prequels =
         storyExecution.prequels().stream()

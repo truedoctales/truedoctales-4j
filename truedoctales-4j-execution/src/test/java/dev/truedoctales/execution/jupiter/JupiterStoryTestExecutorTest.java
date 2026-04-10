@@ -7,7 +7,7 @@ import dev.truedoctales.api.execute.StoryExecutionListener;
 import dev.truedoctales.api.model.execution.*;
 import dev.truedoctales.api.model.plot.PlotBinding;
 import dev.truedoctales.api.model.plot.StepBinding;
-import dev.truedoctales.api.model.story.StepCall;
+import dev.truedoctales.api.model.story.*;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
@@ -34,13 +34,13 @@ class JupiterStoryTestExecutorTest {
   void buildDynamicTests_shouldPropagateStepFailures() {
     // Arrange
     plotRegistry.shouldThrowAssertionError = true;
-    StoryBookExecution book = createTestBookExecution();
-    ChapterExecution chapter = book.prequelChapter();
-    StoryExecution story = chapter.stories().getFirst();
+    var book = createTestBookModel();
 
     // Act
     List<DynamicNode> nodes =
-        executor.buildDynamicTests(book, story.path()).collect(Collectors.toList());
+        executor
+            .buildDynamicTests(book, book.prequelChapter().stories().getFirst().path())
+            .collect(Collectors.toList());
 
     // Assert - Find the scene test node and execute it to verify it throws
     assertNotNull(nodes);
@@ -67,12 +67,11 @@ class JupiterStoryTestExecutorTest {
   void buildDynamicTests_shouldPropagateRuntimeExceptions() {
     // Arrange
     plotRegistry.shouldThrowRuntimeException = true;
-    StoryBookExecution book = createTestBookExecution();
-    ChapterExecution chapter = book.prequelChapter();
-    StoryExecution story = chapter.stories().getFirst();
+    var book = createTestBookModel();
+    var path = book.prequelChapter().stories().getFirst().path();
 
     // Act
-    List<DynamicNode> nodes = executor.buildDynamicTests(book, story.path()).toList();
+    List<DynamicNode> nodes = executor.buildDynamicTests(book, path).toList();
 
     // Find and execute the scene test
     DynamicNode sceneNode =
@@ -96,12 +95,11 @@ class JupiterStoryTestExecutorTest {
     // Arrange
     plotRegistry.shouldThrowAssertionError = false;
     plotRegistry.shouldThrowRuntimeException = false;
-    StoryBookExecution book = createTestBookExecution();
-    ChapterExecution chapter = book.prequelChapter();
-    StoryExecution story = chapter.stories().getFirst();
+    var book = createTestBookModel();
+    var path = book.prequelChapter().stories().getFirst().path();
 
     // Act
-    List<DynamicNode> nodes = executor.buildDynamicTests(book, story.path()).toList();
+    List<DynamicNode> nodes = executor.buildDynamicTests(book, path).toList();
 
     // Find and execute the scene test
     DynamicNode sceneNode =
@@ -119,18 +117,16 @@ class JupiterStoryTestExecutorTest {
         });
   }
 
-  private StoryBookExecution createTestBookExecution() {
+  private StoryBookModel createTestBookModel() {
     Path bookPath = Path.of("book");
     Path introPath = Path.of("intro");
     Path storyPath = introPath.resolve("test.md");
-    StepBinding binding = new StepBinding("TestPlot", "test binding", InputType.SEQUENCE);
-    StepExecution step =
-        StepExecution.simplCall(0, binding, new StepCall("TestPlot", "test binding"));
-    SceneExecution scene = new SceneExecution("Test Scene", 0, List.of(step));
-    StoryExecution story =
-        new StoryExecution(0, storyPath, "Test Story", List.of(), List.of(scene));
-    ChapterExecution intro = new ChapterExecution(0, introPath, "Intro", List.of(story));
-    return new StoryBookExecution(bookPath, "Test Book", intro, List.of());
+
+    StepTask step = new StepTask(0, new StepCall("TestPlot", "test binding"));
+    SceneModel scene = new SceneModel("Test Scene", 1, List.of(step));
+    StoryModel story = new StoryModel(0, storyPath, "Test Story", List.of(), List.of(scene));
+    ChapterModel intro = new ChapterModel(0, introPath, "Intro", List.of(story));
+    return new StoryBookModel(bookPath, "Test Book", intro, List.of());
   }
 
   static class TestPlotRegistry implements PlotRegistry {
@@ -139,7 +135,10 @@ class JupiterStoryTestExecutorTest {
 
     @Override
     public Set<PlotBinding> getBindings() {
-      return Set.of();
+      return Set.of(
+          new PlotBinding(
+              "TestPlot",
+              List.of(new StepBinding("TestPlot", "test binding", InputType.SEQUENCE))));
     }
 
     @Override
