@@ -13,6 +13,7 @@
 
   <name>True Doc Tales - Execution</name>
   <description>Execution module containing the binding to run the unit tests</description>
+  <url>https://github.com/truedoctales/truedoctales-4j/tree/main/truedoctales-4j-execution</url>
 
   <dependencies>
     <dependency>
