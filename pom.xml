@@ -56,8 +56,8 @@
   </ciManagement>
 
   <properties>
-    <google-java-format.version>1.33.0</google-java-format.version>
     <flatten-maven-plugin.version>1.7.0</flatten-maven-plugin.version>
+    <google-java-format.version>1.33.0</google-java-format.version>
     <jackson.version>2.21.1</jackson.version>
     <jacoco.version>0.8.14</jacoco.version>
     <maven-clean-plugin.version>3.4.0</maven-clean-plugin.version>
@@ -198,33 +198,6 @@
       </plugins>
     </pluginManagement>
     <plugins>
-      <!-- Resolve ${revision} in POMs before deploy so staged .pom files
-           contain the real version instead of the placeholder.
-           Required for Maven Central PomChecker validation. -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>flatten-maven-plugin</artifactId>
-        <configuration>
-          <updatePomFile>true</updatePomFile>
-          <flattenMode>resolveCiFriendliesOnly</flattenMode>
-        </configuration>
-        <executions>
-          <execution>
-            <id>flatten</id>
-            <goals>
-              <goal>flatten</goal>
-            </goals>
-            <phase>process-resources</phase>
-          </execution>
-          <execution>
-            <id>flatten.clean</id>
-            <goals>
-              <goal>clean</goal>
-            </goals>
-            <phase>clean</phase>
-          </execution>
-        </executions>
-      </plugin>
       <!-- Spotless plugin for code formatting -->
       <plugin>
         <groupId>com.diffplug.spotless</groupId>
@@ -260,6 +233,33 @@
               <goal>apply</goal>
             </goals>
             <phase>compile</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Resolve ${revision} in POMs before deploy so staged .pom files
+           contain the real version instead of the placeholder.
+           Required for Maven Central PomChecker validation. -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>flatten-maven-plugin</artifactId>
+        <configuration>
+          <updatePomFile>true</updatePomFile>
+          <flattenMode>resolveCiFriendliesOnly</flattenMode>
+        </configuration>
+        <executions>
+          <execution>
+            <id>flatten</id>
+            <goals>
+              <goal>flatten</goal>
+            </goals>
+            <phase>process-resources</phase>
+          </execution>
+          <execution>
+            <id>flatten.clean</id>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+            <phase>clean</phase>
           </execution>
         </executions>
       </plugin>
