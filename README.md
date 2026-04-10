@@ -5,6 +5,7 @@
 ![True Doc Tales](assets/big_icon_full.png)
 
 [![Build](https://github.com/truedoctales/truedoctales-4j/actions/workflows/pages.yml/badge.svg)](https://github.com/truedoctales/truedoctales-4j/actions/workflows/pages.yml)
+[![Maven Central](https://img.shields.io/maven-central/v/dev.truedoctales/truedoctales-4j-execution.svg?label=Maven%20Central)](https://central.sonatype.com/search?q=g%3Adev.truedoctales)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Java](https://img.shields.io/badge/Java-25-orange.svg)](https://openjdk.org/projects/jdk/25/)
 
@@ -79,7 +80,18 @@ When stories are executed and validated by tests, they stop being wishful thinki
 </dependency>
 ```
 
-> Artifacts are published to [GitHub Packages](https://github.com/truedoctales/truedoctales-4j/packages).
+If you also want to generate HTML reports, add:
+
+```xml
+<dependency>
+  <groupId>dev.truedoctales</groupId>
+  <artifactId>truedoctales-4j-report-html</artifactId>
+  <version>0.0.1</version>
+  <scope>test</scope>
+</dependency>
+```
+
+All artifacts are available on [Maven Central](https://central.sonatype.com/search?q=g%3Adev.truedoctales). No additional repository configuration is needed. Replace `0.0.1` below with the [latest release version](https://central.sonatype.com/search?q=g%3Adev.truedoctales).
 
 ### 2. Write a story (Markdown)
 

@@ -600,6 +600,22 @@ article code {
   color: var(--bs-body-color);
   font-size: 0.85rem;
 }
+.footer-links {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem;
+  margin-top: 0.25rem;
+}
+.footer-sep { opacity: 0.4; }
+.footer-icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.125em;
+  fill: currentColor;
+  margin-right: 0.25em;
+}
 
 /* --- Responsive ----------------------------------------------------- */
 

@@ -78,5 +78,3 @@ With True Doc Tales, teams can build documentation that is:
 This project exists so that business stories do not fade into fiction.
 It exists so that teams can rely on their documentation again.
 It exists to turn promising stories into trusted truth.
-
-![True Doc Tales](assets/big_icon_full.png)
