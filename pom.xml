@@ -325,26 +325,7 @@
               </execution>
             </executions>
           </plugin>
-          <!-- Sign all artifacts with GPG (required by Maven Central) -->
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-                <configuration>
-                  <!-- Allows non-interactive signing in CI -->
-                  <gpgArguments>
-                    <arg>--pinentry-mode</arg>
-                    <arg>loopback</arg>
-                  </gpgArguments>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
+          <!-- GPG signing is handled by JReleaser, not maven-gpg-plugin -->
         </plugins>
       </build>
     </profile>
