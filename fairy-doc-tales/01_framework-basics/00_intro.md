@@ -2,6 +2,41 @@
 
 This chapter serves as a technical reference guide for the True Doc Tales framework. It demonstrates all available operations in a step-by-step, progressive manner without narrative embellishment.
 
+## Getting Started
+
+Before writing your first story, add the framework to your project. All artifacts are published to [Maven Central](https://central.sonatype.com/search?q=g%3Adev.truedoctales) — no extra repository configuration is required.
+
+### Maven
+
+```xml
+<dependency>
+  <groupId>dev.truedoctales</groupId>
+  <artifactId>truedoctales-4j-execution</artifactId>
+  <version>0.0.1</version>
+  <scope>test</scope>
+</dependency>
+```
+
+To also generate HTML reports, add:
+
+```xml
+<dependency>
+  <groupId>dev.truedoctales</groupId>
+  <artifactId>truedoctales-4j-report-html</artifactId>
+  <version>0.0.1</version>
+  <scope>test</scope>
+</dependency>
+```
+
+### Gradle
+
+```groovy
+testImplementation 'dev.truedoctales:truedoctales-4j-execution:0.0.1'
+
+// optional — HTML reports
+testImplementation 'dev.truedoctales:truedoctales-4j-report-html:0.0.1'
+```
+
 ## Purpose
 
 Unlike later chapters that use storytelling to demonstrate features, this chapter is deliberately dry and technical. It's designed to:
