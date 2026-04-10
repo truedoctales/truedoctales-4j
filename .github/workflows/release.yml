@@ -35,22 +35,12 @@ jobs:
           java-version: '25'
           cache: maven
 
-      # Import GPG key so maven-gpg-plugin can sign during the build
-      - name: Import GPG key
-        run: |
-          echo "${{ secrets.JRELEASER_GPG_SECRET_KEY }}" | gpg --batch --import
-        env:
-          GNUPGHOME: /tmp/gpg
-
       - name: Build and stage artifacts
         run: |
           ./mvnw --no-transfer-progress clean deploy \
             -Prelease \
             -Drevision=${{ steps.version.outputs.VERSION }} \
             -DaltDeploymentRepository="local::default::file://${GITHUB_WORKSPACE}/target/staging-deploy"
-        env:
-          GNUPGHOME: /tmp/gpg
-          MAVEN_GPG_PASSPHRASE: ${{ secrets.JRELEASER_GPG_PASSPHRASE }}
 
       - name: Release with JReleaser
         uses: jreleaser/release-action@v2

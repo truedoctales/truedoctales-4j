@@ -20,10 +20,18 @@ release:
         format: "- {{contributorName}}"
 
 # ---------------------------------------------------------------------------
-# Deploy
+# Signing
 # ---------------------------------------------------------------------------
-# Currently: GitHub Packages only.
-# Maven Central will be added here later (deploy.maven.mavenCentral section).
+# JReleaser reads JRELEASER_GPG_PUBLIC_KEY, JRELEASER_GPG_SECRET_KEY and
+# JRELEASER_GPG_PASSPHRASE directly from environment variables.
+# No keyring import step needed in CI.
+# ---------------------------------------------------------------------------
+signing:
+  active: ALWAYS
+  armored: true
+
+# ---------------------------------------------------------------------------
+# Deploy
 # ---------------------------------------------------------------------------
 deploy:
   maven:
@@ -33,8 +41,6 @@ deploy:
         url: "https://maven.pkg.github.com/truedoctales/truedoctales-4j"
         stagingRepositories:
           - target/staging-deploy
-
-    # NEW: Maven Central via Sonatype Central Portal
     mavenCentral:
       sonatype:
         active: ALWAYS
