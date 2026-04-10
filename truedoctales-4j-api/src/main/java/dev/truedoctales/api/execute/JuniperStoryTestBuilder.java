@@ -1,6 +1,6 @@
 package dev.truedoctales.api.execute;
 
-import dev.truedoctales.api.model.execution.StoryBookExecution;
+import dev.truedoctales.api.model.story.StoryBookModel;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DynamicNode;
@@ -15,5 +15,5 @@ public interface JuniperStoryTestBuilder {
   /// @param storyPath the path to the specific story
   /// @return stream of dynamic test nodes
   /// @throws Exception if test building fails
-  Stream<DynamicNode> buildDynamicTests(StoryBookExecution book, Path storyPath) throws Exception;
+  Stream<DynamicNode> buildDynamicTests(StoryBookModel book, Path storyPath) throws Exception;
 }

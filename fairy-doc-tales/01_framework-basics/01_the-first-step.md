@@ -8,6 +8,108 @@ result directly in the rendered output.
 
 ---
 
+## Book Structure
+
+A True Doc Tales book is a **folder tree of Markdown files**. The framework scans the folder
+you point it at, discovers every `.md` file, and executes the steps it finds inside them.
+You choose how deep or flat that tree is — but the following conventions keep books readable
+and maintainable.
+
+### Root folder
+
+The root of the book is a plain directory. By convention it is called `fairy-doc-tales/` or
+similar, and you register it with the `@StoryBook` annotation on your test class:
+
+```java
+@StoryBook(path = "../fairy-doc-tales")
+```
+
+Everything inside that folder is part of the book. Files and sub-folders are processed in
+alphabetical order, so numeric prefixes (`00_`, `01_`, `02_`, …) are the standard way to
+control the sequence.
+
+### Intro file
+
+The root folder typically contains a top-level intro file — `00_intro.md` — that sets the
+scene for the whole book. It contains free-form Markdown prose and no executable steps. It
+appears first in the rendered output and gives readers the context they need before diving
+into the chapters.
+
+### Chapters
+
+Each chapter lives in its own sub-folder. The folder name carries the chapter number and a
+short slug:
+
+```
+00_prequels/
+01_framework-basics/
+02_mirror-stakeholder/
+03_squirrel-dev/
+```
+
+Inside every chapter folder there is at least one intro file (`00_intro.md`) and one or more
+story files. Story files contain the actual executable steps.
+
+### Story files
+
+A story file is a plain `.md` file. Its name follows the same numeric-prefix convention:
+
+```
+00_intro.md          ← chapter introduction (prose only)
+01_the-first-step.md ← first story (contains executable steps)
+02_next-story.md
+```
+
+Inside a story file the structure is:
+
+```markdown
+# Story Title
+
+Introductory prose that explains the context for this story.
+
+## Scene: First scene heading
+
+More prose that sets up the scene.
+
+> **PlotName** Step phrase *variable*
+>
+> | column |
+> |--------|
+> | value  |
+
+## Scene: Second scene heading
+
+> **PlotName** Another step
+```
+
+The top-level `#` heading becomes the story title in the report. Each `##` heading
+introduces a scene — a logical group of related steps. Executable steps are written as
+Markdown blockquotes (`>`). Everything that is not a blockquote is treated as narrative prose
+and rendered as-is in the HTML output.
+
+### Full example layout
+
+```
+fairy-doc-tales/
+├── 00_intro.md                        ← book introduction
+├── 00_prequels/
+│   ├── 03_create-business-heroes.md   ← story with steps
+│   └── 04_create-business-villains.md
+├── 01_framework-basics/
+│   ├── 00_intro.md                    ← chapter introduction
+│   └── 01_the-first-step.md           ← this file
+├── 02_mirror-stakeholder/
+│   ├── 00_intro.md
+│   └── 01_mirror-stakeholder.md
+└── assets/
+    └── big_icon_full.png              ← images referenced from prose
+```
+
+The `assets/` folder is reserved for images and other static files. It is not scanned for
+stories.
+
+---
+
 ## Scene: Create a Plot
 
 The first thing you need before writing any story is a **Plot**. A Plot is the bridge between
