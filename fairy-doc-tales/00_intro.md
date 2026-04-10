@@ -12,6 +12,12 @@ In the age of AI-generated code, this risk becomes even bigger. Teams can produc
 
 That is the moment when documentation turns into a fairy tale: it sounds plausible, it was once true, but nobody can fully trust it anymore.
 
+## What This Project Does
+
+True Doc Tales lets you write tests directly inside a Markdown description. You structure your business story as a readable narrative, embed executable steps within that narrative, and run the whole thing as a standard JUnit test suite. The same Markdown file that stakeholders read as a specification is the file the framework executes as a test.
+
+After the tests run, True Doc Tales generates a clean, well-structured HTML report from the results. That report can be published directly as a static website — hosted on GitHub Pages, a CDN, or any web server — so every stakeholder can browse the living documentation in a browser without needing access to a build tool or an IDE.
+
 ## Why This Project Exists
 
 True Doc Tales was created to close the gap between **what people say the system does** and **what the system actually does**.
