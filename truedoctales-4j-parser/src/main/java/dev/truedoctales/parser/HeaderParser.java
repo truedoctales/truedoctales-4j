@@ -35,6 +35,7 @@ final class HeaderParser {
   private static final String BLOCKQUOTE_PREFIX = ">";
   private static final String SCENE_PREFIX = "##";
   private static final String STORY_MARKER = "## Story";
+  private static final String CODE_FENCE_PREFIX = "```";
 
   private static final Pattern LINK_PATTERN = Pattern.compile("]\\(([^)]+)\\)");
 
@@ -49,6 +50,18 @@ final class HeaderParser {
   boolean parseLine(String line) {
     state.lineNumber++;
     String trimmedLine = line.trim();
+
+    // Toggle code-block state: a ## heading inside a fenced code block must
+    // be treated as literal content, not as a scene-start marker.
+    if (trimmedLine.startsWith(CODE_FENCE_PREFIX)) {
+      state.inCodeBlock = !state.inCodeBlock;
+      return true;
+    }
+
+    // While inside a code block skip everything (no title, scene, or prequel parsing).
+    if (state.inCodeBlock) {
+      return true;
+    }
 
     // Parse title (only first H1)
     if (trimmedLine.startsWith(TITLE_PREFIX) && state.getTitle() == null) {
@@ -180,6 +193,7 @@ final class HeaderParser {
     private int lineNumber = 0;
     private ParsingPhase parsingPhase = ParsingPhase.PRE_TITLE;
     private boolean inPrequelsBlock = false;
+    private boolean inCodeBlock = false;
 
     void appendSummaryLine(String line) {
       if (!summaryBuilder.isEmpty()) {

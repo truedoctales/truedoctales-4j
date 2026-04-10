@@ -553,4 +553,66 @@ class MarkdownStoryParserImplTest {
     assertEquals(1, story.scenes().getFirst().steps().size());
     assertEquals("Actual step", story.scenes().getFirst().steps().getFirst().call().stepValue());
   }
+
+  @Test
+  void parse_shouldIgnoreSceneHeaderInsideCodeBlock() throws IOException {
+    // A ## Scene: heading inside a fenced code block must NOT start a new scene;
+    // it is documentation content only.
+    String content =
+        """
+        # Story
+
+        ## Scene: Real Scene
+
+        Here is how a story file is structured:
+
+        ```markdown
+        ## Scene: Example scene heading
+
+        > **PlotName** Example step
+        ```
+
+        > **TestPlot** Actual step
+        """;
+    createTempFile(STORY_MD, content);
+
+    StoryModel story = parser.parse(tempDir, Path.of(STORY_MD));
+
+    // Only one real scene, not two (the one inside the code block must be ignored)
+    assertEquals(1, story.scenes().size());
+    assertEquals("Real Scene", story.scenes().getFirst().title());
+    // Only the actual executable step outside the code block
+    assertEquals(1, story.scenes().getFirst().steps().size());
+    assertEquals("Actual step", story.scenes().getFirst().steps().getFirst().call().stepValue());
+  }
+
+  @Test
+  void parse_shouldIgnoreSceneHeaderInsideCodeBlockInHeaderSection() throws IOException {
+    // A ## Scene: heading inside a fenced code block in the pre-scene header area
+    // must NOT trigger the start of scenes; it is documentation content only.
+    String content =
+        """
+        # Story
+
+        Here is a code example with a fake scene heading:
+
+        ```markdown
+        ## Scene: Fake scene inside code block
+        > **FakePlot** Fake step
+        ```
+
+        ## Scene: Real Scene
+
+        > **TestPlot** Actual step
+        """;
+    createTempFile(STORY_MD, content);
+
+    StoryModel story = parser.parse(tempDir, Path.of(STORY_MD));
+
+    // Only the real scene must be present
+    assertEquals(1, story.scenes().size());
+    assertEquals("Real Scene", story.scenes().getFirst().title());
+    assertEquals(1, story.scenes().getFirst().steps().size());
+    assertEquals("Actual step", story.scenes().getFirst().steps().getFirst().call().stepValue());
+  }
 }

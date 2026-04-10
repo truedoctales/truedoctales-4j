@@ -53,12 +53,6 @@ final class SceneParser {
     context.incrementLine();
     String trimmedLine = line.trim();
 
-    // Check for next scene marker
-    if (trimmedLine.startsWith(SCENE_PREFIX)) {
-      finishCurrentStep();
-      return false; // Scene parsing complete
-    }
-
     // Toggle code-block state on fenced code fence lines (handles both
     // standard ```lang and blockquote-wrapped > ```lang formats).
     if (isFencedCodeBlockLine(trimmedLine)) {
@@ -67,8 +61,17 @@ final class SceneParser {
     }
 
     // While inside a code block, skip all lines without further processing.
+    // This check must come before the scene-header check so that ## headings
+    // inside fenced code blocks are treated as literal content and do not
+    // prematurely terminate the current scene.
     if (context.inCodeBlock) {
       return true;
+    }
+
+    // Check for next scene marker (only outside code blocks)
+    if (trimmedLine.startsWith(SCENE_PREFIX)) {
+      finishCurrentStep();
+      return false; // Scene parsing complete
     }
 
     // If we encounter a new step declaration while currently parsing a step, close the current step
