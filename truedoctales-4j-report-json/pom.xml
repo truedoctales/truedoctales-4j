@@ -14,6 +14,7 @@
 
   <name>True Doc Tales - Report JSON</name>
   <description>JSON Report module for persisting test execution results</description>
+  <url>https://github.com/truedoctales/truedoctales-4j/tree/main/truedoctales-4j-report-json</url>
 
   <dependencies>
     <dependency>

@@ -11,6 +11,7 @@
   <artifactId>truedoctales-4j-api</artifactId>
   <name>True Doc Tales - API</name>
   <description>API module defining interfaces and data models</description>
+  <url>https://github.com/truedoctales/truedoctales-4j/tree/main/truedoctales-4j-api</url>
 
   <dependencies>
     <dependency>

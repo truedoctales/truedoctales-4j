@@ -14,6 +14,7 @@
 
   <name>True Doc Tales - Report HTML</name>
   <description>HTML report module that converts enriched markdown into a professional HTML report with navigation, styling, and Mermaid diagram rendering</description>
+  <url>https://github.com/truedoctales/truedoctales-4j/tree/main/truedoctales-4j-report-html</url>
 
   <dependencies>
     <dependency>

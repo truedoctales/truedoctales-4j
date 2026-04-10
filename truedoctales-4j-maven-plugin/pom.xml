@@ -14,6 +14,7 @@
 
   <name>True Doc Tales - Maven Plugin</name>
   <description>Maven plugin for generating True Doc Tales execution reports in Markdown format</description>
+  <url>https://github.com/truedoctales/truedoctales-4j/tree/main/truedoctales-4j-maven-plugin</url>
 
   <properties>
     <asm.version>9.8</asm.version>
