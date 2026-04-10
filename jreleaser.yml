@@ -9,6 +9,10 @@ project:
     homepage: https://github.com/truedoctales/truedoctales-4j
     documentation: https://github.com/truedoctales/truedoctales-4j
     bugTracker: https://github.com/truedoctales/truedoctales-4j/issues
+  java:
+    groupId: dev.truedoctales
+    artifactId: truedoctales-4j-parent
+    multiProject: true
 
 release:
   github:
@@ -28,7 +32,8 @@ release:
 # ---------------------------------------------------------------------------
 signing:
   active: ALWAYS
-  armored: true
+  pgp:
+    armored: true
 
 # ---------------------------------------------------------------------------
 # Deploy
