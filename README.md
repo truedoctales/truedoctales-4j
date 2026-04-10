@@ -91,7 +91,7 @@ If you also want to generate HTML reports, add:
 </dependency>
 ```
 
-All artifacts are available on [Maven Central](https://central.sonatype.com/search?q=g%3Adev.truedoctales). No additional repository configuration is needed.
+All artifacts are available on [Maven Central](https://central.sonatype.com/search?q=g%3Adev.truedoctales). No additional repository configuration is needed. Replace `0.0.1` below with the [latest release version](https://central.sonatype.com/search?q=g%3Adev.truedoctales).
 
 ### 2. Write a story (Markdown)
 

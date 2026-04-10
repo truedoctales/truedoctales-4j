@@ -4,7 +4,7 @@ This chapter serves as a technical reference guide for the True Doc Tales framew
 
 ## Getting Started
 
-Before writing your first story, add the framework to your project. All artifacts are published to [Maven Central](https://central.sonatype.com/search?q=g%3Adev.truedoctales) — no extra repository configuration is required.
+Before writing your first story, add the framework to your project. All artifacts are available on [Maven Central](https://central.sonatype.com/search?q=g%3Adev.truedoctales) — no extra repository configuration is required. Replace `0.0.1` below with the [latest release version](https://central.sonatype.com/search?q=g%3Adev.truedoctales).
 
 ### Maven
 
