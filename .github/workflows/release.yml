@@ -11,8 +11,8 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write  # create GitHub Release and upload assets
-  packages: write  # publish to GitHub Packages
+  contents: write
+  packages: write
 
 jobs:
   release:
@@ -22,7 +22,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # full history required for JReleaser changelog
+          fetch-depth: 0
 
       - name: Set release version from tag
         id: version
@@ -35,16 +35,30 @@ jobs:
           java-version: '25'
           cache: maven
 
+      # Import GPG key so maven-gpg-plugin can sign during the build
+      - name: Import GPG key
+        run: |
+          echo "${{ secrets.JRELEASER_GPG_SECRET_KEY }}" | gpg --batch --import
+        env:
+          GNUPGHOME: /tmp/gpg
+
       - name: Build and stage artifacts
         run: |
           ./mvnw --no-transfer-progress clean deploy \
             -Prelease \
             -Drevision=${{ steps.version.outputs.VERSION }} \
             -DaltDeploymentRepository="local::default::file://${GITHUB_WORKSPACE}/target/staging-deploy"
+        env:
+          GNUPGHOME: /tmp/gpg
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.JRELEASER_GPG_PASSPHRASE }}
 
       - name: Release with JReleaser
         uses: jreleaser/release-action@v2
         env:
           JRELEASER_PROJECT_VERSION: ${{ steps.version.outputs.VERSION }}
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+          JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.JRELEASER_MAVENCENTRAL_USERNAME }}
+          JRELEASER_MAVENCENTRAL_PASSWORD: ${{ secrets.JRELEASER_MAVENCENTRAL_PASSWORD }}
+          JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.JRELEASER_GPG_PUBLIC_KEY }}
+          JRELEASER_GPG_SECRET_KEY: ${{ secrets.JRELEASER_GPG_SECRET_KEY }}
+          JRELEASER_GPG_PASSPHRASE: ${{ secrets.JRELEASER_GPG_PASSPHRASE }}

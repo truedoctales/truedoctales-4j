@@ -33,3 +33,11 @@ deploy:
         url: "https://maven.pkg.github.com/truedoctales/truedoctales-4j"
         stagingRepositories:
           - target/staging-deploy
+
+    # NEW: Maven Central via Sonatype Central Portal
+    mavenCentral:
+      sonatype:
+        active: ALWAYS
+        url: https://central.sonatype.com/api/v1/publisher
+        stagingRepositories:
+          - target/staging-deploy
