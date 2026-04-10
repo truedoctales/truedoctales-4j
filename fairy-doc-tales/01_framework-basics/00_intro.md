@@ -12,7 +12,7 @@ Before writing your first story, add the framework to your project. All artifact
 <dependency>
   <groupId>dev.truedoctales</groupId>
   <artifactId>truedoctales-4j-execution</artifactId>
-  <version>0.0.1</version>
+  <version>${dev.truedoctales.version}</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -23,7 +23,7 @@ To also generate HTML reports, add:
 <dependency>
   <groupId>dev.truedoctales</groupId>
   <artifactId>truedoctales-4j-report-html</artifactId>
-  <version>0.0.1</version>
+  <version>${dev.truedoctales.version}</version>
   <scope>test</scope>
 </dependency>
 ```
