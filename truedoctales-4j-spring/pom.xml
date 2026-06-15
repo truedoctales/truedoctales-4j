@@ -14,7 +14,7 @@
 
   <name>True Doc Tales - Spring</name>
   <description>Spring Boot auto-configuration for True Doc Tales</description>
-
+  <url>https://github.com/truedoctales/truedoctales-4j/tree/main/truedoctales-4j-spring</url>
   <properties>
     <spring-boot.version>4.1.0</spring-boot.version>
   </properties>
