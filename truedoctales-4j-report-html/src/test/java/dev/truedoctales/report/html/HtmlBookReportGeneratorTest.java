@@ -806,4 +806,129 @@ class HtmlBookReportGeneratorTest {
     assertTrue(
         navJson.contains("\"hasErrors\""), "Nav JSON should contain hasErrors field for stories");
   }
+
+  @Test
+  void generate_jsonNav_shouldIncludeMarkdownOnlyChapterWithIntro() throws IOException {
+    // JSON report has meta.json but no directory for 06_the_spring_developer
+    Path jsonReportDir = Files.createDirectories(tempDir.resolve("json-report"));
+    Files.writeString(
+        jsonReportDir.resolve("meta.json"), "{\"title\": \"Book\", \"hasIntro\": true}");
+
+    Files.writeString(markdownDir.resolve("00_intro.md"), "# Book Intro\n");
+
+    // Chapter 01 has both JSON and markdown
+    Path ch1JsonDir = Files.createDirectories(jsonReportDir.resolve("01_chapter"));
+    Files.writeString(ch1JsonDir.resolve("meta.json"), "{\"title\": \"Chapter One\"}");
+    Files.writeString(
+        ch1JsonDir.resolve("01_story.json"),
+        "{\"path\": \"01_chapter/01_story.md\", \"title\": \"Story One\"}");
+    Path ch1MdDir = Files.createDirectories(markdownDir.resolve("01_chapter"));
+    Files.writeString(ch1MdDir.resolve("00_intro.md"), "# Chapter One Intro\n");
+    Files.writeString(ch1MdDir.resolve("01_story.md"), "# Story One\n");
+
+    // Chapter 06 has ONLY a markdown intro — no JSON directory (mirrors 06_the_spring_developer)
+    Path ch6MdDir = Files.createDirectories(markdownDir.resolve("06_the_spring_developer"));
+    Files.writeString(ch6MdDir.resolve("00_intro.md"), "# The Spring Developer\n");
+
+    HtmlBookReportGenerator generator =
+        new HtmlBookReportGenerator(markdownDir, jsonReportDir, htmlOutputDir);
+    generator.generate();
+
+    String navJson = Files.readString(htmlOutputDir.resolve("report-nav.json"));
+    assertTrue(
+        navJson.contains("06_the_spring_developer"),
+        "Nav JSON should include markdown-only chapter 06_the_spring_developer");
+    assertTrue(
+        navJson.contains("06_the_spring_developer/00_intro.html"),
+        "Nav JSON should include intro page path for markdown-only chapter");
+
+    assertTrue(
+        Files.exists(htmlOutputDir.resolve("06_the_spring_developer/00_intro.html")),
+        "HTML fragment should be generated for intro-only chapter");
+  }
+
+  @Test
+  void generate_jsonNav_introOnlyChapterHtmlShouldContainMarkdownContent() throws IOException {
+    Path jsonReportDir = Files.createDirectories(tempDir.resolve("json-report"));
+    Files.writeString(
+        jsonReportDir.resolve("meta.json"), "{\"title\": \"Book\", \"hasIntro\": false}");
+
+    // Markdown-only chapter with intro
+    Path ch6MdDir = Files.createDirectories(markdownDir.resolve("06_the_spring_developer"));
+    Files.writeString(
+        ch6MdDir.resolve("00_intro.md"), "# The Spring Developer\n\nSpring content here.");
+
+    HtmlBookReportGenerator generator =
+        new HtmlBookReportGenerator(markdownDir, jsonReportDir, htmlOutputDir);
+    generator.generate();
+
+    assertTrue(
+        Files.exists(htmlOutputDir.resolve("06_the_spring_developer/00_intro.html")),
+        "HTML fragment must exist for intro-only chapter");
+
+    String html = Files.readString(htmlOutputDir.resolve("06_the_spring_developer/00_intro.html"));
+    assertTrue(html.contains("The Spring Developer"), "HTML fragment should contain intro heading");
+    assertTrue(
+        html.contains("Spring content here"), "HTML fragment should contain intro body text");
+  }
+
+  @Test
+  void generate_jsonNav_markdownOnlyChapterShouldNotDuplicateIntro() throws IOException {
+    // A chapter that exists in BOTH JSON and markdown should not get a duplicate intro entry
+    Path jsonReportDir = Files.createDirectories(tempDir.resolve("json-report"));
+    Files.writeString(
+        jsonReportDir.resolve("meta.json"), "{\"title\": \"Book\", \"hasIntro\": false}");
+
+    Path ch1JsonDir = Files.createDirectories(jsonReportDir.resolve("01_chapter"));
+    Files.writeString(ch1JsonDir.resolve("meta.json"), "{\"title\": \"Chapter One\"}");
+    Files.writeString(
+        ch1JsonDir.resolve("01_story.json"),
+        "{\"path\": \"01_chapter/01_story.md\", \"title\": \"Story One\"}");
+    Path ch1MdDir = Files.createDirectories(markdownDir.resolve("01_chapter"));
+    Files.writeString(ch1MdDir.resolve("00_intro.md"), "# Chapter One Intro\n");
+    Files.writeString(ch1MdDir.resolve("01_story.md"), "# Story One\n");
+
+    HtmlBookReportGenerator generator =
+        new HtmlBookReportGenerator(markdownDir, jsonReportDir, htmlOutputDir);
+    generator.generate();
+
+    String navJson = Files.readString(htmlOutputDir.resolve("report-nav.json"));
+    // Count occurrences of "01_chapter" to ensure it appears only once as a chapter group
+    int firstIdx = navJson.indexOf("\"dirName\": \"01_chapter\"");
+    int secondIdx = navJson.indexOf("\"dirName\": \"01_chapter\"", firstIdx + 1);
+    assertEquals(-1, secondIdx, "Chapter 01_chapter must not appear as a duplicate group");
+  }
+
+  @Test
+  void generate_jsonNav_markdownOnlyChapterShouldPreservePrequelOrdering() throws IOException {
+    // Markdown-only chapters should respect the same prequel ordering rule (00_ goes last)
+    Path jsonReportDir = Files.createDirectories(tempDir.resolve("json-report"));
+    Files.writeString(
+        jsonReportDir.resolve("meta.json"), "{\"title\": \"Book\", \"hasIntro\": true}");
+    Files.writeString(markdownDir.resolve("00_intro.md"), "# Book Intro\n");
+
+    // Regular chapter in JSON
+    Path ch1JsonDir = Files.createDirectories(jsonReportDir.resolve("01_chapter"));
+    Files.writeString(ch1JsonDir.resolve("meta.json"), "{\"title\": \"Chapter One\"}");
+    Files.writeString(
+        ch1JsonDir.resolve("01_story.json"),
+        "{\"path\": \"01_chapter/01_story.md\", \"title\": \"Story\"}");
+    Path ch1MdDir = Files.createDirectories(markdownDir.resolve("01_chapter"));
+    Files.writeString(ch1MdDir.resolve("01_story.md"), "# Story\n");
+
+    // Markdown-only prequel chapter (00_ prefix → must be placed after regular chapters)
+    Path prequelMdDir = Files.createDirectories(markdownDir.resolve("00_prequels"));
+    Files.writeString(prequelMdDir.resolve("00_intro.md"), "# Prequels Intro\n");
+
+    HtmlBookReportGenerator generator =
+        new HtmlBookReportGenerator(markdownDir, jsonReportDir, htmlOutputDir);
+    generator.generate();
+
+    String navJson = Files.readString(htmlOutputDir.resolve("report-nav.json"));
+    int ch1Index = navJson.indexOf("01_chapter");
+    int prequelIndex = navJson.indexOf("00_prequels");
+    assertTrue(
+        ch1Index < prequelIndex,
+        "Markdown-only prequel chapter must appear after regular chapters");
+  }
 }

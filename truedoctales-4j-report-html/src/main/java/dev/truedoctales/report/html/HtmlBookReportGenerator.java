@@ -11,7 +11,9 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -174,26 +176,62 @@ public class HtmlBookReportGenerator {
       }
     }
 
-    // 2. Chapter directories (sorted — prequels (00_) are moved behind all regular chapters)
-    List<Path> chapterDirs = new ArrayList<>();
+    // 2. Chapter directories — collect from JSON and augment with markdown-only chapters
+    // (chapters that have a 00_intro.md in the markdown directory but no JSON directory)
+    Set<String> jsonChapterNameSet = new HashSet<>();
+    List<String> allChapterDirNames = new ArrayList<>();
     try (var stream = Files.list(jsonReportDirectory)) {
-      stream.filter(Files::isDirectory).sorted().forEach(chapterDirs::add);
+      stream
+          .filter(Files::isDirectory)
+          .sorted()
+          .map(p -> p.getFileName().toString())
+          .forEach(
+              name -> {
+                jsonChapterNameSet.add(name);
+                allChapterDirNames.add(name);
+              });
     }
-    // Move prequel directories (starting with "00_") to the end of the list
-    List<Path> prequelDirs =
-        chapterDirs.stream().filter(p -> p.getFileName().toString().startsWith("00_")).toList();
-    List<Path> regularDirs =
-        chapterDirs.stream().filter(p -> !p.getFileName().toString().startsWith("00_")).toList();
-    chapterDirs = new ArrayList<>(regularDirs);
-    chapterDirs.addAll(prequelDirs);
 
-    for (Path chapterDir : chapterDirs) {
-      String chapterTitle = readJsonField(chapterDir.resolve("meta.json"), "title");
+    // Include markdown-only chapters (no JSON directory) that have a 00_intro.md
+    if (markdownDirectory != null && Files.isDirectory(markdownDirectory)) {
+      List<String> mdOnlyNames = new ArrayList<>();
+      try (var stream = Files.list(markdownDirectory)) {
+        stream
+            .filter(Files::isDirectory)
+            .sorted()
+            .map(p -> p.getFileName().toString())
+            .filter(name -> !jsonChapterNameSet.contains(name))
+            .filter(
+                name -> Files.isRegularFile(markdownDirectory.resolve(name).resolve("00_intro.md")))
+            .forEach(mdOnlyNames::add);
+      }
+      allChapterDirNames.addAll(mdOnlyNames);
+      // Re-sort so markdown-only chapters are interleaved in alphabetical order
+      allChapterDirNames.sort(Comparator.naturalOrder());
+    }
+
+    // Move prequel directories (starting with "00_") to the end of the list
+    List<String> prequelNames =
+        allChapterDirNames.stream().filter(name -> name.startsWith("00_")).toList();
+    List<String> regularNames =
+        allChapterDirNames.stream().filter(name -> !name.startsWith("00_")).toList();
+    List<String> chapterDirNames = new ArrayList<>(regularNames);
+    chapterDirNames.addAll(prequelNames);
+
+    for (String chapterDirName : chapterDirNames) {
+      Path jsonChapterDir =
+          jsonChapterNameSet.contains(chapterDirName)
+              ? jsonReportDirectory.resolve(chapterDirName)
+              : null;
+
+      String chapterTitle =
+          jsonChapterDir != null
+              ? readJsonField(jsonChapterDir.resolve("meta.json"), "title")
+              : null;
       if (chapterTitle == null) {
-        chapterTitle = toLabel(chapterDir.getFileName().toString());
+        chapterTitle = toLabel(chapterDirName);
       }
 
-      String chapterDirName = chapterDir.getFileName().toString();
       Path introMd = findIntroMarkdown(chapterDirName);
       String introHtmlPath = introMd != null ? chapterDirName + "/00_intro.html" : null;
 
@@ -211,46 +249,50 @@ public class HtmlBookReportGenerator {
                 false));
       }
 
-      // Story JSON files (sorted, skip meta.json and any non-json)
-      List<Path> storyJsonFiles = new ArrayList<>();
-      try (var stream = Files.list(chapterDir)) {
-        stream
-            .filter(
-                p ->
-                    p.getFileName().toString().endsWith(".json")
-                        && !p.getFileName().toString().equals("meta.json"))
-            .sorted()
-            .forEach(storyJsonFiles::add);
-      }
-
-      for (Path storyJson : storyJsonFiles) {
-        String storyPathField = readJsonField(storyJson, "path");
-        String storyTitle = readJsonField(storyJson, "title");
-        if (storyTitle == null) {
-          storyTitle = toLabel(storyJson.getFileName().toString().replace(".json", ""));
+      // Story JSON files (sorted, skip meta.json and any non-json) — only if JSON dir exists
+      if (jsonChapterDir != null) {
+        List<Path> storyJsonFiles = new ArrayList<>();
+        try (var stream = Files.list(jsonChapterDir)) {
+          stream
+              .filter(
+                  p ->
+                      p.getFileName().toString().endsWith(".json")
+                          && !p.getFileName().toString().equals("meta.json"))
+              .sorted()
+              .forEach(storyJsonFiles::add);
         }
 
-        String storyStatus = readStoryStatus(storyJson);
-        boolean storyHasErrors = "FAILURE".equals(storyStatus) || "ERROR".equals(storyStatus);
+        for (Path storyJson : storyJsonFiles) {
+          String storyPathField = readJsonField(storyJson, "path");
+          String storyTitle = readJsonField(storyJson, "title");
+          if (storyTitle == null) {
+            storyTitle = toLabel(storyJson.getFileName().toString().replace(".json", ""));
+          }
 
-        String mdRelativePath =
-            storyPathField != null
-                ? storyPathField
-                : chapterDirName + "/" + storyJson.getFileName().toString().replace(".json", ".md");
-        String htmlRelativePath = mdRelativePath.replaceAll("\\.md$", ".html");
-        Path mdSource = resolveMarkdownSource(mdRelativePath);
+          String storyStatus = readStoryStatus(storyJson);
+          boolean storyHasErrors = "FAILURE".equals(storyStatus) || "ERROR".equals(storyStatus);
 
-        entries.add(
-            new NavEntry(
-                mdSource,
-                mdRelativePath,
-                htmlRelativePath,
-                storyTitle,
-                false,
-                chapterDirName,
-                chapterTitle,
-                storyStatus,
-                storyHasErrors));
+          String mdRelativePath =
+              storyPathField != null
+                  ? storyPathField
+                  : chapterDirName
+                      + "/"
+                      + storyJson.getFileName().toString().replace(".json", ".md");
+          String htmlRelativePath = mdRelativePath.replaceAll("\\.md$", ".html");
+          Path mdSource = resolveMarkdownSource(mdRelativePath);
+
+          entries.add(
+              new NavEntry(
+                  mdSource,
+                  mdRelativePath,
+                  htmlRelativePath,
+                  storyTitle,
+                  false,
+                  chapterDirName,
+                  chapterTitle,
+                  storyStatus,
+                  storyHasErrors));
+        }
       }
     }
 
