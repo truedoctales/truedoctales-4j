@@ -243,6 +243,7 @@ The `fairy-doc-tales/` directory contains the living documentation for this proj
 | `03_squirrel-dev` | The squirrel developer and undocumented behavior |
 | `04_product-queen` | Product owner perspective and specification confidence |
 | `05_true-doc-tales-success` | Full end-to-end success story |
+| `06_the_spring_developer` | Spring integration with plot beans managed by the application context |
 
 ---
 
