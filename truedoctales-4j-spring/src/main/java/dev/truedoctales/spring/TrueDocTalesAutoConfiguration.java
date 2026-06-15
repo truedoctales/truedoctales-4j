@@ -6,6 +6,7 @@ import dev.truedoctales.api.execute.StoryExecutionListener;
 import dev.truedoctales.execution.execute.SimplePlotRegistry;
 import dev.truedoctales.execution.jupiter.JupiterStoryTestExecutor;
 import java.util.Comparator;
+import java.util.Map;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
@@ -21,7 +22,7 @@ public class TrueDocTalesAutoConfiguration {
     SimplePlotRegistry registry = new SimplePlotRegistry();
     applicationContext.getBeansWithAnnotation(Plot.class).entrySet().stream()
         .sorted(Comparator.comparing(entry -> entry.getKey()))
-        .map(entry -> entry.getValue())
+        .map(Map.Entry::getValue)
         .forEach(registry::register);
     return registry;
   }
