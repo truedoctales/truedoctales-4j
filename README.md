@@ -138,6 +138,68 @@ public class StoryBookTest {
 }
 ```
 
+### Spring Boot quick start
+
+For Spring Boot tests, add the Spring integration module instead of manually creating a
+`SimplePlotRegistry`:
+
+```xml
+<dependency>
+  <groupId>dev.truedoctales</groupId>
+  <artifactId>truedoctales-4j-spring</artifactId>
+  <version>0.0.1</version>
+  <scope>test</scope>
+</dependency>
+```
+
+Then define plots as Spring beans in your test source set. The auto-configuration registers every
+bean annotated with `@Plot` in the True Doc Tales `PlotRegistry`:
+
+```java
+@TestConfiguration(proxyBeanMethods = false)
+class PlotBeans {
+
+    @Bean
+    GreetingPlot greetingPlot(GreetingService greetingService) {
+        return new GreetingPlot(greetingService);
+    }
+}
+```
+
+A Spring Boot story test can use the Spring-managed registry and keep the story template
+parameters from True Doc Tales:
+
+```java
+@ClassTemplate
+@SpringBootTest
+@ExtendWith({SpringExtension.class, StoryTestProvider.class})
+@StoryBook(path = "src/test/resources/book-of-stories", listener = {JsonStoryListener.class})
+class SpringStoryBookTest {
+
+    private final StoryExecutionListener listener;
+    private final StoryBookModel book;
+    private final Path storyPath;
+
+    @Autowired
+    private PlotRegistry plotRegistry;
+
+    SpringStoryBookTest(StoryExecutionListener listener, StoryBookModel book, Path storyPath) {
+        this.listener = listener;
+        this.book = book;
+        this.storyPath = storyPath;
+    }
+
+    @TestFactory
+    Stream<DynamicNode> runStory() {
+        return new JupiterStoryTestExecutor(plotRegistry, listener)
+                .buildDynamicTests(book, storyPath);
+    }
+}
+```
+
+See `truedoctales-4j-sample-spring` for a complete runnable sample with plot beans under
+`src/test/java`.
+
 ### 5. Generate the enriched report
 
 ```bash
@@ -162,9 +224,11 @@ Enriched Markdown (with ✅ / ❌ badges) is written to `target/truedoctales-mar
 | `truedoctales-4j-report-json` | JSON execution listener |
 | `truedoctales-4j-report-html` | HTML report generator |
 | `truedoctales-4j-report-markdown` | Enriched Markdown report generator |
+| `truedoctales-4j-spring` | Spring Boot auto-configuration that registers `@Plot` beans |
 | `truedoctales-4j-maven-plugin` | Maven plugin that merges execution results into book Markdown |
 | `truedoctales-4j-sample-domain` | Example domain model (heroes, quests, sprints…) |
 | `truedoctales-4j-sample-jupiter` | End-to-end sample showing all framework features |
+| `truedoctales-4j-sample-spring` | Spring Boot sample with plots defined as test-scope Spring beans |
 
 ---
 
