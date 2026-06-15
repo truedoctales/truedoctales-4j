@@ -21,7 +21,7 @@ public class TrueDocTalesAutoConfiguration {
   public PlotRegistry trueDocTalesPlotRegistry(ApplicationContext applicationContext) {
     SimplePlotRegistry registry = new SimplePlotRegistry();
     applicationContext.getBeansWithAnnotation(Plot.class).entrySet().stream()
-        .sorted(Comparator.comparing(entry -> entry.getKey()))
+        .sorted(Comparator.comparing(Map.Entry::getKey))
         .map(Map.Entry::getValue)
         .forEach(registry::register);
     return registry;
