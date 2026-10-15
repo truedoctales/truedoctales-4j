@@ -60,4 +60,28 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <!-- Generate enriched Markdown report at the end of the default lifecycle.
+           Tests run in the 'test' phase, producing JSON + Markdown execution
+           results in target/truedoctales-report/.  The report plugin then merges
+           those results with the original book in the 'verify' phase.
+           Usage: mvn clean verify -->
+      <plugin>
+        <groupId>dev.truedoctales</groupId>
+        <artifactId>truedoctales-4j-maven-plugin</artifactId>
+        <version>${project.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>report</goal>
+            </goals>
+            <phase>verify</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>

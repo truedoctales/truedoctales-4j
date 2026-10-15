@@ -37,6 +37,18 @@ class SimplePlotRegistryTest {
   }
 
   @Test
+  void register_shouldUseDeclaredClassForManagedProxy() throws Exception {
+    ManagedTestPlot plot = new ManagedTestPlot();
+
+    registry.register(plot, TestPlot.class);
+
+    assertEquals("TestPlot", registry.getBindings().iterator().next().plotId());
+    StepBinding step = new StepBinding("TestPlot", "Simple binding", InputType.SEQUENCE, "");
+    registry.invoke(StepExecution.simplCall(0, step, new StepCall("TestPlot", "Simple binding")));
+    assertTrue(plot.simpleCalled);
+  }
+
+  @Test
   void register_shouldThrowWhenMissingPlotAnnotation() {
     // Arrange
     Object notAPlot = new Object();
@@ -274,6 +286,8 @@ class SimplePlotRegistryTest {
       lastParam = param;
     }
   }
+
+  public static class ManagedTestPlot extends TestPlot {}
 
   @Plot("AnotherPlot")
   public static class AnotherTestPlot {
