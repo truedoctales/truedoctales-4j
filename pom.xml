@@ -35,10 +35,12 @@
     <module>truedoctales-4j-report-html</module>
     <module>truedoctales-4j-report-markdown</module>
     <module>truedoctales-4j-spring</module>
+    <module>truedoctales-4j-quarkus</module>
     <module>truedoctales-4j-maven-plugin</module>
     <module>truedoctales-4j-sample-domain</module>
     <module>truedoctales-4j-sample-jupiter</module>
     <module>truedoctales-4j-sample-spring</module>
+    <module>truedoctales-4j-sample-quarkus</module>
   </modules>
 
   <scm>

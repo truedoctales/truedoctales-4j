@@ -131,15 +131,28 @@ public class SimplePlotRegistry implements PlotRegistry {
   /// @return this registry for fluent chaining
   /// @throws IllegalArgumentException if the plot is not annotated with @Plot
   public SimplePlotRegistry register(Object plot) {
+    return register(plot, plot.getClass());
+  }
+
+  /// Registers a plot instance using the class that declares its plot annotations.
+  ///
+  /// This overload supports container-managed proxies whose runtime classes do not carry the
+  /// annotations declared on the bean class.
+  ///
+  /// @param plot the plot instance
+  /// @param plotClass the class that declares the plot and step annotations
+  /// @return this registry for fluent chaining
+  /// @throws IllegalArgumentException if the plot class is not annotated with @Plot
+  public SimplePlotRegistry register(Object plot, Class<?> plotClass) {
     String plotName =
-        Optional.ofNullable(plot.getClass().getAnnotation(Plot.class))
+        Optional.ofNullable(plotClass.getAnnotation(Plot.class))
             .map(Plot::value)
             .orElseThrow(
                 () ->
                     new IllegalArgumentException(
                         "Plot instance must be annotated with @Plot: " + plot));
 
-    Arrays.stream(plot.getClass().getMethods())
+    Arrays.stream(plotClass.getMethods())
         .filter(m -> m.isAnnotationPresent(Step.class))
         .forEach(m -> registerStepMethod(plot, plotName, m));
     return this;

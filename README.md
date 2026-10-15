@@ -200,6 +200,43 @@ class SpringStoryBookTest {
 See `truedoctales-4j-sample-spring` for a complete runnable sample with plot beans under
 `src/test/java`.
 
+### Quarkus quick start
+
+For Quarkus tests, add the Quarkus integration module and Quarkus test support. Import the
+Quarkus platform BOM in `dependencyManagement` (as in a generated Quarkus project) to manage the
+Quarkus dependency version:
+
+```xml
+<dependency>
+  <groupId>dev.truedoctales</groupId>
+  <artifactId>truedoctales-4j-quarkus</artifactId>
+  <version>0.0.1</version>
+  <scope>test</scope>
+</dependency>
+<dependency>
+  <groupId>io.quarkus</groupId>
+  <artifactId>quarkus-junit5</artifactId>
+  <scope>test</scope>
+</dependency>
+```
+
+Annotate plot beans with both `@ApplicationScoped` and `@Plot`. The Quarkus integration
+automatically registers CDI-managed plots and provides the True Doc Tales registry and executor:
+
+```java
+@ApplicationScoped
+@Plot("Greeting")
+public class GreetingPlot {
+
+    @Step("Say hello")
+    public void sayHello() {
+        // Implement the step.
+    }
+}
+```
+
+See `truedoctales-4j-sample-quarkus` for a complete runnable sample using Quarkus CDI beans.
+
 ### 5. Generate the enriched report
 
 ```bash
@@ -225,10 +262,12 @@ Enriched Markdown (with ✅ / ❌ badges) is written to `target/truedoctales-mar
 | `truedoctales-4j-report-html` | HTML report generator |
 | `truedoctales-4j-report-markdown` | Enriched Markdown report generator |
 | `truedoctales-4j-spring` | Spring Boot auto-configuration that registers `@Plot` beans |
+| `truedoctales-4j-quarkus` | Quarkus CDI integration that registers `@Plot` beans |
 | `truedoctales-4j-maven-plugin` | Maven plugin that merges execution results into book Markdown |
 | `truedoctales-4j-sample-domain` | Example domain model (heroes, quests, sprints…) |
 | `truedoctales-4j-sample-jupiter` | End-to-end sample showing all framework features |
 | `truedoctales-4j-sample-spring` | Spring Boot sample with plots defined as test-scope Spring beans |
+| `truedoctales-4j-sample-quarkus` | Quarkus sample with plots defined as CDI beans |
 
 ---
 
