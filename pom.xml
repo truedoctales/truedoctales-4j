@@ -62,7 +62,7 @@
   <properties>
     <flatten-maven-plugin.version>1.8.0</flatten-maven-plugin.version>
     <google-java-format.version>1.33.0</google-java-format.version>
-    <jackson.version>2.21.1</jackson.version>
+    <jackson.version>2.22.3</jackson.version>
     <jacoco.version>0.8.14</jacoco.version>
     <maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
     <maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
