@@ -248,6 +248,20 @@ mvn site
 ```
 
 Enriched Markdown (with ✅ / ❌ badges) is written to `target/truedoctales-markdown/`.
+The JSON report's book-level `meta.json` also records the Maven project version, which is shown
+in the generated HTML report. This parent POM passes the Maven version to tests through Surefire.
+Projects using the listener outside this parent POM can configure the same property:
+
+```xml
+<plugin>
+  <artifactId>maven-surefire-plugin</artifactId>
+  <configuration>
+    <systemPropertyVariables>
+      <truedoctales.project.version>${project.version}</truedoctales.project.version>
+    </systemPropertyVariables>
+  </configuration>
+</plugin>
+```
 
 ---
 

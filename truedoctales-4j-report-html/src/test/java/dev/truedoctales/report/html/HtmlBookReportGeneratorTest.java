@@ -55,6 +55,24 @@ class HtmlBookReportGeneratorTest {
   }
 
   @Test
+  void generate_shouldShowTestProjectVersionFromJsonMetadata() throws IOException {
+    Files.writeString(markdownDir.resolve("00_intro.md"), "# Book Intro\n\nWelcome.");
+    Path jsonReportDir = tempDir.resolve("report");
+    Files.createDirectories(jsonReportDir);
+    Files.writeString(
+        jsonReportDir.resolve("meta.json"),
+        "{\"title\":\"Book\",\"hasIntro\":true,\"version\":\"1.2<&\"}");
+
+    HtmlBookReportGenerator generator =
+        new HtmlBookReportGenerator(markdownDir, jsonReportDir, htmlOutputDir);
+    generator.generate();
+
+    String shellHtml = Files.readString(htmlOutputDir.resolve("index.html"));
+    assertTrue(shellHtml.contains("Test project version: 1.2&lt;&amp;"));
+    assertFalse(shellHtml.contains("__PROJECT_VERSION__"));
+  }
+
+  @Test
   void generate_shouldRenderMarkdownAsHtml() throws IOException {
     String markdown =
         """

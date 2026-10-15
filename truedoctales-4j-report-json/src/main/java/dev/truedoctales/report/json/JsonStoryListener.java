@@ -187,7 +187,9 @@ public class JsonStoryListener extends PersistStoryListener {
       throws IOException {
     Path metadataPath = outputDirectory.resolve("meta.json");
     objectMapper.writeValue(
-        metadataPath.toFile(), new BookMetadata(bookResult.getTitle(), hasIntro));
+        metadataPath.toFile(),
+        new BookMetadata(
+            bookResult.getTitle(), hasIntro, System.getProperty("truedoctales.project.version")));
   }
 
   private void writeChapterMetadata(Path outputChapterDir, ChapterExecutionResult chapterResult)
@@ -209,7 +211,7 @@ public class JsonStoryListener extends PersistStoryListener {
   }
 
   /// Simple record to hold book metadata.
-  record BookMetadata(String title, boolean hasIntro) {}
+  record BookMetadata(String title, boolean hasIntro, String version) {}
 
   record ChapterMeta(Integer number, String path, String title) {}
 
