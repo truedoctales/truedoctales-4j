@@ -250,6 +250,15 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <systemPropertyVariables>
+            <truedoctales.project.version>${project.version}</truedoctales.project.version>
+          </systemPropertyVariables>
+        </configuration>
+      </plugin>
       <!-- Resolve ${revision} in POMs before deploy so staged .pom files
            contain the real version instead of the placeholder.
            Required for Maven Central PomChecker validation. -->

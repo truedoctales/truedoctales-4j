@@ -633,8 +633,26 @@ public class HtmlBookReportGenerator {
   private void generateIndexHtml(List<NavEntry> navigation) throws IOException {
     String defaultPage = navigation.getFirst().htmlRelativePath();
     String shellHtml = readResourceAsString(TEMPLATE_RESOURCE);
+    String projectVersion =
+        jsonReportDirectory != null
+            ? readJsonField(jsonReportDirectory.resolve("meta.json"), "version")
+            : null;
+    String projectVersionHtml =
+        projectVersion == null || projectVersion.isBlank()
+            ? ""
+            : "<span class=\"project-version\">Test project version: "
+                + escapeHtml(projectVersion)
+                + "</span><br>\n      ";
+    shellHtml = shellHtml.replace("__PROJECT_VERSION__", projectVersionHtml);
     Files.writeString(htmlOutputDirectory.resolve("index.html"), shellHtml);
     copyJsAsset(defaultPage);
+  }
+
+  private String escapeHtml(String text) {
+    return text.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace("\"", "&quot;");
   }
 
   /// Returns a lightweight HTML fragment containing only the {@code <article>} element.

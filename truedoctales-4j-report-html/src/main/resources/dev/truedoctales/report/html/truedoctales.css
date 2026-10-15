@@ -600,6 +600,7 @@ article code {
   color: var(--bs-body-color);
   font-size: 0.85rem;
 }
+.report-footer .project-version { font-size: 0.75rem; }
 .footer-links {
   display: inline-flex;
   align-items: center;
