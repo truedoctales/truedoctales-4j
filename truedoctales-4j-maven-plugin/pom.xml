@@ -19,7 +19,7 @@
   <properties>
     <asm.version>9.8</asm.version>
     <maven-plugin-annotations.version>3.15.2</maven-plugin-annotations.version>
-    <maven-plugin-api.version>3.9.14</maven-plugin-api.version>
+    <maven-plugin-api.version>3.10.0</maven-plugin-api.version>
     <maven-plugin-plugin.version>3.16.0</maven-plugin-plugin.version>
   </properties>
 
